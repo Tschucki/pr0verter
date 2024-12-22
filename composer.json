@@ -10,6 +10,11 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-bcmath": "*",
+        "ext-intl": "*",
+        "ext-pcntl": "*",
+        "ext-sodium": "*",
+        "ext-zip": "*",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^11.31",
         "laravel/horizon": "^5.30",
@@ -19,6 +24,7 @@
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest",
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.0",
         "laravel/pail": "^1.1",
