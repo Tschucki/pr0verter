@@ -42,8 +42,23 @@ const updateConversionWithProgress = (progressEvent) => {
   });
 };
 
+const updateConversionWithDownloadProgress = (downloadProgressEvent) => {
+  allConversions.value = allConversions.value.map((conversion) => {
+    if (conversion.id === downloadProgressEvent.conversionId) {
+      if (
+        downloadProgressEvent.speed !== null &&
+        downloadProgressEvent.speed !== ''
+      ) {
+        conversion.downloadProgressEvent = downloadProgressEvent;
+      }
+    }
+    return conversion;
+  });
+};
+
 const updateConversion = (conversion) => {
   allConversions.value = allConversions.value.map((c) => {
+    console.log(c);
     if (c.id === conversion.id) {
       c = { ...c, ...conversion };
     }
@@ -56,6 +71,10 @@ onMounted(() => {
   Echo.channel(`session.${sessionId}`)
     .listen('ConversionProgressEvent', (event) => {
       updateConversionWithProgress(event);
+    })
+    .listen('DownloadProgress', (event) => {
+      console.log(event);
+      updateConversionWithDownloadProgress(event);
     })
     .listen('ConversionUpdated', (event) => {
       console.log(event);
@@ -76,9 +95,13 @@ onMounted(() => {
         :key="idx"
         :class="cn($attrs.class ?? '')">
         <CardHeader>
-          <CardTitle class="truncate">{{ conversion.file.filename }}</CardTitle>
-          <CardDescription
-            >Hochgeladen {{ conversion.file.created_at_diff }}
+          <CardTitle class="truncate"
+            >{{ conversion.file?.filename ?? 'Noch nicht vorhanden' }}
+          </CardTitle>
+          <CardDescription>
+            <span v-if="conversion.file?.created_at_diff"
+              >Hochgeladen {{ conversion.file.created_at_diff }}</span
+            >
           </CardDescription>
         </CardHeader>
         <CardContent class="grid gap-4">
@@ -141,6 +164,18 @@ onMounted(() => {
                       ">
                       <br />
                       Fortschritt: {{ conversion.progressEvent.percentage }}%
+                    </strong>
+                    <strong
+                      v-if="
+                        step.status === 'downloading' &&
+                        conversion.downloadProgressEvent
+                      ">
+                      <br />
+                      Fortschritt:
+                      {{ conversion.downloadProgressEvent.percentage }}<br />
+                      Geschwindigkeit:
+                      {{ conversion.downloadProgressEvent.speed }}<br />
+                      Verbleibend: {{ conversion.downloadProgressEvent.eta }}
                     </strong>
                   </StepperDescription>
                 </div>

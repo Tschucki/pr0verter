@@ -208,6 +208,19 @@ return [
             'timeout' => 1200,
             'nice' => 1,
         ],
+        'downloader' => [
+            'connection' => 'redis',
+            'queue' => ['downloader'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 300,
+            'tries' => 1,
+            'timeout' => 120,
+            'nice' => 1,
+        ],
     ],
 
     'environments' => [
@@ -222,6 +235,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'downloader' => [
+                'maxProcesses' => 2,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
@@ -229,6 +247,9 @@ return [
                 'maxProcesses' => 3,
             ],
             'converter' => [
+                'maxProcesses' => 1,
+            ],
+            'downloader' => [
                 'maxProcesses' => 1,
             ],
         ],

@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Models\Conversion;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -42,9 +41,7 @@ class HandleInertiaRequests extends Middleware
             'session' => [
                 'id' => $request->session()->getId(),
             ],
-            'conversions' => fn () => Conversion::whereHas('file', static function (Builder $query) use ($request) {
-                $query->where('session_id', $request->session()->getId());
-            })->select('id')->get(),
+            'conversions' => fn () => Conversion::where('session_id', $request->session()->getId())->select('id')->get(),
         ]);
     }
 }

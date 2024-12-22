@@ -12,8 +12,8 @@ return new class extends Migration
     {
         Schema::create('conversions', static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('conversion_presets')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignUuid('file_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('session_id')->unique();
+            $table->foreignUuid('file_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('status')->default('pending');
             $table->boolean('downloadable')->default(false);
             $table->boolean('keep_resolution')->default(false);
@@ -25,7 +25,14 @@ return new class extends Migration
             $table->unsignedInteger('trim_start')->nullable();
             $table->unsignedInteger('trim_end')->nullable();
             $table->unsignedInteger('max_size')->nullable();
+            $table->text('url')->nullable();
             $table->timestamps();
+
+            $table->foreign('session_id')
+                ->references('id')
+                ->on('sessions')
+                ->cascadeOnDelete()
+                ->cascadeOnDelete();
         });
     }
 

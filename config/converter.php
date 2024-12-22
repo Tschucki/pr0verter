@@ -10,4 +10,9 @@ return [
     'default_format_operations' => [
 
     ],
+    'binaries' => [
+        'ffmpeg' => config('laravel-ffmpeg.ffmpeg.binaries'),
+        'ffprobe' => config('laravel-ffmpeg.ffprobe.binaries'),
+        'yt-dlp' => env('YT_DLP_PATH', 'yt-dlp'),
+    ],
 ];

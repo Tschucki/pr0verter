@@ -54,7 +54,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 const formSchema = toTypedSchema(
   z.object({
     file: z.any().optional(),
-    url: z.string().url('Keine valide URL').optional(),
+    url: z.string().url('Keine valide URL').optional().default(''),
     // keepResolution: z.boolean().default(false),
     audio: z.boolean().default(true),
     audioQuality: z

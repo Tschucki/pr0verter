@@ -6,10 +6,11 @@ use App\Models\Conversion;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ConversionProgressEvent implements ShouldBroadcast
+class ConversionProgressEvent implements ShouldBroadcast, ShouldQueue
 {
     use Dispatchable;
     use InteractsWithSockets;
@@ -35,7 +36,7 @@ class ConversionProgressEvent implements ShouldBroadcast
         $this->percentage = $percentage;
         $this->remaining = $remaining;
         $this->rate = $rate;
-        $this->sessionId = Conversion::find($conversionId)->file->session_id;
+        $this->sessionId = Conversion::find($conversionId)->session_id;
     }
 
     public function broadcastOn(): array

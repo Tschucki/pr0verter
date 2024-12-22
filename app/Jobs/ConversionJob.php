@@ -7,6 +7,7 @@ use App\Models\Conversion;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,7 @@ use Throwable;
 
 class ConversionJob implements ShouldBeUnique, ShouldQueue
 {
+    use Dispatchable;
     use Queueable;
 
     private string $conversionId;

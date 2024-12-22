@@ -33,7 +33,7 @@ onMounted(() => {
       toast.error('Konvertierung fehlgeschlagen');
     })
     .listen('ConversionProgressEvent', (event) => {
-      toast.loading('Konvertierung Fortschritt: ' + event.percentage + '%');
+      toast.info('Konvertierung Fortschritt: ' + event.percentage + '%');
     });
 });
 

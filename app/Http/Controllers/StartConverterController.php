@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Conversion\ConversionSettings;
+use App\Enums\ConversionStatus;
 use App\Events\FileUploadFailed;
 use App\Events\FileUploadSuccessful;
 use App\Events\PreviousFilesDeleted;
@@ -28,29 +29,32 @@ class StartConverterController extends Controller
 
         $this->deleteOldFiles();
 
-        $file = $this->handleUploadedFile($request);
+        if ($request->hasFile('file')) {
+            $file = $this->handleUploadedFile($request);
+        }
 
         $conversionSettings = ConversionSettings::fromRequest($validated);
 
         $conversion = Conversion::create([
             ...$conversionSettings->toArray(),
-            'file_id' => $file->id,
+            'status' => ConversionStatus::PENDING,
+            'session_id' => $this->sessionId,
+            'file_id' => $file->id ?? null,
+            'url' => $validated['url'] ?? null,
         ]);
 
         //ConversionJob::dispatchSync($conversion->id);
 
-        ConversionJob::dispatch($conversion->id)->onQueue('converter');
+        if ($request->hasFile('file')) {
+            ConversionJob::dispatch($conversion->id)->onQueue('converter');
+        }
 
         return redirect()->route('conversions.list');
     }
 
     private function handleUploadedFile(StartConverterRequest $request): File
     {
-        $file = null;
-
-        if ($request->hasFile('file')) {
-            $file = $this->storeUploadedFile($request->file('file'));
-        }
+        $file = $this->storeUploadedFile($request->file('file'));
 
         if ($file === null) {
             FileUploadFailed::dispatch($this->sessionId);
@@ -87,6 +91,7 @@ class StartConverterController extends Controller
     {
         $countOldFiles = File::where('session_id', $this->sessionId)->count();
 
+        Conversion::where('session_id', $this->sessionId)->delete();
         File::where('session_id', $this->sessionId)->delete();
 
         if ($countOldFiles > 0) {
