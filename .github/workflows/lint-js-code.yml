@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'resources'
+    branches:
+      - main
   pull_request:
     paths:
       - 'resources'

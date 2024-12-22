@@ -5,6 +5,8 @@ on:
     paths:
       - 'composer.json'
       - 'composer-lock.json'
+    branches:
+      - main
   pull_request:
     paths:
       - 'composer.json'
