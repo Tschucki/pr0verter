@@ -32,6 +32,11 @@ class Conversion extends Model
 
     protected $casts = [
         'audio' => 'boolean',
+        'interpolation' => 'boolean',
+        'auto_crop' => 'boolean',
+        'max_size' => 'integer',
+        'audio_quality' => 'float',
+        'watermark' => 'boolean',
         'downloadable' => 'boolean',
     ];
 
@@ -62,6 +67,15 @@ class Conversion extends Model
             ],
             [
                 'order' => 2,
+                'completed' => $this->status === ConversionStatus::PROCESSING || $this->status === ConversionStatus::PREPARING || $this->status === ConversionStatus::FINISHED || $this->status === ConversionStatus::FAILED || $this->status === ConversionStatus::CANCELED,
+                'current_step' => $this->status === ConversionStatus::DOWNLOADING,
+                'status' => ConversionStatus::DOWNLOADING,
+                'title' => 'Download läuft',
+                'description' => 'Es wird versucht das Video herunterzuladen.',
+                'visible' => $this->url !== null,
+            ],
+            [
+                'order' => 3,
                 'completed' => $this->status === ConversionStatus::PROCESSING || $this->status === ConversionStatus::FINISHED || $this->status === ConversionStatus::FAILED || $this->status === ConversionStatus::CANCELED,
                 'current_step' => $this->status === ConversionStatus::PREPARING,
                 'status' => ConversionStatus::PREPARING,
@@ -70,7 +84,7 @@ class Conversion extends Model
                 'visible' => true,
             ],
             [
-                'order' => 3,
+                'order' => 4,
                 'completed' => $this->status === ConversionStatus::FINISHED || $this->status === ConversionStatus::FAILED || $this->status === ConversionStatus::CANCELED,
                 'current_step' => $this->status === ConversionStatus::PROCESSING,
                 'status' => ConversionStatus::PROCESSING,
@@ -79,7 +93,7 @@ class Conversion extends Model
                 'visible' => true,
             ],
             [
-                'order' => 4,
+                'order' => 5,
                 'completed' => $this->status === ConversionStatus::FINISHED,
                 'current_step' => $this->status === ConversionStatus::FINISHED,
                 'status' => ConversionStatus::FINISHED,
@@ -88,7 +102,7 @@ class Conversion extends Model
                 'visible' => $this->status !== 'cancelled' && $this->status !== ConversionStatus::FAILED,
             ],
             [
-                'order' => 5,
+                'order' => 6,
                 'completed' => $this->status === ConversionStatus::FAILED,
                 'current_step' => $this->status === ConversionStatus::FAILED,
                 'status' => ConversionStatus::FAILED,
@@ -97,7 +111,7 @@ class Conversion extends Model
                 'visible' => $this->status === ConversionStatus::FAILED,
             ],
             [
-                'order' => 6,
+                'order' => 7,
                 'completed' => $this->status === ConversionStatus::CANCELED,
                 'current_step' => $this->status === ConversionStatus::CANCELED,
                 'status' => ConversionStatus::CANCELED,

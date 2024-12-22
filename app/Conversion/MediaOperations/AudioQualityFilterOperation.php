@@ -13,7 +13,7 @@ class AudioQualityFilterOperation implements MediaFormatOperation
 {
     public Conversion $conversion;
 
-    private int $currentBitrate;
+    private ?int $currentBitrate;
 
     public function __construct(Conversion $conversion)
     {
@@ -23,6 +23,10 @@ class AudioQualityFilterOperation implements MediaFormatOperation
 
     public function applyToFormat(DefaultVideo $format): DefaultVideo
     {
+        if ($this->conversion->audio === false || $this->currentBitrate === null) {
+            return $format;
+        }
+
         $maxQuality = $this->conversion->audio_quality;
 
         if ($maxQuality < 0 || $maxQuality > 1) {
@@ -44,7 +48,7 @@ class AudioQualityFilterOperation implements MediaFormatOperation
     private function prepareData(): void
     {
         $probe = app(FFProbe::class);
-
+        $this->currentBitrate = null;
         $streams = $probe->streams(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
         foreach ($streams as $stream) {
             if ($stream->get('codec_type') === 'audio') {

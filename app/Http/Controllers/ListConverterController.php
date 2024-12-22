@@ -18,20 +18,16 @@ class ListConverterController extends Controller
 
     public function index(Request $request): Response
     {
-        $conversions = Conversion::with('file')->whereHas('file', function ($query) {
-            $query->where('session_id', $this->sessionId);
-        })->get();
+        $conversions = Conversion::with('file')->where('session_id', $this->sessionId)->get();
 
         return Inertia::render('Converter/List', [
-            'conversions' => $conversions,
+            'conversions' => $conversions->toArray(),
         ]);
     }
 
     public function myConversions(Request $request): array
     {
-        $conversions = Conversion::with('file')->whereHas('file', function ($query) {
-            $query->where('session_id', $this->sessionId);
-        })->get();
+        $conversions = Conversion::with('file')->where('session_id', $this->sessionId)->get();
 
         return $conversions->toArray();
     }

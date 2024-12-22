@@ -4,6 +4,8 @@ namespace App\Enums;
 
 enum ConversionStatus
 {
+    public const DOWNLOADING = 'downloading';
+
     public const PREPARING = 'preparing';
 
     public const PENDING = 'pending';
