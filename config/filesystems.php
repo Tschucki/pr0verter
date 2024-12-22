@@ -37,6 +37,20 @@ return [
             'throw' => false,
         ],
 
+        'conversions' => [
+            'driver' => 'local',
+            'root' => storage_path('app/conversions'),
+            'serve' => true,
+            'throw' => false,
+        ],
+
+        'watermarks' => [
+            'driver' => 'local',
+            'root' => storage_path('app/watermarks'),
+            'serve' => true,
+            'throw' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

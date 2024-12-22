@@ -10,14 +10,20 @@ return new class extends Migration
     {
         Schema::create('conversions', static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('job_batch_id');
-            $table->foreignUuid('conversion_presets')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignUuid('conversion_presets')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignUuid('file_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('status')->default('pending');
             $table->boolean('downloadable')->default(false);
+            $table->boolean('keep_resolution')->default(false);
+            $table->boolean('audio')->default(true);
+            $table->boolean('auto_crop')->default(false);
+            $table->boolean('watermark')->default(false);
+            $table->boolean('interpolation')->default(false);
+            $table->float('audio_quality');
+            $table->unsignedInteger('trim_start')->nullable();
+            $table->unsignedInteger('trim_end')->nullable();
+            $table->unsignedInteger('max_size')->nullable();
             $table->timestamps();
-
-            $table->foreign('job_batch_id')->cascadeOnUpdate()->cascadeOnDelete()->references('id')->on('job_batches');
         });
     }
 

@@ -12,7 +12,10 @@
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^11.31",
+        "laravel/horizon": "^5.30",
+        "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.9",
+        "pbmedia/laravel-ffmpeg": "^8.6",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {

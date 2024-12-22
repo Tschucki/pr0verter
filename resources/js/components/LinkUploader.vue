@@ -7,7 +7,7 @@ const url = ref()
 </script>
 
 <template>
-    <div class="flex h-60 shrink-0 p-4 rounded-md border relative border-dashed">
+    <div class="flex h-60 shrink-0 p-4 rounded-md border">
         <div class="flex flex-col w-full">
             <div class="space-y-1">
                 <Label for="url">URL eingeben</Label>

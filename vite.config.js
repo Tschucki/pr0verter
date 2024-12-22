@@ -21,4 +21,15 @@ export default defineConfig({
             vue: 'vue/dist/vue.esm-bundler.js',
         },
     },
+    build: {
+        cssCodeSplit: true,
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['vue', 'radix-vue'],
+                },
+            },
+        },
+    },
 });

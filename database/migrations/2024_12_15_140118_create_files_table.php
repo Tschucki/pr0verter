@@ -10,13 +10,19 @@ return new class extends Migration
     {
         Schema::create('files', static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('ip_hash')->unique();
+            $table->string('session_id')->unique();
             $table->string('filename');
             $table->string('mime_type');
             $table->string('extension');
             $table->bigInteger('size');
             $table->string('disk');
             $table->timestamps();
+
+            $table->foreign('session_id')
+                ->references('id')
+                ->on('sessions')
+                ->cascadeOnDelete()
+                ->cascadeOnDelete();
         });
     }
 
