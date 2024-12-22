@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'conversions' => fn () => Conversion::whereHas('file', static function (Builder $query) use ($request) {
                 $query->where('session_id', $request->session()->getId());
-            })->get()?->pluck('id'),
+            })->select('id')->get(),
         ]);
     }
 }

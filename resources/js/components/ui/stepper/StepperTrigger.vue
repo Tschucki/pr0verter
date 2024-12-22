@@ -21,14 +21,13 @@ const forwarded = useForwardProps(delegatedProps);
 
 <template>
   <StepperTrigger
-    v-bind="forwarded"
     :class="
       cn(
-        'p-2 flex flex-col items-center text-center gap-2 rounded-md',
-        props.class,
+        'flex flex-col items-center gap-2 rounded-md p-2 text-center',
+        props.class
       )
     "
-  >
+    v-bind="forwarded">
     <slot />
   </StepperTrigger>
 </template>

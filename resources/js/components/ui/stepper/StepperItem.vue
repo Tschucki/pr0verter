@@ -25,14 +25,13 @@ const forwarded = useForwardProps(delegatedProps);
 <template>
   <StepperItem
     v-slot="slotProps"
-    v-bind="forwarded"
     :class="
       cn(
-        'flex items-center gap-2 group data-[disabled]:pointer-events-none',
-        props.class,
+        'group flex items-center gap-2 data-[disabled]:pointer-events-none',
+        props.class
       )
     "
-  >
+    v-bind="forwarded">
     <slot v-bind="slotProps" />
   </StepperItem>
 </template>

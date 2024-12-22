@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'ffmpeg' => [
         'binaries' => env('FFMPEG_BINARIES', '/opt/homebrew/bin/ffmpeg'),

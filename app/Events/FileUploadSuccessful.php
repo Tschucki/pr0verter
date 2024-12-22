@@ -10,14 +10,16 @@ use Illuminate\Queue\SerializesModels;
 
 class FileUploadSuccessful implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(public string $sessionId) {}
 
     public function broadcastOn(): array
     {
         return [
-            new Channel('session.'.$this->sessionId),
+            new Channel('session.' . $this->sessionId),
         ];
     }
 }

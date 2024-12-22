@@ -24,20 +24,6 @@ class MaxSizeOperation implements MediaFormatOperation
         $this->prepareData();
     }
 
-    private function prepareData(): void
-    {
-        $probe = app(FFProbe::class);
-        $this->format = $probe->format(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
-
-        $streams = $probe->streams(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
-        foreach ($streams as $stream) {
-            if ($stream->get('codec_type') === 'audio') {
-                $this->currentAudioBitrate = $stream->get('bit_rate');
-                break;
-            }
-        }
-    }
-
     public function applyToFormat(DefaultVideo $format): DefaultVideo
     {
         // removing 4MB from the max size to make sure the video fits
@@ -63,12 +49,26 @@ class MaxSizeOperation implements MediaFormatOperation
         $input = Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename);
 
         $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
-        Process::run("{$ffmpeg} -y -i $input -c:v libx264 -b:v {$kiloBitRate}k -pass 1 -f null /dev/null");
+        Process::run("{$ffmpeg} -y -i {$input} -c:v libx264 -b:v {$kiloBitRate}k -pass 1 -f null /dev/null");
 
         $format->setKiloBitrate($kiloBitRate);
         $format->setPasses(2);
 
         return $format;
+    }
+
+    private function prepareData(): void
+    {
+        $probe = app(FFProbe::class);
+        $this->format = $probe->format(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
+
+        $streams = $probe->streams(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
+        foreach ($streams as $stream) {
+            if ($stream->get('codec_type') === 'audio') {
+                $this->currentAudioBitrate = $stream->get('bit_rate');
+                break;
+            }
+        }
     }
 
     private function actualDuration()

@@ -26,8 +26,6 @@ const props = defineProps({
 
 <template>
   <Sonner
-    class="toaster group"
-    v-bind="props"
     :toast-options="{
       classes: {
         toast:
@@ -39,5 +37,6 @@ const props = defineProps({
           'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
       },
     }"
-  />
+    class="toaster group"
+    v-bind="props" />
 </template>

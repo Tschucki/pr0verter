@@ -16,7 +16,9 @@ use Illuminate\Support\Str;
 class File extends Model
 {
     /** @use HasFactory<FileFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory;
+
+    use HasUuids;
 
     protected $guarded = [];
 
@@ -46,7 +48,7 @@ class File extends Model
 
     public function convertedFileName(): string
     {
-        return Str::rtrim($this->file->filename, '.'.$this->file->extension).'-converted.mp4';
+        return Str::rtrim($this->filename, '.' . $this->extension) . '-converted.mp4';
     }
 
     public function deleteLocalFile(): void

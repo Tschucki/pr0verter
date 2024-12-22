@@ -24,7 +24,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Conversion extends Model
 {
     /** @use HasFactory<ConversionFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory;
+
+    use HasUuids;
 
     protected $guarded = [];
 

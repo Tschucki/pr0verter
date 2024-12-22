@@ -26,7 +26,7 @@ class StartConverterController extends Controller
     {
         $validated = $request->validated();
 
-        $this->deleteOldFiles($request);
+        $this->deleteOldFiles();
 
         $file = $this->handleUploadedFile($request);
 

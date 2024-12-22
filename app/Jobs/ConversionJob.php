@@ -19,14 +19,14 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
 
     private string $conversionId;
 
-    public function uniqueId(): string
-    {
-        return $this->conversionId;
-    }
-
     public function __construct(string $conversionId)
     {
         $this->conversionId = $conversionId;
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->conversionId;
     }
 
     public function handle(): void
@@ -102,7 +102,6 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         $conversion->update([
             'status' => 'finished',
             'downloadable' => true,
-            'delete_after' => now()->addDays(7),
         ]);
     }
 }

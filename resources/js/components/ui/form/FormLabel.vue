@@ -16,8 +16,7 @@ const { error, formItemId } = useFormField();
 <template>
   <Label
     :class="cn(error && 'text-destructive', props.class)"
-    :for="formItemId"
-  >
+    :for="formItemId">
     <slot />
   </Label>
 </template>

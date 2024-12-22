@@ -21,19 +21,6 @@ class AudioQualityFilterOperation implements MediaFormatOperation
         $this->prepareData();
     }
 
-    private function prepareData(): void
-    {
-        $probe = app(FFProbe::class);
-
-        $streams = $probe->streams(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
-        foreach ($streams as $stream) {
-            if ($stream->get('codec_type') === 'audio') {
-                $this->currentBitrate = $stream->get('bit_rate');
-                break;
-            }
-        }
-    }
-
     public function applyToFormat(DefaultVideo $format): DefaultVideo
     {
         $maxQuality = $this->conversion->audio_quality;
@@ -52,5 +39,18 @@ class AudioQualityFilterOperation implements MediaFormatOperation
         $format->setAudioKiloBitrate($audioBitrateInKiloBits);
 
         return $format;
+    }
+
+    private function prepareData(): void
+    {
+        $probe = app(FFProbe::class);
+
+        $streams = $probe->streams(Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename));
+        foreach ($streams as $stream) {
+            if ($stream->get('codec_type') === 'audio') {
+                $this->currentBitrate = $stream->get('bit_rate');
+                break;
+            }
+        }
     }
 }

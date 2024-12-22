@@ -23,6 +23,16 @@ class AddPr0GrammWatermarkFilterOperation implements MediaFilterOperation
         $this->prepareData();
     }
 
+    public function applyToMedia(MediaOpener $media): MediaOpener
+    {
+        return $media->addWatermark(function (WatermarkFactory $watermark) {
+            $watermark->fromDisk('watermarks')
+                ->open('pr0gramm-logo.png')
+                ->right((int) $this->offsetX)
+                ->bottom((int) $this->offsetY);
+        });
+    }
+
     private function prepareData(): void
     {
         $probe = app(FFProbe::class);
@@ -35,15 +45,5 @@ class AddPr0GrammWatermarkFilterOperation implements MediaFilterOperation
 
         $this->offsetX = $videoStream->get('width') * 0.05;
         $this->offsetY = $videoStream->get('height') * 0.05;
-    }
-
-    public function applyToMedia(MediaOpener $media): MediaOpener
-    {
-        return $media->addWatermark(function (WatermarkFactory $watermark) {
-            $watermark->fromDisk('watermarks')
-                ->open('pr0gramm-logo.png')
-                ->right((int) $this->offsetX)
-                ->bottom((int) $this->offsetY);
-        });
     }
 }

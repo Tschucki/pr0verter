@@ -11,7 +11,9 @@ use Illuminate\Queue\SerializesModels;
 
 class ConversionProgressEvent implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public string $sessionId;
 
@@ -39,7 +41,7 @@ class ConversionProgressEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('session.'.$this->sessionId),
+            new Channel('session.' . $this->sessionId),
         ];
     }
 }

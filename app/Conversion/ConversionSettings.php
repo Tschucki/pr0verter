@@ -31,6 +31,32 @@ class ConversionSettings
         $this->fromArray($settings);
     }
 
+    /**
+     * @throws JsonException
+     */
+    public function __toString(): string
+    {
+        return json_encode($this->toArray(), JSON_THROW_ON_ERROR);
+    }
+
+    public static function fromConversion(Conversion $conversion): ConversionSettings
+    {
+        return new ConversionSettings($conversion->toArray());
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public static function fromString(string $settings): ConversionSettings
+    {
+        return new ConversionSettings(json_decode($settings, true, 512, JSON_THROW_ON_ERROR));
+    }
+
+    public static function fromRequest(array $settings): ConversionSettings
+    {
+        return new ConversionSettings($settings);
+    }
+
     public function fromArray(array $settings): void
     {
         $settings = $this->convertKeysToSnakeCase($settings);
@@ -44,11 +70,6 @@ class ConversionSettings
         $this->autoCrop = $settings['auto_crop'] ?? false;
         $this->watermark = $settings['watermark'] ?? false;
         $this->interpolation = $settings['interpolation'] ?? false;
-    }
-
-    public static function fromConversion(Conversion $conversion): ConversionSettings
-    {
-        return new ConversionSettings($conversion->toArray());
     }
 
     public function toArray(): array
@@ -75,26 +96,5 @@ class ConversionSettings
         }
 
         return $result;
-    }
-
-    /**
-     * @throws JsonException
-     */
-    public function __toString(): string
-    {
-        return json_encode($this->toArray(), JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * @throws JsonException
-     */
-    public static function fromString(string $settings): ConversionSettings
-    {
-        return new ConversionSettings(json_decode($settings, true, 512, JSON_THROW_ON_ERROR));
-    }
-
-    public static function fromRequest(array $settings): ConversionSettings
-    {
-        return new ConversionSettings($settings);
     }
 }
