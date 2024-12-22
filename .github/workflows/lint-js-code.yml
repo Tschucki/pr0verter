@@ -27,7 +27,7 @@ jobs:
         with:
           php_extensions: intl zip sodium pcntl bcmath
           php_version: "8.2"
-          args: --ignore-platform-req=ext-pcntl --ignore-platform-req=ext-bcmath --no-progress --prefer-dist --optimize-autoloader
+          args: --ignore-platform-reqs --optimize-autoloader --no-progress --prefer-dist --optimize-autoloader
 
       - name: Setup Node
         uses: actions/setup-node@v4
