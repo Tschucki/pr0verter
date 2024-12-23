@@ -1,0 +1,35 @@
+{
+  "_vendor-DGIpqfzb.js": {
+    "file": "assets/vendor-DGIpqfzb.js",
+    "name": "vendor"
+  },
+  "resources/assets/pimmelmannjones.svg": {
+    "file": "assets/pimmelmannjones-UhIV0Q9Z.svg",
+    "src": "resources/assets/pimmelmannjones.svg"
+  },
+  "resources/assets/pr0verter.png": {
+    "file": "assets/pr0verter-7PUV2TMe.png",
+    "src": "resources/assets/pr0verter.png"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-CL0fgfCQ.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DJtheE9J.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-DGIpqfzb.js"
+    ],
+    "css": [
+      "assets/app-CL0fgfCQ.css"
+    ],
+    "assets": [
+      "assets/pimmelmannjones-UhIV0Q9Z.svg",
+      "assets/pr0verter-7PUV2TMe.png"
+    ]
+  }
+}
