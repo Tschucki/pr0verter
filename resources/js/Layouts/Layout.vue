@@ -89,11 +89,6 @@ onBeforeUnmount(() => {
                   '!w-full !justify-start',
                 ]">
                 Konvertierungen
-                {{
-                  $page.props.conversions.length
-                    ? ' (' + $page.props.conversions.length + ')'
-                    : ''
-                }}
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>

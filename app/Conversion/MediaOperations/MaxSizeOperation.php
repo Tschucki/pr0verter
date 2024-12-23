@@ -36,10 +36,6 @@ class MaxSizeOperation implements MediaFormatOperation
         $maxSizeInBits = $maxSizeInMB * 1024 * 1024 * 8;
         $videoBitrate = floor(($maxSizeInBits / $duration) - floor($audioBitrateInKiloBits));
 
-        if (($videoBitrate * $duration) >= $this->format->get('bit_rate')) {
-            return $format;
-        }
-
         if ($videoBitrate < 0) {
             $videoBitrate = 0;
         }

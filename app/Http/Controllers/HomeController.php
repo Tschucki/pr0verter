@@ -9,6 +9,7 @@ class HomeController extends Controller
 {
     public function __invoke(Request $request)
     {
+        return Inertia::render('Temp');
         return Inertia::render('Converter/Show');
     }
 }
