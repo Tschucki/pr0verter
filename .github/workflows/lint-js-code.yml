@@ -1,4 +1,4 @@
-name: "JavaScript Code Linting"
+name: 'JavaScript Code Linting'
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_extensions: intl zip sodium pcntl bcmath
-          php_version: "8.2"
+          php_version: '8.2'
           args: --ignore-platform-reqs --optimize-autoloader --no-progress --prefer-dist --optimize-autoloader
 
       - name: Setup Node

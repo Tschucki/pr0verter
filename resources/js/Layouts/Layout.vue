@@ -6,10 +6,13 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { Bars3Icon } from '@heroicons/vue/24/solid/index.js';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'vue-sonner';
 import { Link, usePage } from '@inertiajs/vue3';
-import { onBeforeUnmount, onMounted } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import pr0verterLogo from '../../assets/pr0verter.png';
+import { Button } from '@/components/ui/button/index.js';
 
 const props = usePage().props;
 const sessionId = props.session.id;
@@ -37,6 +40,8 @@ onMounted(() => {
     });
 });
 
+const menuVisible = ref(false);
+
 onBeforeUnmount(() => {
   // eslint-disable-next-line no-undef
   Echo.leaveChannel(`session.${sessionId}`);
@@ -46,38 +51,109 @@ onBeforeUnmount(() => {
 <template>
   <header class="mx-auto max-w-4xl px-4">
     <NavigationMenu
-      class="flex max-w-4xl items-center justify-between gap-x-4 py-4">
-      <Link :href="route('home')">
-        <NavigationMenuLink :class="navigationMenuTriggerStyle()">
-          pr0konverter
+      class="flex max-w-4xl gap-4 py-4 md:items-center md:justify-between">
+      <Link :href="route('home')" class="block w-full">
+        <NavigationMenuLink class="flex items-center gap-x-4 px-0 py-0">
+          <img
+            :src="pr0verterLogo"
+            alt="pr0verter Logo"
+            class="size-8 object-contain" />
+          <h1 class="text-xl font-medium tracking-wide">pr0verter</h1>
         </NavigationMenuLink>
       </Link>
-      <NavigationMenuList class="gap-x-4">
-        <NavigationMenuItem>
-          <Link :href="route('home')">
-            <NavigationMenuLink :class="navigationMenuTriggerStyle()">
-              Converter
+      <Button
+        class="block md:hidden"
+        @click.prevent="menuVisible = !menuVisible"
+        variant="outline">
+        <Bars3Icon class="block size-6"></Bars3Icon>
+      </Button>
+      <div class="block hidden w-full md:block">
+        <NavigationMenuList
+          class="w-full flex-col items-start gap-x-4 md:flex-row md:items-center">
+          <NavigationMenuItem class="block w-full">
+            <Link :href="route('home')" class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-start',
+                ]">
+                Converter
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <Link :href="route('conversions.list')" class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-start',
+                ]">
+                Konvertierungen
+                {{
+                  $page.props.conversions.length
+                    ? ' (' + $page.props.conversions.length + ')'
+                    : ''
+                }}
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <NavigationMenuLink
+              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              FAQ
             </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link :href="route('conversions.list')">
-            <NavigationMenuLink :class="navigationMenuTriggerStyle()">
-              Konvertierungen
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <NavigationMenuLink
+              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              Kontakt
             </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuLink :class="navigationMenuTriggerStyle()">
-            FAQ
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuLink :class="navigationMenuTriggerStyle()">
-            Kontakt
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-      </NavigationMenuList>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </div>
+    </NavigationMenu>
+    <NavigationMenu
+      v-if="menuVisible"
+      class="flex max-w-4xl gap-4 py-1 md:items-center md:justify-between">
+      <div class="block w-full md:hidden">
+        <NavigationMenuList
+          class="w-full flex-col items-start gap-x-4 md:flex-row md:items-center">
+          <NavigationMenuItem class="block w-full">
+            <Link :href="route('home')" class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-start',
+                ]">
+                Converter
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <Link :href="route('conversions.list')" class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-start',
+                ]">
+                Konvertierungen
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <NavigationMenuLink
+              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              FAQ
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <NavigationMenuLink
+              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              Kontakt
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </div>
     </NavigationMenu>
   </header>
   <main class="mx-auto max-w-4xl px-4 py-6">

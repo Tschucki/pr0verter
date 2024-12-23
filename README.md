@@ -11,17 +11,17 @@ verwenden.
 ## Features die ich mindestens implementieren möchte.
 
 - [ ] Einfacher Download von Videos von X beliebigen Plattformen und diese dann komplett downloadbar machen. (Private
-  Zwecke natürlich)
+      Zwecke natürlich)
 - [ ] Nur Sound von Videos downloaden. (Weil Schwester das "braucht")
 - [ ] Download von Ziel-URLs (.mp4 URL, .webm URL, .mp3 URL, .jpg URL, .png URL, .gif URL)
 - [ ] Bulk Download von YouTube Playlists (Sound & Video - Auswählbar)
 - [ ] Konvertieren von Videos in das gewünschte Format.
-    - [ ] MP4 (H264/AAC)
-    - [ ] WebM (VP8/Vorbis/Opus)
-    - [ ] GIF aus Video (Von-bis Zeit)
-    - [ ] MP3
-    - [ ] JPEG Frame aus Video
-    - [ ] PNG Frame aus Video
+  - [ ] MP4 (H264/AAC)
+  - [ ] WebM (VP8/Vorbis/Opus)
+  - [ ] GIF aus Video (Von-bis Zeit)
+  - [ ] MP3
+  - [ ] JPEG Frame aus Video
+  - [ ] PNG Frame aus Video
 - [ ] Video schneiden (Von-bis Zeit)
 - [ ] Untertitel von YouTube übernehmen
 - [ ] Ratio von Bildern und Videos definieren
@@ -30,14 +30,14 @@ verwenden.
 - [ ] FPS von Videos definieren (min. 1, max. 60)
 - [ ] Statistik über die konvertierten Videos und Bilder
 - [ ] Voreinstellungen definierbar machen (Damit ein normaler User einfach nur auf "Konvertieren" klicken muss und
-  fertig)
+      fertig)
 
 ## Features die ich gerne implementieren möchte aber nicht muss.
 
 - [ ] System für pr0gramm Nutzer begrenzen (0Auth Login, wenn Gamb das gut findet) um Missbrauch zu verhindern.
 - [ ] FFMPEG Parameter zusammenklicken (Art Pipeline an Dateien die man haben möchte)
-    - Bsp.: Man möchte aus einer Rohdatei eine MP4, AVI und ein GIF von 0:12 bis 0:15 erstellen. (Das ganze dann in
-      einer Queue)
+  - Bsp.: Man möchte aus einer Rohdatei eine MP4, AVI und ein GIF von 0:12 bis 0:15 erstellen. (Das ganze dann in
+    einer Queue)
 
 ## Use Case
 
