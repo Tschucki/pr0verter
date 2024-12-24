@@ -177,4 +177,54 @@ class Conversion extends Model
 
         return $operations;
     }
+
+    public function statistic(): BelongsTo
+    {
+        return $this->belongsTo(Statistic::class);
+    }
+
+    public function trackStatistic(): void
+    {
+        $conversionEnd = $this->status === ConversionStatus::FINISHED ? now() : null;
+
+        $updateValues = [
+            'mime_type' => $this->file->mime_type ?? '',
+            'extension' => $this->file->extension ?? '',
+            'size' => $this->file->size ?? 0,
+            'status' => $this->status,
+            'keep_resolution' => $this->keep_resolution,
+            'audio' => $this->audio,
+            'auto_crop' => $this->auto_crop,
+            'watermark' => $this->watermark,
+            'interpolation' => $this->interpolation,
+            'audio_quality' => $this->audio_quality,
+            'trim_start' => $this->trim_start,
+            'trim_end' => $this->trim_end,
+            'max_size' => $this->max_size,
+            'url' => $this->url,
+            'conversion_started_at' => $this->created_at,
+            'conversion_ended_at' => $conversionEnd,
+        ];
+
+        $stat = Statistic::where('conversion_id', $this->id)->first();
+
+        if ($stat) {
+            if ($stat->mime_type !== '' && $stat->mime_type !== $updateValues['mime_type']) {
+                $updateValues['mime_type'] = $stat->mime_type;
+            }
+            if ($stat->extension !== '' && $stat->extension !== $updateValues['extension']) {
+                $updateValues['extension'] = $stat->extension;
+            }
+            if ($stat->size !== 0 && $stat->size !== $updateValues['size']) {
+                $updateValues['size'] = $stat->size;
+            }
+            if ($stat->size === 0) {
+                $updateValues['size'] = $this->file->size ?? 0;
+            }
+
+            $stat->update($updateValues);
+        } else {
+            Statistic::create(array_merge($updateValues, ['conversion_id' => $this->id]));
+        }
+    }
 }

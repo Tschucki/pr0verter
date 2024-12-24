@@ -54,7 +54,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 const formSchema = toTypedSchema(
   z.object({
     file: z.any().optional(),
-    url: z.string().url('Keine valide URL').optional().default(''),
+    url: z.string().url('Keine valide URL').nullish().optional().default(null),
     // keepResolution: z.boolean().default(false),
     audio: z.boolean().default(true),
     audioQuality: z
@@ -74,6 +74,7 @@ const formSchema = toTypedSchema(
 const form = useForm({
   validationSchema: formSchema,
   name: 'converterSettings',
+  validateOnMount: true,
 });
 
 const inertiaForm = useInertiaForm({
@@ -90,6 +91,7 @@ const inertiaForm = useInertiaForm({
 });
 
 const onSubmit = form.handleSubmit(async (values) => {
+  console.log(values);
   if (inertiaForm.processing) {
     return;
   }
