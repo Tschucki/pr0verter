@@ -19,6 +19,7 @@
     "laravel/horizon": "^5.30",
     "laravel/reverb": "^1.0",
     "laravel/tinker": "^2.9",
+    "norkunas/youtube-dl-php": "^2.9",
     "pbmedia/laravel-ffmpeg": "^8.6",
     "tightenco/ziggy": "^2.4"
   },
