@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/number-field';
 import { CloudUpload, RotateCcw, Trash2 } from 'lucide-vue-next';
 import { useForm } from 'vee-validate';
-import { useForm as useInertiaForm } from '@inertiajs/vue3';
+import { Head, useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 
@@ -163,6 +163,12 @@ const removeFile = () => {
 </script>
 
 <template>
+  <Head>
+    <title>Pr0verter - Converter für das pr0gramm</title>
+    <meta
+      name="description"
+      content="Der pr0verter ist ein Converter für das pr0gramm. Hier kannst Videos konvertieren." />
+  </Head>
   <form class="grid w-full items-start gap-6" @submit.prevent="onSubmit">
     <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
       Konvertierung

@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/stepper';
 import { Check, Dot, Download, Loader, Loader2 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
   conversions: {
@@ -84,6 +84,12 @@ onMounted(() => {
 </script>
 
 <template>
+  <Head>
+    <title>Pr0verter - Deine Konvertierungen</title>
+    <meta
+      name="description"
+      content="Der pr0verter ist ein Converter für das pr0gramm. Hier kannst Videos konvertieren." />
+  </Head>
   <div class="grid w-full items-start gap-6">
     <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
       Meine Konvertierungen

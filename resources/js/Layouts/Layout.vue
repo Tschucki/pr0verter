@@ -94,12 +94,7 @@ onBeforeUnmount(() => {
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
-              FAQ
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem class="block w-full">
-            <NavigationMenuLink
+              href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
               :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
               Kontakt
             </NavigationMenuLink>
@@ -137,12 +132,7 @@ onBeforeUnmount(() => {
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
-              FAQ
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem class="block w-full">
-            <NavigationMenuLink
+              href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
               :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
               Kontakt
             </NavigationMenuLink>
@@ -153,6 +143,18 @@ onBeforeUnmount(() => {
   </header>
   <main class="mx-auto max-w-4xl px-4 py-6">
     <slot />
+    <div class="group fixed bottom-5 right-5 z-20">
+      <h4
+        class="mb-2 cursor-default text-center text-4xl font-extrabold tracking-wide text-gray-200 transition-colors duration-200 group-hover:text-primary">
+        BETA
+      </h4>
+      <a
+        target="_blank"
+        href="https://pr0gramm.com/inbox/messages/PimmelmannJones?beta=1"
+        title="Feedback zum Beta-Test senden">
+        <Button icon="heroicon-o-bug-ant">Feedback senden</Button>
+      </a>
+    </div>
   </main>
   <footer class="mx-auto max-w-4xl px-4"></footer>
   <Toaster richColors />
