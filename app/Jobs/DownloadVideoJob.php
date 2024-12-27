@@ -54,7 +54,6 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     ->downloadPath(Storage::disk('conversions')->path('/'))
                     ->restrictFileNames(true)
                     ->continue(true)
-                    ->format('best')
                     ->noPlaylist()
                     ->cookies(config('converter.cookies.file'))
                     ->cleanupMetadata(true)
