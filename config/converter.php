@@ -15,4 +15,7 @@ return [
         'ffprobe' => config('laravel-ffmpeg.ffprobe.binaries'),
         'yt-dlp' => env('YT_DLP_PATH', 'yt-dlp'),
     ],
+    'cookies' => [
+        'file' => storage_path('app/youtube-cookie/cookies.txt'),
+    ],
 ];

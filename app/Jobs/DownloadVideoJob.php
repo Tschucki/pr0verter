@@ -56,6 +56,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     ->continue(true)
                     ->format('best')
                     ->noPlaylist()
+                    ->cookies(config('converter.cookies.file'))
                     ->cleanupMetadata(true)
                     ->maxDownloads(1)
                     ->url($conversion->url)
