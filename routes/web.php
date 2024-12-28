@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListConverterController;
@@ -28,3 +29,10 @@ Route::middleware([VerifyCsrfToken::class])
 
 Route::get('conversions/download/{conversion}', [ConversionController::class, 'download'])
     ->name('conversions.download');
+
+Route::middleware(['guest'])->group(function () {
+    Route::get('login', [AuthController::class, 'index'])
+        ->name('login');
+
+    Route::post('login', [AuthController::class, 'login'])->name('auth.login');
+});
