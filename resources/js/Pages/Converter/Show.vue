@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/number-field';
 import { CloudUpload, RotateCcw, Trash2 } from 'lucide-vue-next';
 import { useForm } from 'vee-validate';
-import { Head, useForm as useInertiaForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm as useInertiaForm } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 
@@ -461,6 +461,15 @@ const removeFile = () => {
           </FormItem>
         </Label>
       </FormField>
+      <p class="text-sm text-muted-foreground">
+        <a
+          target="_blank"
+          href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
+          >Alle Daten werden zum Ende der Session nach 2 Stunden vom Server
+          gelöscht. Metadaten werden anonymisiert für die Statistik gespeichert.
+          Bei Problemen oder Fragen schreib mir (PimmelmannJones) auf pr0gramm.
+        </a>
+      </p>
     </fieldset>
     <Button type="submit">Konvertieren</Button>
   </form>

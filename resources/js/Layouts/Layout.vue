@@ -13,6 +13,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import pr0verterLogo from '../../assets/pr0verter.png';
 import { Button } from '@/components/ui/button/index.js';
+import { GithubIcon } from 'lucide-vue-next';
 
 const props = usePage().props;
 const sessionId = props.session.id;
@@ -68,8 +69,8 @@ const logout = async () => {
       </Link>
       <Button
         class="block md:hidden"
-        @click.prevent="menuVisible = !menuVisible"
-        variant="outline">
+        variant="outline"
+        @click.prevent="menuVisible = !menuVisible">
         <Bars3Icon class="block size-6"></Bars3Icon>
       </Button>
       <div class="block hidden w-full md:block">
@@ -80,7 +81,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-start',
+                  '!w-full !justify-center',
                 ]">
                 Converter
               </NavigationMenuLink>
@@ -91,25 +92,53 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-start',
+                  '!w-full !justify-center',
                 ]">
                 Konvertierungen
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
+            <a
+              target="_blank"
+              href="https://github.com/Tschucki/pr0verter/releases/latest"
+              class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-center',
+                ]">
+                Changelog
+              </NavigationMenuLink>
+            </a>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
               target="_blank"
               href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              :class="[
+                navigationMenuTriggerStyle(),
+                '!w-full !justify-center',
+              ]">
               Kontakt
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <NavigationMenuLink
+              target="_blank"
+              href="https://github.com/Tschucki/pr0verter"
+              :class="[
+                navigationMenuTriggerStyle(),
+                '!w-full !justify-center',
+              ]">
+              <GithubIcon />
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem
             v-if="$page.props.user !== null"
             class="block w-full cursor-pointer">
             <NavigationMenuLink
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']"
+              :class="[navigationMenuTriggerStyle(), '!w-full !justify-center']"
               @click="logout">
               Logout
             </NavigationMenuLink>
@@ -146,11 +175,34 @@ const logout = async () => {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
+            <a
+              target="_blank"
+              href="https://github.com/Tschucki/pr0verter/releases/latest"
+              class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-start',
+                ]">
+                Changelog
+              </NavigationMenuLink>
+            </a>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
               target="_blank"
               href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
               :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
               Kontakt
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
+            <NavigationMenuLink
+              target="_blank"
+              href="https://github.com/Tschucki/pr0verter"
+              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              <GithubIcon />
+              - GitHub
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem
@@ -181,7 +233,39 @@ const logout = async () => {
       </a>
     </div>
   </main>
-  <footer class="mx-auto max-w-4xl px-4"></footer>
+  <footer>
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div class="py-8 text-center">
+        <div class="flex items-center justify-center gap-x-4">
+          <img
+            :src="pr0verterLogo"
+            alt="pr0verter Logo"
+            class="size-8 object-contain" />
+          <h1 class="text-xl font-medium tracking-wide">pr0verter</h1>
+        </div>
+        <nav aria-label="quick links" class="mt-10 text-sm">
+          <div class="-my-1 flex flex-wrap justify-center gap-2 lg:gap-6">
+            <Link
+              class="inline-block rounded-lg px-2 py-1 text-sm hover:text-primary"
+              :href="route('legal-notice')"
+              >Impressum
+            </Link>
+            <Link
+              class="inline-block rounded-lg px-2 py-1 text-sm hover:text-primary"
+              :href="route('privacy-policy')"
+              >Datenschutz
+            </Link>
+          </div>
+        </nav>
+      </div>
+      <div
+        class="flex flex-col items-center border-t border-primary/40 py-10 sm:flex-row-reverse sm:justify-between">
+        <a :href="route('home')" target="_blank" class="text-sm sm:mt-0"
+          >{{ new Date().getFullYear() }} - pr0verter</a
+        >
+      </div>
+    </div>
+  </footer>
   <Toaster richColors />
 </template>
 

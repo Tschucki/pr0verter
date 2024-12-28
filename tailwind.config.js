@@ -1,4 +1,5 @@
 const animate = require('tailwindcss-animate');
+const typography = require('@tailwindcss/typography');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -92,5 +93,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms'), animate],
+  plugins: [require('@tailwindcss/forms'), animate, typography],
 };

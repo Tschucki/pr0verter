@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             'logout',
-            'livewire/update'
+            'livewire/update',
         ]);
     })
     ->withSchedule(function (Schedule $schedule) {

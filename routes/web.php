@@ -5,7 +5,9 @@ declare(strict_types=1);
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegalNoticeController;
 use App\Http\Controllers\ListConverterController;
+use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\StartConverterController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,3 +32,6 @@ Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login')
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('auth.logout');
+
+Route::get('/impressum', LegalNoticeController::class)->name('legal-notice');
+Route::get('/datenschutz', PrivacyPolicyController::class)->name('privacy-policy');
