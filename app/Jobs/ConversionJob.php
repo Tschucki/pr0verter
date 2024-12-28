@@ -43,6 +43,12 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             'status' => 'preparing',
         ]);
 
+        $conversionNeeded = $this->checkIfConversionIsActuallyNeeded($conversion);
+
+        if ($conversionNeeded === false) {
+            return;
+        }
+
         $conversion = $conversion->loadMissing('file');
 
         // the file needs to be named differently as the input can not be the same as Input
@@ -105,5 +111,53 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             'status' => 'finished',
             'downloadable' => true,
         ]);
+    }
+
+    private function checkIfConversionIsActuallyNeeded(Conversion $conversion): bool
+    {
+        $hasAdditionalOperations = false;
+        $hasCorrectExtension = false;
+        $hasCorrectSize = false;
+
+        $file = Storage::disk($conversion->file->disk)->path($conversion->file->filename);
+        $size = Storage::disk($conversion->file->disk)->size($conversion->file->filename);
+
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+        if ($extension === 'mp4' || $extension === 'webm') {
+            $conversion->update([
+                'status' => 'finished',
+                'downloadable' => true,
+            ]);
+            Log::info('Datei ist bereits mp4 oder webm');
+            $hasCorrectExtension = true;
+        }
+
+        if ($size <= $conversion->max_size * 1024 * 1024) {
+            $conversion->update([
+                'status' => 'finished',
+                'downloadable' => true,
+            ]);
+
+            $hasCorrectSize = true;
+        }
+
+        if (
+            $conversion->audio_quality !== 1 &&
+            $conversion->audio === false &&
+            $conversion->watermark === true &&
+            $conversion->auto_crop === true &&
+            $conversion->trim_start !== null &&
+            $conversion->trim_end !== null
+        ) {
+            $conversion->update([
+                'status' => 'finished',
+                'downloadable' => true,
+            ]);
+
+            $hasAdditionalOperations = true;
+        }
+
+        return ! $hasCorrectExtension || ! $hasCorrectSize || $hasAdditionalOperations;
     }
 }
