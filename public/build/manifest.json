@@ -12,12 +12,12 @@
     "src": "resources/assets/pr0verter.png"
   },
   "resources/css/app.css": {
-    "file": "assets/app-j511oxwp.css",
+    "file": "assets/app-Dkgpg7gs.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Bx553GzH.js",
+    "file": "assets/app-BaWSpHtM.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -25,7 +25,7 @@
       "_vendor-gcK4JrNu.js"
     ],
     "css": [
-      "assets/app-j511oxwp.css"
+      "assets/app-Dkgpg7gs.css"
     ],
     "assets": [
       "assets/pimmelmannjones-UhIV0Q9Z.svg",
