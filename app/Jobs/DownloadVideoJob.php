@@ -55,6 +55,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     ->restrictFileNames(true)
                     ->continue(true)
                     ->noPlaylist()
+                    ->ffmpegLocation(config('laravel-ffmpeg.ffmpeg.binaries'))
                     ->cookies(config('converter.cookies.file'))
                     ->cleanupMetadata(true)
                     ->maxDownloads(1)
