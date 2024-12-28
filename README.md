@@ -1,89 +1,80 @@
-# Pr0konverter
+<br/>
+<p align="center">
+  <a href="https://github.com/Tschucki/pr0verter">
+    <img src="resources/assets/pr0verter.png" alt="Logo" width="100" height="100">
+  </a>
 
-Pr0konverter soll eine einfache Webseite werden, auf der pr0gramm Nutzer Videos für das pr0gramm konvertieren können.
+<h3 align="center">pr0verter</h3>
 
-Ich werde YouTube DL verwenden, um Videos von X beliebigen Plattformen zu downloaden und ffmpeg, um diese in das
-gewünschte Format zu konvertieren.
+  <p align="center">
+    <br/>
+    <br/>
+    <a href="https://pr0verter.de">Visit Website</a>
+    .
+    <a href="https://github.com/Tschucki/pr0verter/issues">Report Bug</a>
+    .
+    <a href="https://github.com/Tschucki/pr0verter/issues">Request Feature</a>
+  </p>
+</p>
 
-Damit das ganze etwas geiler aussieht und man den Fortschritt ordentlich verfolgen kann, werde ich Reverb mit Shadcn
-verwenden.
+[![Laravel Forge Site Deployment Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fforge.laravel.com%2Fsite-badges%2Fc9505301-16b7-47c9-bc6c-924c33c5cbc3%3Fdate%3D1&style=plastic)](https://forge.laravel.com/servers/754115/sites/2256343) ![Contributors](https://img.shields.io/github/contributors/Tschucki/pr0verter?color=dark-green) ![Issues](https://img.shields.io/github/issues/Tschucki/pr0verter) ![License](https://img.shields.io/github/license/Tschucki/pr0verter)
 
-## Features die ich mindestens implementieren möchte.
+## Table Of Contents
 
-- [ ] Einfacher Download von Videos von X beliebigen Plattformen und diese dann komplett downloadbar machen. (Private
-      Zwecke natürlich)
-- [ ] Nur Sound von Videos downloaden. (Weil Schwester das "braucht")
-- [ ] Download von Ziel-URLs (.mp4 URL, .webm URL, .mp3 URL, .jpg URL, .png URL, .gif URL)
-- [ ] Bulk Download von YouTube Playlists (Sound & Video - Auswählbar)
-- [ ] Konvertieren von Videos in das gewünschte Format.
-  - [ ] MP4 (H264/AAC)
-  - [ ] WebM (VP8/Vorbis/Opus)
-  - [ ] GIF aus Video (Von-bis Zeit)
-  - [ ] MP3
-  - [ ] JPEG Frame aus Video
-  - [ ] PNG Frame aus Video
-- [ ] Video schneiden (Von-bis Zeit)
-- [ ] Untertitel von YouTube übernehmen
-- [ ] Ratio von Bildern und Videos definieren
-- [ ] Megapixel von den Bildern definieren (min. 0,09 Megapixel (z.B. 300×300), max. 20,25 Megapixel (z.B. 4608×4608))
-- [ ] Dateigröße von Bildern und Videos evtl. komprimierbar machen (20MB für Bilder und 200MB für Videos)
-- [ ] FPS von Videos definieren (min. 1, max. 60)
-- [ ] Statistik über die konvertierten Videos und Bilder
-- [ ] Voreinstellungen definierbar machen (Damit ein normaler User einfach nur auf "Konvertieren" klicken muss und
-      fertig)
+* [About the Project](#about-the-project)
+* [Features](#features)
+* [Contributing](#contributing)
+* [License](#license)
+* [Authors](#authors)
+* [Acknowledgements](#acknowledgements)
 
-## Features die ich gerne implementieren möchte aber nicht muss.
+## About The Project
 
-- [ ] System für pr0gramm Nutzer begrenzen (0Auth Login, wenn Gamb das gut findet) um Missbrauch zu verhindern.
-- [ ] FFMPEG Parameter zusammenklicken (Art Pipeline an Dateien die man haben möchte)
-  - Bsp.: Man möchte aus einer Rohdatei eine MP4, AVI und ein GIF von 0:12 bis 0:15 erstellen. (Das ganze dann in
-    einer Queue)
+Pr0verter is a web application designed to allow users, particularly those from the pr0gramm community, to convert
+videos into X264/AAC MP4 formats. The application also allows users to download videos from various platforms, omit
+audio from videos, download files from URLs, defining the maximum file size, and more.
 
-## Use Case
+#### FFmpeg
+The application uses FFmpeg to convert videos into the desired format and perform other operations on the videos.
 
-1. User kommt auf die Seite und sieht direkt den Konverter.
-2. Frage, was er machen möchte (Video oder Bild konvertieren)
-3. Zieldatei beziehen (URL oder Datei)
-4. Einstellungen definieren (FPS, Megapixel, Dateigröße, Konvertierung)
-5. Konvertieren
-6. Downloaden
-7. Statistik einsehen
-8. Fertig
+## Features
 
-## Umsetzung
+- [X] Simple download of videos from various platforms and make them completely downloadable. (For private purposes)
+- [X] Download target URLs
+- [X] Convert videos to the desired format.
+    - [X] MP4 (H264/AAC)
+- [X] Cut videos (From-to time)
+- [X] Define maximum file size for videos by changing the bitrate
+- [X] Collect statistics on converted videos
+- [ ] Take subtitles from YouTube
+- [ ] Download only sound from videos.
+- [ ] Presets definable (So that a normal user only has to click on "Convert" and done)
 
-Alles in einzelne Schritte / Jobs aufteilen, damit man dem User auch den wirklichen Fortschritt mitteilen kann.
-Reverb Channel → Status Mitteilungen
+## Contributing
 
-Liste an erlaubten Mimes definieren
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any
+contributions you make are **greatly appreciated**.
 
-Datei Upload muss Multi-Part sein, sonst Problem mit kack header
+* If you have suggestions for adding or removing projects, feel free
+  to [open an issue](https://github.com/Tschucki/pr0verter/issues/new) to discuss it, or directly create a pull request.
+* Create individual PR for each suggestion.
+* Please also read through
+  the [Code Of Conduct](https://github.com/Tschucki/pr0verter/blob/main/.github/CODE_OF_CONDUCT.md) before
+  posting your first idea as well.
 
-Ich werde Pipeline Pattern verwenden, um den Zyklus abzubilden. So kann man auch einfach weitere Schritte dazu klicken.
-Bspw. Ich möchte ein Video zu 60 FPS konvertieren und zuschneiden.
-Also muss ich den Job zum Zuschneiden zuerst machen und dann das Video auf 60 FPS konvertieren.
-Wie definiere ich, dass der Job X for Y laufen muss?
-Ich bau mir eine Config an verfügbaren Operationen und gebe so die sinnvolle Reihenfolge vor.
-Die verfügbaren Operationen wären aber als einzelne Models viel geiler. So kann man die Commands auch einfach erweitern.
-Jedes Model muss dann dem MediaOperation Interface entsprechen, was die Pipeline dann auch erwartet.
+### Creating A Pull Request
 
-Um einen Überblick über die Dateien am Server zu haben, werde ich jede zu verarbeitende Datei in der DB speichern.
-Die Datei ist dann immer die Zieldatei, an der die Operationen nach und nach durchgeführt werden.
-Der Datei speichere ich noch Daten wie Ursprung (URL oder Upload) und Anonyme IP des Users oder wirklich den Nutzer vom
-pr0gramm zu.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'I love Blussis'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-Die Dateien müssen nach der Verarbeitung sofort gelöscht werden, damit der Server nicht voll läuft.
-Über Listener oder automatische Löschung nach spätestens 24 Stunden, wenn fehlgeschlagen.
-Jeder Upload erstellt aber eine neue File. Also → Löschen wir besser sofort.
+## License
 
-Begrenzung pro IP oder User auf eine Datei gleichzeitig.
+Distributed under the AGPL-3.0 License. See [LICENSE](https://github.com/Tschucki/pr0verter/blob/main/LICENSE) for more
+information.
 
-Models:
+## Authors
 
-- User
-- File
-- MediaOperation
-- ConversionPreset - Voreinstellung für die Konvertierung (Ein Preset besteht aus mehreren MediaOperations)
-- Conversion - aktueller Status der Konvertierung und das definierte Preset - Jedes Zielformat ist eine eigene
-  Conversion
-- ConversionLog = Log der Konvertierung (Nachvollziehbarkeit für Nutzer)
+* **[Tschucki](https://github.com/Tschucki)** - *Maintainer*
