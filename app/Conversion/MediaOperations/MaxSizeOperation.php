@@ -56,7 +56,8 @@ class MaxSizeOperation implements MediaFormatOperation
         $input = Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename);
 
         $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
-        Process::run("{$ffmpeg} -y -i {$input} -c:v libx264 -b:v {$kiloBitRate}k -pass 1 -f null /dev/null");
+        $timeout = config('laravel-ffmpeg.timeout');
+        Process::run("{$ffmpeg} -timeout {$timeout}  -y -i {$input} -c:v libx264 -b:v {$kiloBitRate}k -pass 1 -f null /dev/null");
 
         $format->setKiloBitrate($kiloBitRate);
         $format->setPasses(2);
