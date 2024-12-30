@@ -244,13 +244,13 @@ return [
 
         'local' => [
             'supervisor-1' => [
-                'maxProcesses' => 3,
+                'maxProcesses' => 5,
             ],
             'converter' => [
-                'maxProcesses' => 1,
+                'maxProcesses' => 3,
             ],
             'downloader' => [
-                'maxProcesses' => 1,
+                'maxProcesses' => 3,
             ],
         ],
     ],

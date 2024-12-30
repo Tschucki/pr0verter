@@ -30,9 +30,11 @@ class AutoCropFilterOperation implements MediaFilterOperation
     private function prepareData(): void
     {
         $path = Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename);
-        $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
 
-        $process = Process::run("{$ffmpeg} -flags2 +export_mvs -i {$path} -vf cropdetect -f null - 2>&1 | awk '/crop/ { print \$NF }' | tail -1");
+        $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
+        $timeout = config('laravel-ffmpeg.timeout');
+
+        $process = Process::run("{$ffmpeg} -timeout {$timeout} -flags2 +export_mvs -i {$path} -vf cropdetect -f null - 2>&1 | awk '/crop/ { print \$NF }' | tail -1");
 
         $this->crop = trim($process->output());
     }

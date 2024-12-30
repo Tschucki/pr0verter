@@ -259,7 +259,7 @@ const logout = async () => {
         </nav>
       </div>
       <div
-        class="flex flex-col items-center border-t border-primary/40 py-10 sm:flex-row-reverse sm:justify-between">
+        class="flex flex-col items-center border-t border-muted py-10 sm:flex-row-reverse sm:justify-between">
         <a :href="route('home')" target="_blank" class="text-sm sm:mt-0"
           >{{ new Date().getFullYear() }} - pr0verter</a
         >
