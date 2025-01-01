@@ -21,12 +21,12 @@
 
 ## Table Of Contents
 
-* [About the Project](#about-the-project)
-* [Features](#features)
-* [Contributing](#contributing)
-* [License](#license)
-* [Authors](#authors)
-* [Acknowledgements](#acknowledgements)
+- [About the Project](#about-the-project)
+- [Features](#features)
+- [Contributing](#contributing)
+- [License](#license)
+- [Authors](#authors)
+- [Acknowledgements](#acknowledgements)
 
 ## About The Project
 
@@ -35,17 +35,18 @@ videos into X264/AAC MP4 formats. The application also allows users to download 
 audio from videos, download files from URLs, defining the maximum file size, and more.
 
 #### FFmpeg
+
 The application uses FFmpeg to convert videos into the desired format and perform other operations on the videos.
 
 ## Features
 
-- [X] Simple download of videos from various platforms and make them completely downloadable. (For private purposes)
-- [X] Download target URLs
-- [X] Convert videos to the desired format.
-    - [X] MP4 (H264/AAC)
-- [X] Cut videos (From-to time)
-- [X] Define maximum file size for videos by changing the bitrate
-- [X] Collect statistics on converted videos
+- [x] Simple download of videos from various platforms and make them completely downloadable. (For private purposes)
+- [x] Download target URLs
+- [x] Convert videos to the desired format.
+  - [x] MP4 (H264/AAC)
+- [x] Cut videos (From-to time)
+- [x] Define maximum file size for videos by changing the bitrate
+- [x] Collect statistics on converted videos
 - [ ] Take subtitles from YouTube
 - [ ] Download only sound from videos.
 - [ ] Presets definable (So that a normal user only has to click on "Convert" and done)
@@ -55,10 +56,10 @@ The application uses FFmpeg to convert videos into the desired format and perfor
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any
 contributions you make are **greatly appreciated**.
 
-* If you have suggestions for adding or removing projects, feel free
+- If you have suggestions for adding or removing projects, feel free
   to [open an issue](https://github.com/Tschucki/pr0verter/issues/new) to discuss it, or directly create a pull request.
-* Create individual PR for each suggestion.
-* Please also read through
+- Create individual PR for each suggestion.
+- Please also read through
   the [Code Of Conduct](https://github.com/Tschucki/pr0verter/blob/main/.github/CODE_OF_CONDUCT.md) before
   posting your first idea as well.
 
@@ -77,4 +78,4 @@ information.
 
 ## Authors
 
-* **[Tschucki](https://github.com/Tschucki)** - *Maintainer*
+- **[Tschucki](https://github.com/Tschucki)** - _Maintainer_
