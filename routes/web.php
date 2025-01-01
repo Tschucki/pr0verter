@@ -9,12 +9,15 @@ use App\Http\Controllers\LegalNoticeController;
 use App\Http\Controllers\ListConverterController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\StartConverterController;
+use App\Http\Controllers\StatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 
 Route::get('/conversions', [ListConverterController::class, 'index'])
     ->name('conversions.list');
+
+Route::get('/stats', StatController::class)->name('stats');
 
 Route::post('/conversions', [ListConverterController::class, 'myConversions'])
     ->name('conversions.my');
