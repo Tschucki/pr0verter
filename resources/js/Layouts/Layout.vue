@@ -88,6 +88,17 @@ const logout = async () => {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
+            <Link :href="route('stats')" class="block w-full">
+              <NavigationMenuLink
+                :class="[
+                  navigationMenuTriggerStyle(),
+                  '!w-full !justify-center',
+                ]">
+                Statistik
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem class="block w-full">
             <Link :href="route('conversions.list')" class="block w-full">
               <NavigationMenuLink
                 :class="[
@@ -97,20 +108,6 @@ const logout = async () => {
                 Konvertierungen
               </NavigationMenuLink>
             </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem class="block w-full">
-            <a
-              target="_blank"
-              href="https://github.com/Tschucki/pr0verter/releases/latest"
-              class="block w-full">
-              <NavigationMenuLink
-                :class="[
-                  navigationMenuTriggerStyle(),
-                  '!w-full !justify-center',
-                ]">
-                Changelog
-              </NavigationMenuLink>
-            </a>
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
@@ -175,18 +172,15 @@ const logout = async () => {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
-            <a
-              target="_blank"
-              href="https://github.com/Tschucki/pr0verter/releases/latest"
-              class="block w-full">
+            <Link :href="route('stats')" class="block w-full">
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
                   '!w-full !justify-start',
                 ]">
-                Changelog
+                Statistik
               </NavigationMenuLink>
-            </a>
+            </Link>
           </NavigationMenuItem>
           <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
