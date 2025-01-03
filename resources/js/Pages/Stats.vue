@@ -48,6 +48,8 @@ defineProps({
         <li>www.youtube.com</li>
         <li>youtu.be</li>
         <li>m.youtube.com</li>
+        <li>music.youtube.com</li>
+        <li>youtube-nocookie.com</li>
       </ul>
     </div>
   </div>
