@@ -12,6 +12,20 @@ use Throwable;
 
 class StatController extends Controller
 {
+
+    /**
+     * @var string[]
+     * */
+    public const YOUTUBE_SYNONYMS = [
+        'youtube.com',
+        'www.youtube.com',
+        'youtu.be',
+        'm.youtube.com',
+        'music.youtube.com',
+        'youtube-nocookie.com',
+        'www.youtube-nocookie.com',
+    ];
+
     public function __invoke(Request $request)
     {
         return Inertia::render('Stats', [
@@ -30,14 +44,7 @@ class StatController extends Controller
                 return parse_url($item->url, PHP_URL_HOST);
             });
 
-            $synonyms = [
-                [
-                    'youtube.com',
-                    'www.youtube.com',
-                    'youtu.be',
-                    'm.youtube.com',
-                ],
-            ];
+            $synonyms = self::YOUTUBE_SYNONYMS;
 
             foreach ($synonyms as $synonym) {
                 $mainDomain = $synonym[0];
