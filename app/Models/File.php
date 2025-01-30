@@ -23,6 +23,7 @@ class File extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'public' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -57,5 +58,10 @@ class File extends Model
 
         Storage::disk($this->disk)->delete($convertedFileName);
         Storage::disk($this->disk)->delete($this->filename);
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->public;
     }
 }

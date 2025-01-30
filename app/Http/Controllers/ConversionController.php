@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ConversionUpdated;
 use App\Models\Conversion;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -12,10 +16,15 @@ class ConversionController extends Controller
     public function download(Conversion $conversion, Request $request): BinaryFileResponse
     {
         $conversionWithFile = $conversion->load('file');
-        $conversionSessionId = $conversionWithFile->file->session_id;
+
+        $file = $conversionWithFile->file;
+        $conversionSessionId = $file->session_id;
         $sessionId = $request->session()->getId();
 
-        abort_unless($conversionSessionId === $sessionId, 403);
+        if ($file->isPublic() === false) {
+            abort_unless($conversionSessionId === $sessionId, 403);
+        }
+
         abort_unless($conversionWithFile->status === 'finished', 403);
         abort_unless($conversionWithFile->downloadable === true, 403);
 
@@ -27,5 +36,23 @@ class ConversionController extends Controller
         $disk = $conversionWithFile->file->disk;
 
         return response()->download(Storage::disk($disk)->path($fileName));
+    }
+
+    public function togglePublicFlag(Conversion $conversion, Request $request)
+    {
+        $sessionId = $request->session()->getId();
+        $conversionSessionId = $conversion->file->session_id;
+
+        abort_unless($conversionSessionId === $sessionId, 403);
+
+        $conversion->file->update([
+            'public' => ! $conversion->file->public,
+        ]);
+
+        ConversionUpdated::dispatch($conversion->id);
+
+        return response()->json([
+            'public' => $conversion->file->public,
+        ]);
     }
 }

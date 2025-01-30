@@ -44,6 +44,7 @@ class Conversion extends Model
     {
         $array = parent::toArray();
         $array['progress'] = $this->getProgress();
+        $array['public'] = $this->getPublicAttribute();
 
         return $array;
     }
@@ -226,5 +227,10 @@ class Conversion extends Model
         } else {
             Statistic::create(array_merge($updateValues, ['conversion_id' => $this->id]));
         }
+    }
+
+    public function getPublicAttribute(): bool
+    {
+        return (bool)$this->file?->isPublic();
     }
 }

@@ -12,7 +12,6 @@ use Throwable;
 
 class StatController extends Controller
 {
-
     /**
      * @var string[]
      * */

@@ -43,7 +43,7 @@ class StartConverterController extends Controller
             'url' => $validated['url'] ?? null,
         ]);
 
-        //ConversionJob::dispatchSync($conversion->id);
+        // ConversionJob::dispatchSync($conversion->id);
 
         if ($request->hasFile('file')) {
             ConversionJob::dispatch($conversion->id)->onQueue('converter');

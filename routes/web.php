@@ -28,6 +28,9 @@ Route::post('/converter/start', StartConverterController::class)
 Route::get('conversions/download/{conversion}', [ConversionController::class, 'download'])
     ->name('conversions.download');
 
+Route::patch('conversions/toggle-public/{conversion}', [ConversionController::class, 'togglePublicFlag'])
+    ->name('conversions.toggle-public');
+
 Route::get('/login', [AuthController::class, 'index'])
     ->name('login');
 

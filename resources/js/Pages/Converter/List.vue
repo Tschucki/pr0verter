@@ -18,9 +18,17 @@ import {
   StepperTitle,
   StepperTrigger,
 } from '@/components/ui/stepper';
-import { Check, Dot, Download, Loader, Loader2 } from 'lucide-vue-next';
+import {
+  Check,
+  Dot,
+  Download,
+  Link as LinkIcon,
+  Loader,
+  Loader2,
+} from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 
 const props = defineProps({
   conversions: {
@@ -62,6 +70,35 @@ const updateConversion = (conversion) => {
       c = { ...c, ...conversion };
     }
     return c;
+  });
+};
+
+const togglePublic = async (conversion) => {
+  let togglePromise = () =>
+    new Promise((resolve, reject) => {
+      // eslint-disable-next-line no-undef
+      axios.patch(route('conversions.toggle-public', conversion.id)).then(
+        (response) => {
+          conversion.public = response.data.public;
+          if (conversion.public) {
+            navigator.clipboard.writeText(
+              // eslint-disable-next-line no-undef
+              route('conversions.download', conversion.id)
+            );
+            toast.info('Öffentlicher Link in die Zwischenablage kopiert');
+          }
+          resolve(response.data);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+
+  toast.promise(togglePromise, {
+    loading: 'Öffentlicher Link wird aktualisiert',
+    success: 'Öffentlicher Link erfolgreich aktualisiert',
+    error: 'Fehler beim Aktualisieren des öffentlichen Links',
   });
 };
 
@@ -187,24 +224,62 @@ onMounted(() => {
           </div>
         </CardContent>
         <CardFooter>
-          <a
-            :class="{
-              'cursor-not-allowed': !conversion.downloadable,
-              'w-full': true,
-            }"
-            :href="
-              conversion.downloadable
-                ? route('conversions.download', conversion.id)
-                : null
-            "
-            target="_blank">
-            <Button :disabled="!conversion.downloadable" class="w-full">
-              <Download v-if="conversion.downloadable" class="mr-2 h-4 w-4" />
-              <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />
-              {{ conversion.downloadable ? 'Datei herunterladen' : '' }}
+          <div class="grid w-full grid-cols-1 gap-4">
+            <a
+              :class="{
+                'cursor-not-allowed': !conversion.downloadable,
+                'w-full': true,
+              }"
+              :href="
+                conversion.downloadable
+                  ? route('conversions.download', conversion.id)
+                  : null
+              "
+              target="_blank">
+              <Button :disabled="!conversion.downloadable" class="w-full">
+                <Download v-if="conversion.downloadable" class="mr-2 h-4 w-4" />
+                <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />
+                {{ conversion.downloadable ? 'Datei herunterladen' : '' }}
+              </Button>
+            </a>
+            <Button
+              :disabled="!conversion.downloadable"
+              class="w-full"
+              variant="outline"
+              @click="togglePublic(conversion)">
+              <LinkIcon class="mr-2 size-4"></LinkIcon>
+              {{
+                conversion.public === false
+                  ? 'Link öffentlich machen & kopieren'
+                  : 'Öffentlichen Link deaktivieren'
+              }}
             </Button>
-          </a>
+            <p class="text-sm text-muted-foreground">
+              Öffentliche Links können direkt beim Upload auf pr0gramm
+              eingegeben werden.
+              <a
+                target="_blank"
+                href="https://pr0gramm.com/upload"
+                class="text-primary"
+                >Direkt zum Upload</a
+              >
+            </p>
+          </div>
         </CardFooter>
+      </Card>
+      <Card v-if="allConversions.length === 0" class="text-center">
+        <CardHeader>
+          <CardTitle class="text-2xl"
+            >Keine Konvertierungen vorhanden
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Link :href="route('home')">
+            <Button class="mt-4" type="button">
+              Neue Konvertierung starten
+            </Button>
+          </Link>
+        </CardContent>
       </Card>
     </div>
   </div>
