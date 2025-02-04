@@ -45,6 +45,6 @@
     "zod": "^3.24.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-musl": "4.9.5"
+    "@rollup/rollup-linux-x64-musl": "4.34.2"
   }
 }
