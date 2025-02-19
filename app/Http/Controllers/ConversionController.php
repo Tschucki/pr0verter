@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\ConversionUpdated;
 use App\Models\Conversion;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -18,6 +15,11 @@ class ConversionController extends Controller
         $conversionWithFile = $conversion->load('file');
 
         $file = $conversionWithFile->file;
+
+        if ($file === null) {
+            abort(404);
+        }
+
         $conversionSessionId = $file->session_id;
         $sessionId = $request->session()->getId();
 
