@@ -231,6 +231,6 @@ class Conversion extends Model
 
     public function getPublicAttribute(): bool
     {
-        return (bool)$this->file?->isPublic();
+        return (bool) $this->file?->isPublic();
     }
 }
