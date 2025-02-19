@@ -65,7 +65,7 @@ const formSchema = toTypedSchema(
       .default(1.0),
     trimStart: z.any().nullish(),
     trimEnd: z.any().nullish(),
-    maxSize: z.number().min(1).default(200),
+    maxSize: z.number().min(1).max(500).default(200),
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
   })
@@ -350,6 +350,7 @@ const removeFile = () => {
                 <NumberField
                   id="maxSize"
                   :default-value="200"
+                  :max="500"
                   :model-value="value"
                   :step="1"
                   @update:model-value="handleChange">
