@@ -63,8 +63,7 @@ const formSchema = toTypedSchema(
       .max(1.0, 'Die Zahl muss zwischen 1 und 100 liegen.')
       .nonnegative()
       .default(1.0),
-    trimStart: z.any().nullish(),
-    trimEnd: z.any().nullish(),
+    segments: z.array().optional(), // Zod Form sucks
     maxSize: z.number().min(1).max(500).default(200),
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
@@ -80,11 +79,9 @@ const form = useForm({
 const inertiaForm = useInertiaForm({
   file: null,
   url: null,
-  // keepResolution: null,
   audio: null,
   audioQuality: null,
-  trimStart: null,
-  trimEnd: null,
+  segments: [],
   maxSize: null,
   autoCrop: null,
   watermark: null,
@@ -97,7 +94,7 @@ const onSubmit = form.handleSubmit(async (values) => {
 
   inertiaForm.file = values.file;
   inertiaForm.url = values.url;
-  // inertiaForm.keepResolution = values.keepResolution;
+  //inertiaForm.segments
   inertiaForm.audio = values.audio;
   inertiaForm.audioQuality = values.audioQuality;
   inertiaForm.trimStart = values.trimStart;
@@ -423,6 +420,7 @@ const removeFile = () => {
               <div class="flex flex-row items-center gap-x-4">
                 <NumberField
                   id="trimStart"
+                  :disabled="inertiaForm.segments.length > 0"
                   :model-value="value"
                   :step="1"
                   @update:model-value="handleChange">
@@ -449,6 +447,7 @@ const removeFile = () => {
             <FormControl>
               <div class="flex flex-row items-center gap-x-4">
                 <NumberField
+                  :disabled="inertiaForm.segments.length > 0"
                   id="trimEnd"
                   :model-value="value"
                   :step="1"
@@ -461,6 +460,78 @@ const removeFile = () => {
             </FormControl>
           </FormItem>
         </Label>
+      </FormField>
+      <FormField name="segments">
+        <FormItem
+          class="flex flex-col items-start justify-between space-y-4 rounded-lg border p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <div class="space-y-0.5">
+              <FormLabel class="text-base">Video-Segmente</FormLabel>
+              <FormDescription>
+                Definiere Abschnitte des Videos, die du behalten möchtest.
+                Aktuell noch in Entwicklung und noch nicht wirklich stabil.
+              </FormDescription>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              @click="inertiaForm.segments.push({ start: 0, duration: 0 })">
+              Segment hinzufügen
+            </Button>
+          </div>
+
+          <div
+            v-for="(segment, index) in inertiaForm.segments"
+            :key="index"
+            class="mb-4 w-full rounded-lg border p-4">
+            <div class="flex flex-row items-center justify-between">
+              <div class="text-base font-medium">Segment {{ index + 1 }}</div>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                @click="inertiaForm.segments.splice(index, 1)">
+                Entfernen
+              </Button>
+            </div>
+
+            <div class="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <Label :for="`segment-${index}-start`">Start (Sekunden)</Label>
+                <NumberField
+                  :id="`segment-${index}-start`"
+                  :model-value="segment.start"
+                  :min="0"
+                  :step="1"
+                  @update:model-value="
+                    (val) => (inertiaForm.segments[index].start = val)
+                  ">
+                  <NumberFieldContent>
+                    <NumberFieldInput />
+                  </NumberFieldContent>
+                </NumberField>
+              </div>
+
+              <div>
+                <Label :for="`segment-${index}-duration`"
+                  >Dauer (Sekunden)</Label
+                >
+                <NumberField
+                  :id="`segment-${index}-duration`"
+                  :model-value="segment.duration"
+                  :min="0.1"
+                  :step="0.1"
+                  @update:model-value="
+                    (val) => (inertiaForm.segments[index].duration = val)
+                  ">
+                  <NumberFieldContent>
+                    <NumberFieldInput />
+                  </NumberFieldContent>
+                </NumberField>
+              </div>
+            </div>
+          </div>
+        </FormItem>
       </FormField>
       <p class="text-sm text-muted-foreground">
         <a

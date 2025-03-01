@@ -19,6 +19,7 @@ class Statistic extends Model
         'max_size' => 'integer',
         'audio_quality' => 'float',
         'watermark' => 'boolean',
+        'segments' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

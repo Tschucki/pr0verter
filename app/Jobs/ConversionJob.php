@@ -133,7 +133,8 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             $conversion->watermark === true ||
             $conversion->auto_crop === true ||
             $conversion->trim_start !== null ||
-            $conversion->trim_end !== null;
+            $conversion->trim_end !== null ||
+            ! empty($conversion->segments);
 
         if ($hasCustomOperations) {
             return true;

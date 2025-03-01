@@ -26,6 +26,8 @@ class ConversionSettings
 
     public bool $interpolation;
 
+    public array $segments;
+
     public function __construct(array $settings = [])
     {
         $this->fromArray($settings);
@@ -70,6 +72,12 @@ class ConversionSettings
         $this->autoCrop = $settings['auto_crop'] ?? false;
         $this->watermark = $settings['watermark'] ?? false;
         $this->interpolation = $settings['interpolation'] ?? false;
+        $this->segments = $settings['segments'] ?? [];
+
+        if (count($this->segments) > 0) {
+            $this->trimEnd = null;
+            $this->trimStart = null;
+        }
     }
 
     public function toArray(): array
@@ -84,6 +92,7 @@ class ConversionSettings
             'auto_crop' => $this->autoCrop,
             'watermark' => $this->watermark,
             'interpolation' => $this->interpolation,
+            'segments' => $this->segments,
         ];
     }
 

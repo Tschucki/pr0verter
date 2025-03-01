@@ -9,6 +9,7 @@ use App\Conversion\MediaOperations\AudioQualityFilterOperation;
 use App\Conversion\MediaOperations\AutoCropFilterOperation;
 use App\Conversion\MediaOperations\InterpolateFilterOperation;
 use App\Conversion\MediaOperations\MaxSizeOperation;
+use App\Conversion\MediaOperations\MultiSegmentTrimOperation;
 use App\Conversion\MediaOperations\RemoveAudioFilterOperation;
 use App\Conversion\MediaOperations\TrimFilterOperation;
 use App\Enums\ConversionStatus;
@@ -38,6 +39,7 @@ class Conversion extends Model
         'audio_quality' => 'float',
         'watermark' => 'boolean',
         'downloadable' => 'boolean',
+        'segments' => 'array',
     ];
 
     public function toArray(): array
@@ -146,6 +148,12 @@ class Conversion extends Model
             $operations[] = new AddPr0GrammWatermarkFilterOperation($this);
         }
 
+        $segments = $this->segments ?? [];
+
+        if (! empty($segments)) {
+            $operations[] = new MultiSegmentTrimOperation($this, $segments);
+        }
+
         if ($this->interpolation) {
             $operations[] = new InterpolateFilterOperation($this);
         }
@@ -201,6 +209,7 @@ class Conversion extends Model
             'audio_quality' => $this->audio_quality,
             'trim_start' => $this->trim_start,
             'trim_end' => $this->trim_end,
+            'segments' => $this->segments,
             'max_size' => $this->max_size,
             'url' => $this->url,
             'conversion_started_at' => $this->created_at,
