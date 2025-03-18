@@ -88,7 +88,7 @@ class ConversionSettings
 
         $parts = explode(':', $time);
         if (count($parts) === 1) {
-            return $parts[1];
+            return $parts[0];
         }
         else if (count($parts) === 2) {
             return ($parts[0] * 60) + $parts[1];
@@ -97,7 +97,7 @@ class ConversionSettings
             return ($parts[0] * 360) + ($parts[1] * 60) + $parts[2];
         }
 
-        return (int)$time;
+        return null;
     }
 
     public function toArray(): array
