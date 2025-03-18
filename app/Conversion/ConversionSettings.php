@@ -66,8 +66,8 @@ class ConversionSettings
         $this->audio = $settings['audio'] ?? true;
         $this->keepResolution = $settings['keep_resolution'] ?? false;
         $this->audioQuality = $settings['audio_quality'] ?? 1.0;
-        $this->trimStart = $settings['trim_start'] ?? null;
-        $this->trimEnd = $settings['trim_end'] ?? null;
+        $this->trimStart = $this->convertToSeconds($settings['trim_start'] ?? null);
+        $this->trimEnd = $this->convertToSeconds($settings['trim_end'] ?? null);
         $this->maxSize = $settings['max_size'] ?? null;
         $this->autoCrop = $settings['auto_crop'] ?? false;
         $this->watermark = $settings['watermark'] ?? false;
@@ -78,6 +78,26 @@ class ConversionSettings
             $this->trimEnd = null;
             $this->trimStart = null;
         }
+    }
+
+    private function convertToSeconds(?string $time): ?int
+    {
+        if ($time === null) {
+            return null;
+        }
+
+        $parts = explode(':', $time);
+        if (count($parts) === 1) {
+            return $parts[1];
+        }
+        else if (count($parts) === 2) {
+            return ($parts[0] * 60) + $parts[1];
+        }
+        else if (count($parts) === 3) {
+            return ($parts[0] * 360) + ($parts[1] * 60) + $parts[2];
+        }
+
+        return (int)$time;
     }
 
     public function toArray(): array

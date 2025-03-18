@@ -412,7 +412,9 @@ const removeFile = () => {
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Startzeitpunkt</FormLabel>
               <FormDescription>
-                Leer lassen, um von Anfang an zu konvertieren
+                Leer lassen, um von Anfang an zu konvertieren.<br />
+                Angabe in Sekunden oder Doppelpunktschreibweise (HH:MM:SS).<br />
+                Bsp.: 111 ≙ 1:51 ≙ 0:01:51
               </FormDescription>
               <FormMessage />
             </div>
@@ -440,7 +442,9 @@ const removeFile = () => {
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Endzeitpunkt</FormLabel>
               <FormDescription>
-                Leer lassen, um bis zum Ende zu konvertieren
+                Leer lassen, um bis zum Ende zu konvertieren.<br />
+                Angabe in Sekunden oder Doppelpunktschreibweise (HH:MM:SS).<br />
+                Bsp.: 111 ≙ 1:51 ≙ 0:01:51
               </FormDescription>
               <FormMessage />
             </div>
