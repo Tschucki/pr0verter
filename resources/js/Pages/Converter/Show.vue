@@ -63,6 +63,8 @@ const formSchema = toTypedSchema(
       .max(1.0, 'Die Zahl muss zwischen 1 und 100 liegen.')
       .nonnegative()
       .default(1.0),
+    trimStart: z.any().nullish(),
+    trimEnd: z.any().nullish(),
     segments: z.array().optional(), // Zod Form sucks
     maxSize: z.number().min(1).max(500).default(200),
     autoCrop: z.boolean().default(false),
@@ -81,6 +83,8 @@ const inertiaForm = useInertiaForm({
   url: null,
   audio: null,
   audioQuality: null,
+  trimStart: null,
+  trimEnd: null,
   segments: [],
   maxSize: null,
   autoCrop: null,
@@ -451,8 +455,8 @@ const removeFile = () => {
             <FormControl>
               <div class="flex flex-row items-center gap-x-4">
                 <NumberField
-                  :disabled="inertiaForm.segments.length > 0"
                   id="trimEnd"
+                  :disabled="inertiaForm.segments.length > 0"
                   :model-value="value"
                   :step="1"
                   @update:model-value="handleChange">
