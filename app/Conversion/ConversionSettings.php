@@ -80,6 +80,22 @@ class ConversionSettings
         }
     }
 
+    public function toArray(): array
+    {
+        return [
+            'audio' => $this->audio,
+            'keep_resolution' => $this->keepResolution,
+            'audio_quality' => $this->audioQuality,
+            'trim_start' => $this->trimStart,
+            'trim_end' => $this->trimEnd,
+            'max_size' => $this->maxSize,
+            'auto_crop' => $this->autoCrop,
+            'watermark' => $this->watermark,
+            'interpolation' => $this->interpolation,
+            'segments' => $this->segments,
+        ];
+    }
+
     private function convertToSeconds(?string $time): ?int
     {
         if ($time === null || trim($time) === '') {
@@ -128,22 +144,6 @@ class ConversionSettings
 
             default => null
         };
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'audio' => $this->audio,
-            'keep_resolution' => $this->keepResolution,
-            'audio_quality' => $this->audioQuality,
-            'trim_start' => $this->trimStart,
-            'trim_end' => $this->trimEnd,
-            'max_size' => $this->maxSize,
-            'auto_crop' => $this->autoCrop,
-            'watermark' => $this->watermark,
-            'interpolation' => $this->interpolation,
-            'segments' => $this->segments,
-        ];
     }
 
     private function convertKeysToSnakeCase(array $array): array
