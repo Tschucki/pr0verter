@@ -63,8 +63,8 @@ const formSchema = toTypedSchema(
       .max(1.0, 'Die Zahl muss zwischen 1 und 100 liegen.')
       .nonnegative()
       .default(1.0),
-    trimStart: z.any().nullish(),
-    trimEnd: z.any().nullish(),
+    trimStart: z.string().nullish(),
+    trimEnd: z.string().nullish(),
     segments: z.array().optional(), // Zod Form sucks
     maxSize: z.number().min(1).max(500).default(200),
     autoCrop: z.boolean().default(false),
@@ -228,10 +228,12 @@ const removeFile = () => {
                   <FormMessage />
                 </div>
                 <div>
-                  <div class="flex flex-row items-center gap-x-4">
+                  <div
+                    class="flex w-full flex-row items-start gap-x-4 lg:items-center">
                     {{ form.values.file.name }}
                   </div>
-                  <div class="flex flex-row items-center gap-x-4">
+                  <div
+                    class="flex w-full flex-row items-start gap-x-4 lg:items-center">
                     <span class="text-muted-foreground"
                       >{{ sizeOfFile(form.values.file).toFixed(2) }} MB</span
                     >
@@ -281,7 +283,7 @@ const removeFile = () => {
       <FormField v-slot="{ value, handleChange }" name="audio">
         <label class="cursor-pointer" for="audio">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Audio</FormLabel>
               <FormDescription> Audiospur beibehalten</FormDescription>
@@ -302,19 +304,20 @@ const removeFile = () => {
         name="audioQuality">
         <Label for="audioQuality">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Audio Qualität</FormLabel>
               <FormDescription> Qualität der Audiospur</FormDescription>
               <FormMessage />
             </div>
             <FormControl>
-              <div class="flex flex-row items-center gap-x-4">
+              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
                 <RotateCcw
                   class="size-4 cursor-pointer text-muted-foreground"
                   @click="resetAudioQuality" />
                 <NumberField
                   id="audioQuality"
+                  class="w-full lg:w-auto"
                   :default-value="1.0"
                   :format-options="{
                     style: 'percent',
@@ -338,7 +341,7 @@ const removeFile = () => {
       <FormField v-slot="{ value, handleChange }" name="maxSize">
         <Label for="maxSize">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Gewünschte Maximalgröße</FormLabel>
               <FormDescription>
@@ -347,9 +350,10 @@ const removeFile = () => {
               <FormMessage />
             </div>
             <FormControl>
-              <div class="flex flex-row items-center gap-x-4">
+              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
                 <NumberField
                   id="maxSize"
+                  class="w-full"
                   :default-value="200"
                   :max="500"
                   :model-value="value"
@@ -367,7 +371,7 @@ const removeFile = () => {
       <FormField v-slot="{ value, handleChange }" name="autoCrop">
         <label class="cursor-pointer" for="autoCrop">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base">
                 Automatisches Zuschneiden
@@ -391,7 +395,7 @@ const removeFile = () => {
       <FormField v-slot="{ value, handleChange }" name="watermark">
         <label class="cursor-pointer" for="watermark">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Wasserzeichen</FormLabel>
               <FormDescription>
@@ -412,7 +416,7 @@ const removeFile = () => {
       <FormField v-slot="{ value, handleChange }" name="trimStart">
         <Label for="trimStart">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Startzeitpunkt</FormLabel>
               <FormDescription>
@@ -423,17 +427,13 @@ const removeFile = () => {
               <FormMessage />
             </div>
             <FormControl>
-              <div class="flex flex-row items-center gap-x-4">
-                <NumberField
+              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                <Input
                   id="trimStart"
+                  class="w-full"
                   :disabled="inertiaForm.segments.length > 0"
                   :model-value="value"
-                  :step="1"
-                  @update:model-value="handleChange">
-                  <NumberFieldContent>
-                    <NumberFieldInput />
-                  </NumberFieldContent>
-                </NumberField>
+                  @update:model-value="handleChange" />
               </div>
             </FormControl>
           </FormItem>
@@ -442,7 +442,7 @@ const removeFile = () => {
       <FormField v-slot="{ value, handleChange }" name="trimEnd">
         <Label for="trimEnd">
           <FormItem
-            class="flex flex-row items-center justify-between rounded-lg border p-4">
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base"> Endzeitpunkt</FormLabel>
               <FormDescription>
@@ -453,17 +453,13 @@ const removeFile = () => {
               <FormMessage />
             </div>
             <FormControl>
-              <div class="flex flex-row items-center gap-x-4">
-                <NumberField
+              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                <Input
                   id="trimEnd"
+                  class="w-full"
                   :disabled="inertiaForm.segments.length > 0"
                   :model-value="value"
-                  :step="1"
-                  @update:model-value="handleChange">
-                  <NumberFieldContent>
-                    <NumberFieldInput />
-                  </NumberFieldContent>
-                </NumberField>
+                  @update:model-value="handleChange" />
               </div>
             </FormControl>
           </FormItem>
@@ -472,7 +468,8 @@ const removeFile = () => {
       <FormField name="segments">
         <FormItem
           class="flex flex-col items-start justify-between space-y-4 rounded-lg border p-4">
-          <div class="flex w-full flex-row items-center justify-between">
+          <div
+            class="flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
               <FormLabel class="text-base">Video-Segmente</FormLabel>
               <FormDescription>
@@ -481,6 +478,7 @@ const removeFile = () => {
               </FormDescription>
             </div>
             <Button
+              class="w-full lg:w-auto"
               type="button"
               variant="outline"
               @click="inertiaForm.segments.push({ start: 0, duration: 0 })">
@@ -492,9 +490,11 @@ const removeFile = () => {
             v-for="(segment, index) in inertiaForm.segments"
             :key="index"
             class="mb-4 w-full rounded-lg border p-4">
-            <div class="flex flex-row items-center justify-between">
+            <div
+              class="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
               <div class="text-base font-medium">Segment {{ index + 1 }}</div>
               <Button
+                class="w-full lg:w-auto"
                 type="button"
                 variant="destructive"
                 size="sm"
@@ -504,7 +504,7 @@ const removeFile = () => {
             </div>
 
             <div class="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
+              <div class="flex flex-col gap-2">
                 <Label :for="`segment-${index}-start`">Start (Sekunden)</Label>
                 <NumberField
                   :id="`segment-${index}-start`"
@@ -520,7 +520,7 @@ const removeFile = () => {
                 </NumberField>
               </div>
 
-              <div>
+              <div class="flex flex-col gap-2">
                 <Label :for="`segment-${index}-duration`"
                   >Dauer (Sekunden)</Label
                 >
