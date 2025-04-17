@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\ConversionStatus;
 use App\Events\ConversionProgressEvent;
 use App\Models\Conversion;
+use FFMpeg\Format\Audio\Mp3;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -58,8 +59,13 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         $conversion = $conversion->loadMissing('file');
 
         // the file needs to be named differently as the input can not be the same as Input
-        $newFileName = $conversion->file->convertedFileName();
-        $format = new X264;
+        if ($conversion->audio_only) {
+            $format = new Mp3;
+            $newFileName = pathinfo($conversion->file->filename, PATHINFO_FILENAME) . '.mp3';
+        } else {
+            $format = new X264;
+            $newFileName = $conversion->file->convertedFileName();
+        }
 
         $formatOperations = $conversion->getFormatOperations();
         $mediaOperations = $conversion->getMediaOperations();
@@ -83,7 +89,7 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             $media->export()
                 ->inFormat($format)
                 ->onProgress(function ($percentage, $remaining, $rate) use ($conversion) {
-                    if ($percentage % 5 !== 0) {
+                    if ($percentage % 10 !== 0) {
                         return;
                     }
 
@@ -101,7 +107,7 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
 
             $conversion->update([
                 'status' => ConversionStatus::FAILED,
-                'error_message' => $e->getMessage(),
+                'error_message' => 'Beim Konvertieren ist ein Fehler aufgetreten.',
             ]);
 
             return;
@@ -109,7 +115,7 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
 
         $conversion->file->update([
             'filename' => $newFileName,
-            'extension' => 'mp4',
+            'extension' => pathinfo($newFileName, PATHINFO_EXTENSION),
             'size' => Storage::disk($conversion->file->disk)->size($newFileName),
             'mime_type' => Storage::disk($conversion->file->disk)->mimeType($newFileName),
         ]);
@@ -125,6 +131,10 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         $file = $conversion->file;
         $storage = Storage::disk($file->disk);
         $extension = pathinfo($storage->path($file->filename), PATHINFO_EXTENSION);
+
+        if ($conversion->audio_only) {
+            return $extension !== 'mp3';
+        }
 
         $hasCompatibleFormat = in_array($extension, ['mp4', 'webm'], true);
         $isWithinSizeLimit = $storage->size($file->filename) <= $conversion->max_size * 1024 * 1024;

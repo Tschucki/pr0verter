@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('statistics', function (Blueprint $table) {
-            $table->string('error_message')->nullable()->after('conversion_time');
+        Schema::table('statistics', static function (Blueprint $table) {
+            $table->boolean('audio_only')->nullable()->default(false)->after('audio');
         });
     }
 
     public function down(): void
     {
-        Schema::table('statistics', function (Blueprint $table) {
-            $table->dropColumn('error_message');
+        Schema::table('statistics', static function (Blueprint $table) {
+            $table->dropColumn('audio_only');
         });
     }
 };

@@ -28,6 +28,8 @@ class ConversionSettings
 
     public array $segments;
 
+    public bool $audio_only;
+
     public function __construct(array $settings = [])
     {
         $this->fromArray($settings);
@@ -73,6 +75,17 @@ class ConversionSettings
         $this->watermark = $settings['watermark'] ?? false;
         $this->interpolation = $settings['interpolation'] ?? false;
         $this->segments = $settings['segments'] ?? [];
+        $this->audio_only = $settings['audio_only'] ?? false;
+
+        if ($this->audio_only === true) {
+            $this->audio = true;
+            $this->keepResolution = false;
+            $this->autoCrop = false;
+            $this->watermark = false;
+            $this->interpolation = false;
+            $this->trimStart = null;
+            $this->trimEnd = null;
+        }
 
         if (count($this->segments) > 0) {
             $this->trimEnd = null;
@@ -93,6 +106,7 @@ class ConversionSettings
             'watermark' => $this->watermark,
             'interpolation' => $this->interpolation,
             'segments' => $this->segments,
+            'audio_only' => $this->audio_only,
         ];
     }
 

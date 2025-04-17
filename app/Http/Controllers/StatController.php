@@ -63,7 +63,7 @@ class StatController extends Controller
 
         $stats['today_conversions'] = [
             'title' => 'Heutige Konvertierungen',
-            'value' => Statistic::whereDate('created_at', now())->count(),
+            'value' => Statistic::whereDate('created_at', now())->where('status', ConversionStatus::FINISHED)->count(),
         ];
 
         $stats['favorite_url'] = [
@@ -125,6 +125,11 @@ class StatController extends Controller
         $stats['removed_audio'] = [
             'title' => 'Audio entfernt',
             'value' => Statistic::where('audio', false)->count() . ' mal',
+        ];
+
+        $stats['audio_only'] = [
+            'title' => 'Nur Audio extrahiert',
+            'value' => Statistic::where('audio_only', true)->count() . ' mal',
         ];
 
         return $stats;

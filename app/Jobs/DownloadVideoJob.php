@@ -49,19 +49,27 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             });
 
             // only supporting one video for now
-            $video = $youtubeDl->download(
-                Options::create()
-                    ->downloadPath(Storage::disk('conversions')->path('/'))
-                    ->restrictFileNames(true)
-                    ->continue(true)
-                    ->noPlaylist()
-                    ->ffmpegLocation(config('laravel-ffmpeg.ffmpeg.binaries'))
-                    ->cookies(config('converter.cookies.file'))
-                    ->format('bestvideo+bestaudio/best')
-                    ->cleanupMetadata(true)
-                    ->maxDownloads(1)
-                    ->url($conversion->url)
-            )->getVideos()[0] ?? null;
+            $options = Options::create()
+                ->downloadPath(Storage::disk('conversions')->path('/'))
+                ->restrictFileNames(true)
+                ->continue(true)
+                ->noPlaylist()
+                ->ffmpegLocation(config('laravel-ffmpeg.binaries'))
+                ->cookies(config('converter.cookies.file'))
+                ->cleanupMetadata(true)
+                ->maxDownloads(1)
+                ->url($conversion->url);
+
+            if ($conversion->audio_only === true) {
+                $options = $options->format('bestaudio/best')
+                    ->extractAudio(true)
+                    ->audioFormat('mp3')
+                    ->audioQuality(0);
+            } else {
+                $options = $options->format('bestvideo+bestaudio/best');
+            }
+
+            $video = $youtubeDl->download($options)->getVideos()[0] ?? null;
 
             if ($video === null || $video->getError() !== null) {
                 $conversion->update([

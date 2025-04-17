@@ -40,7 +40,7 @@ class ConversionController extends Controller
         return response()->download(Storage::disk($disk)->path($fileName));
     }
 
-    public function togglePublicFlag(Conversion $conversion, Request $request)
+    public function togglePublicFlag(Conversion $conversion, Request $request): \Illuminate\Http\JsonResponse
     {
         $sessionId = $request->session()->getId();
         $conversionSessionId = $conversion->file->session_id;

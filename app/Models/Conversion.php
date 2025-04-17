@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Contracts\MediaFilterOperation;
 use App\Contracts\MediaFormatOperation;
 use App\Conversion\MediaOperations\AddPr0GrammWatermarkFilterOperation;
+use App\Conversion\MediaOperations\AudioExtractionOperation;
 use App\Conversion\MediaOperations\AudioQualityFilterOperation;
 use App\Conversion\MediaOperations\AutoCropFilterOperation;
 use App\Conversion\MediaOperations\InterpolateFilterOperation;
@@ -40,6 +41,7 @@ class Conversion extends Model
         'watermark' => 'boolean',
         'downloadable' => 'boolean',
         'segments' => 'array',
+        'audio_only' => 'boolean',
     ];
 
     public function toArray(): array
@@ -172,16 +174,22 @@ class Conversion extends Model
     {
         $operations = [];
 
+        foreach (config('converter.default_format_operations') as $operation) {
+            $operations[] = new $operation($this);
+        }
+
+        if ($this->audio_only) {
+            $operations[] = new AudioExtractionOperation($this);
+
+            return $operations;
+        }
+
         if ($this->max_size) {
             $operations[] = new MaxSizeOperation($this);
         }
 
         if ($this->audio_quality) {
             $operations[] = new AudioQualityFilterOperation($this);
-        }
-
-        foreach (config('converter.default_format_operations') as $operation) {
-            $operations[] = new $operation($this);
         }
 
         return $operations;
@@ -203,6 +211,7 @@ class Conversion extends Model
             'status' => $this->status,
             'keep_resolution' => $this->keep_resolution,
             'audio' => $this->audio,
+            'audio_only' => $this->audio_only,
             'auto_crop' => $this->auto_crop,
             'watermark' => $this->watermark,
             'interpolation' => $this->interpolation,

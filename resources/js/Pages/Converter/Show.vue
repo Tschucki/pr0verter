@@ -69,6 +69,7 @@ const formSchema = toTypedSchema(
     maxSize: z.number().min(1).max(500).default(200),
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
+    audio_only: z.boolean().default(false),
   })
 );
 
@@ -89,6 +90,7 @@ const inertiaForm = useInertiaForm({
   maxSize: null,
   autoCrop: null,
   watermark: null,
+  audio_only: false,
 });
 
 const onSubmit = form.handleSubmit(async (values) => {
@@ -106,6 +108,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   inertiaForm.maxSize = values.maxSize;
   inertiaForm.autoCrop = values.autoCrop;
   inertiaForm.watermark = values.watermark;
+  inertiaForm.audio_only = values.audio_only;
 
   if (!values.file && !values.url) {
     form.setErrors({
@@ -280,7 +283,31 @@ const removeFile = () => {
     </fieldset>
     <fieldset class="grid gap-6 rounded-lg border p-4">
       <legend class="-ml-1 px-1 text-sm font-medium">Einstellungen</legend>
-      <FormField v-slot="{ value, handleChange }" name="audio">
+      <FormField v-slot="{ value, handleChange }" name="audio_only">
+        <label class="cursor-pointer" for="audio_only">
+          <FormItem
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+            <div class="space-y-0.5">
+              <FormLabel class="text-base">Nur Audio</FormLabel>
+              <FormDescription>
+                Lädt nur die Audiospur des Videos als MP3-Datei herunter.<br />
+                Ideal für Musik oder Podcasts ohne unnötige Videodaten.
+              </FormDescription>
+              <FormMessage />
+            </div>
+            <FormControl>
+              <Switch
+                id="audio_only"
+                :checked="value"
+                @update:checked="handleChange" />
+            </FormControl>
+          </FormItem>
+        </label>
+      </FormField>
+      <FormField
+        v-slot="{ value, handleChange }"
+        name="audio"
+        v-if="form.values.audio_only === false">
         <label class="cursor-pointer" for="audio">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -299,7 +326,7 @@ const removeFile = () => {
         </label>
       </FormField>
       <FormField
-        v-if="form.values.audio === true"
+        v-if="form.values.audio === true && form.values.audio_only === false"
         v-slot="{ value, handleChange }"
         name="audioQuality">
         <Label for="audioQuality">
@@ -338,7 +365,10 @@ const removeFile = () => {
           </FormItem>
         </Label>
       </FormField>
-      <FormField v-slot="{ value, handleChange }" name="maxSize">
+      <FormField
+        v-slot="{ value, handleChange }"
+        name="maxSize"
+        v-if="form.values.audio_only === false">
         <Label for="maxSize">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -368,7 +398,10 @@ const removeFile = () => {
           </FormItem>
         </Label>
       </FormField>
-      <FormField v-slot="{ value, handleChange }" name="autoCrop">
+      <FormField
+        v-slot="{ value, handleChange }"
+        name="autoCrop"
+        v-if="form.values.audio_only === false">
         <label class="cursor-pointer" for="autoCrop">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -392,7 +425,10 @@ const removeFile = () => {
           </FormItem>
         </label>
       </FormField>
-      <FormField v-slot="{ value, handleChange }" name="watermark">
+      <FormField
+        v-slot="{ value, handleChange }"
+        name="watermark"
+        v-if="form.values.audio_only === false">
         <label class="cursor-pointer" for="watermark">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -413,7 +449,10 @@ const removeFile = () => {
           </FormItem>
         </label>
       </FormField>
-      <FormField v-slot="{ value, handleChange }" name="trimStart">
+      <FormField
+        v-slot="{ value, handleChange }"
+        name="trimStart"
+        v-if="form.values.audio_only === false">
         <Label for="trimStart">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -439,7 +478,10 @@ const removeFile = () => {
           </FormItem>
         </Label>
       </FormField>
-      <FormField v-slot="{ value, handleChange }" name="trimEnd">
+      <FormField
+        v-slot="{ value, handleChange }"
+        name="trimEnd"
+        v-if="form.values.audio_only === false">
         <Label for="trimEnd">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -465,7 +507,7 @@ const removeFile = () => {
           </FormItem>
         </Label>
       </FormField>
-      <FormField name="segments">
+      <FormField name="segments" v-if="form.values.audio_only === false">
         <FormItem
           class="flex flex-col items-start justify-between space-y-4 rounded-lg border p-4">
           <div
