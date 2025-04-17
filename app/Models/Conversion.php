@@ -214,6 +214,7 @@ class Conversion extends Model
             'url' => $this->url,
             'conversion_started_at' => $this->created_at,
             'conversion_ended_at' => $conversionEnd,
+            'error_message' => $this->error_message,
         ];
 
         $stat = Statistic::where('conversion_id', $this->id)->first();

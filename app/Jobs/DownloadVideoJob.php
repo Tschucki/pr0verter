@@ -66,6 +66,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             if ($video === null || $video->getError() !== null) {
                 $conversion->update([
                     'status' => ConversionStatus::FAILED,
+                    'error_message' => $video->getError(),
                 ]);
 
                 Log::error('Failed to download video', [
@@ -84,6 +85,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             if (! $exists || ! $moved) {
                 $conversion->update([
                     'status' => ConversionStatus::FAILED,
+                    'error_message' => 'Die Datei konnte nicht verschoben werden.',
                 ]);
 
                 Log::error('Failed to download video', [
@@ -111,6 +113,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
         } catch (Throwable $th) {
             $conversion->update([
                 'status' => ConversionStatus::FAILED,
+                'error_message' => $th->getMessage(),
             ]);
 
             Log::error('Failed to download video', [

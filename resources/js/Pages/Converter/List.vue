@@ -196,7 +196,7 @@ onMounted(() => {
                   </StepperTitle>
                   <StepperDescription
                     :class="[step.current_step && 'text-primary']"
-                    class="sr-only text-xs text-muted-foreground transition md:not-sr-only lg:text-sm">
+                    class="text-xs text-muted-foreground transition lg:text-sm">
                     {{ step.description }}
                     <strong
                       v-if="
@@ -216,6 +216,13 @@ onMounted(() => {
                       Geschwindigkeit:
                       {{ conversion.downloadProgressEvent.speed }}<br />
                       Verbleibend: {{ conversion.downloadProgressEvent.eta }}
+                    </strong>
+                    <strong
+                      v-if="
+                        step.status === 'failed' && conversion.error_message
+                      ">
+                      <br />
+                      {{ conversion.error_message }}
                     </strong>
                   </StepperDescription>
                 </div>

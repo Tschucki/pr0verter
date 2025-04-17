@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\ConversionStatus;
 use App\Events\ConversionProgressEvent;
 use App\Models\Conversion;
 use FFMpeg\Format\Video\X264;
@@ -99,7 +100,8 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             ]);
 
             $conversion->update([
-                'status' => 'failed',
+                'status' => ConversionStatus::FAILED,
+                'error_message' => $e->getMessage(),
             ]);
 
             return;
