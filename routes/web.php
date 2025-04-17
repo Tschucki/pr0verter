@@ -31,6 +31,9 @@ Route::get('conversions/download/{conversion}', [ConversionController::class, 'd
 Route::patch('conversions/toggle-public/{conversion}', [ConversionController::class, 'togglePublicFlag'])
     ->name('conversions.toggle-public');
 
+Route::patch('conversions/cancel/{conversion}', [ConversionController::class, 'cancel'])
+    ->name('conversions.cancel');
+
 Route::get('/login', [AuthController::class, 'index'])
     ->name('login');
 

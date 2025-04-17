@@ -25,6 +25,8 @@ import {
   Link as LinkIcon,
   Loader,
   Loader2,
+  StopCircle,
+  X,
 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
@@ -99,6 +101,28 @@ const togglePublic = async (conversion) => {
     loading: 'Öffentlicher Link wird aktualisiert',
     success: 'Öffentlicher Link erfolgreich aktualisiert',
     error: 'Fehler beim Aktualisieren des öffentlichen Links',
+  });
+};
+
+const cancelConversion = async (conversion) => {
+  let togglePromise = () =>
+    new Promise((resolve, reject) => {
+      // eslint-disable-next-line no-undef
+      axios.patch(route('conversions.cancel', conversion.id)).then(
+        (response) => {
+          conversion.status = response.data.status;
+          resolve(response.data);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+
+  toast.promise(togglePromise, {
+    loading: 'Konvertierung wird abgebrochen',
+    success: 'Konvertierung abgebrochen',
+    error: 'Fehler beim Abbrechen des Konvertierung',
   });
 };
 
@@ -181,6 +205,11 @@ onMounted(() => {
                     class="pointer-events-none z-10 shrink-0 rounded-full"
                     size="icon">
                     <Check v-if="step.completed" class="size-5" />
+                    <X
+                      v-else-if="
+                        step.completed === false && step.current_step === false
+                      "
+                      class="size-5" />
                     <Loader
                       v-else-if="step.current_step && step.completed === false"
                       class="size-5 animate-spin" />
@@ -260,6 +289,16 @@ onMounted(() => {
                   ? 'Link öffentlich machen & kopieren'
                   : 'Öffentlichen Link deaktivieren'
               }}
+            </Button>
+            <Button
+              :disabled="
+                conversion.downloadable || conversion.status === 'canceled'
+              "
+              class="w-full"
+              variant="outline"
+              @click="cancelConversion(conversion)">
+              <StopCircle class="mr-2 size-4"></StopCircle>
+              Konvertierung abbrechen
             </Button>
             <p class="text-sm text-muted-foreground">
               Öffentliche Links können direkt beim Upload auf pr0gramm

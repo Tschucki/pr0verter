@@ -14,6 +14,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
+use RuntimeException;
 use Throwable;
 
 class ConversionJob implements ShouldBeUnique, ShouldQueue
@@ -44,6 +45,10 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         $conversion->update([
             'status' => 'preparing',
         ]);
+
+        if (! $this->shouldContinue()) {
+            return;
+        }
 
         $conversionNeeded = $this->checkIfConversionIsActuallyNeeded($conversion);
 
@@ -93,6 +98,10 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
                         return;
                     }
 
+                    if (! $this->shouldContinue()) {
+                        throw new RuntimeException('Konvertierung wurde abgebrochen');
+                    }
+
                     ConversionProgressEvent::dispatch(
                         $conversion->id, $percentage, $remaining, $rate);
                 })
@@ -105,10 +114,17 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
                 'exception' => $e,
             ]);
 
-            $conversion->update([
-                'status' => ConversionStatus::FAILED,
-                'error_message' => 'Beim Konvertieren ist ein Fehler aufgetreten.',
-            ]);
+            if (! $this->shouldContinue()) {
+                $conversion->update([
+                    'status' => ConversionStatus::CANCELED,
+                    'error_message' => null,
+                ]);
+            } else {
+                $conversion->update([
+                    'status' => ConversionStatus::FAILED,
+                    'error_message' => 'Beim Konvertieren ist ein Fehler aufgetreten.',
+                ]);
+            }
 
             return;
         }
@@ -153,5 +169,12 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         }
 
         return ! ($hasCompatibleFormat && $isWithinSizeLimit);
+    }
+
+    private function shouldContinue(): bool
+    {
+        $conversion = Conversion::find($this->conversionId);
+
+        return $conversion && $conversion->status !== ConversionStatus::CANCELED;
     }
 }
