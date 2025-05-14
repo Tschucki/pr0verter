@@ -16,13 +16,21 @@ jobs:
       MAIL_MAILER: log
     steps:
       - uses: actions/checkout@v4
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt
+            /var/lib/apt
+          key: ${{ runner.os }}-apt-yt-dlp-ffmpeg
+          restore-keys: |
+            ${{ runner.os }}-apt-
       - name: Install yt-dlp and ffmpeg
         run: |
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:tomtomtom/yt-dlp -y
-          sudo apt-get update
-          sudo apt-get install -y yt-dlp ffmpeg
+          if ! command -v yt-dlp &> /dev/null || ! command -v ffmpeg &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y yt-dlp ffmpeg
+          fi
       - name: Prepare The Environment
         run: cp .env.example .env
       - name: Create Database
@@ -41,6 +49,8 @@ jobs:
         run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
       - name: Build Assets
         run: npm install && npm run build
+      - name: Migrate Database & Seed
+        run: php artisan migrate:fresh --seed --force
       - name: Run Laravel Server
         run: php artisan serve --no-reload &
       - name: Run Laravel Reverb Server
