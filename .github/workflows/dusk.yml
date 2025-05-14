@@ -16,15 +16,6 @@ jobs:
       MAIL_MAILER: log
     steps:
       - uses: actions/checkout@v4
-      - name: Cache apt packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            /var/cache/apt
-            /var/lib/apt
-          key: ${{ runner.os }}-apt-yt-dlp-ffmpeg
-          restore-keys: |
-            ${{ runner.os }}-apt-
       - name: Install yt-dlp and ffmpeg
         run: |
           if ! command -v yt-dlp &> /dev/null || ! command -v ffmpeg &> /dev/null; then
@@ -54,7 +45,7 @@ jobs:
       - name: Run Laravel Server
         run: php artisan serve --no-reload &
       - name: Run Laravel Reverb Server
-        run: php artisan reverb:start --host="0.0.0.0" --port=8080 --no-interaction --no-ansi --verbose
+        run: php artisan reverb:start --host="0.0.0.0" --port=8080 --no-interaction &
       - name: Run Dusk Tests
         run: php artisan dusk
       - name: Upload Screenshots
