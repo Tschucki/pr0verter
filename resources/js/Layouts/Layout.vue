@@ -17,6 +17,7 @@ import { GithubIcon } from 'lucide-vue-next';
 
 const props = usePage().props;
 const sessionId = props.session.id;
+const version = ref(props.github_version || '');
 
 onMounted(() => {
   // eslint-disable-next-line no-undef
@@ -112,17 +113,6 @@ const logout = async () => {
           <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
               target="_blank"
-              href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
-              :class="[
-                navigationMenuTriggerStyle(),
-                '!w-full !justify-center',
-              ]">
-              Kontakt
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem class="block w-full">
-            <NavigationMenuLink
-              target="_blank"
               href="https://github.com/Tschucki/pr0verter"
               :class="[
                 navigationMenuTriggerStyle(),
@@ -185,14 +175,6 @@ const logout = async () => {
           <NavigationMenuItem class="block w-full">
             <NavigationMenuLink
               target="_blank"
-              href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
-              Kontakt
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem class="block w-full">
-            <NavigationMenuLink
-              target="_blank"
               href="https://github.com/Tschucki/pr0verter"
               :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
               <GithubIcon />
@@ -217,12 +199,12 @@ const logout = async () => {
     <div class="group fixed bottom-5 right-5 z-20">
       <h4
         class="mb-2 cursor-default text-center text-4xl font-extrabold tracking-wide text-gray-200 transition-colors duration-200 group-hover:text-primary">
-        BETA
+        {{ version }}
       </h4>
       <a
         target="_blank"
-        href="https://pr0gramm.com/inbox/messages/PimmelmannJones?beta=1"
-        title="Feedback zum Beta-Test senden">
+        href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
+        title="Feedback senden">
         <Button icon="heroicon-o-bug-ant">Feedback senden</Button>
       </a>
     </div>

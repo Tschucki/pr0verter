@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Conversion;
+use App\Services\GitHubVersionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
@@ -45,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                 'id' => $request->session()->getId(),
             ],
             'conversions' => fn () => Conversion::where('session_id', $request->session()->getId())->select('id')->get(),
+            'github_version' => app(GitHubVersionService::class)->getVersion(),
         ]);
     }
 }
