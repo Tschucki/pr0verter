@@ -52,6 +52,8 @@ jobs:
         run: php artisan serve --no-reload &
       - name: Run Laravel Reverb Server
         run: php artisan reverb:start --host="0.0.0.0" --port=8080 --no-interaction &
+      - name: Run Laravel Horizon
+        run: php artisan horizon &
       - name: Run Dusk Tests
         run: php artisan dusk
       - name: Upload Screenshots
