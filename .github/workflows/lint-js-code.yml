@@ -36,15 +36,11 @@ jobs:
         with:
           node-version: 21
 
-      - name: Cache Node Modules
-        id: cache-node-modules
-        uses: actions/cache@v4
+      - uses: actions/setup-node@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-vendor-${{ hashFiles('**/package-lock.json') }}
-      - name: Install Node Modules
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm install
+          node-version: 21
+          cache: 'npm'
+          cache-dependency-path: subdir/package-lock.json
 
       - name: ESLint
         run: npm run lint
