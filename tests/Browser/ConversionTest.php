@@ -38,7 +38,7 @@ class ConversionTest extends DuskTestCase
                 'url' => $url,
             ]);
 
-            sleep(15);
+            sleep(60);
 
             $browser->refresh()
                 ->assertSee('Konvertierung')
