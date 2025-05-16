@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: "latest"
           cache: 'npm'
-          cache-dependency-path: subdir/package-lock.json
+          cache-dependency-path: "**/package-lock.json"
 
       - name: ESLint
         run: npm run lint

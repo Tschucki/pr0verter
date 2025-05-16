@@ -63,7 +63,7 @@ jobs:
         with:
           node-version: "latest"
           cache: 'npm'
-          cache-dependency-path: subdir/package-lock.json
+          cache-dependency-path: "**/package-lock.json"
       - run: npm run build
       - name: Migrate Database & Seed
         run: php artisan migrate:fresh --seed --force
