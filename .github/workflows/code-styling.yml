@@ -25,13 +25,6 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Install Composer
-        uses: php-actions/composer@v6
-        with:
-          php_extensions: intl zip sodium pcntl bcmath
-          php_version: '8.2'
-          args: --ignore-platform-reqs --optimize-autoloader --no-progress --prefer-dist --optimize-autoloader
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
