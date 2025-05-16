@@ -272,7 +272,10 @@ onMounted(() => {
                   : null
               "
               target="_blank">
-              <Button :disabled="!conversion.downloadable" class="w-full">
+              <Button
+                id="download-button"
+                :disabled="!conversion.downloadable"
+                class="w-full">
                 <Download v-if="conversion.downloadable" class="mr-2 h-4 w-4" />
                 <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />
                 {{ conversion.downloadable ? 'Datei herunterladen' : '' }}
@@ -291,6 +294,7 @@ onMounted(() => {
               }}
             </Button>
             <Button
+              id="cancel-conversion-button"
               :disabled="
                 conversion.downloadable || conversion.status === 'canceled'
               "

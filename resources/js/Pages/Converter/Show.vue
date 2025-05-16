@@ -182,7 +182,9 @@ const removeFile = () => {
           <TabsTrigger class="w-full" value="upload">
             Datei hochladen
           </TabsTrigger>
-          <TabsTrigger class="w-full" value="download"> Download</TabsTrigger>
+          <TabsTrigger class="download-tab-trigger w-full" value="download">
+            Download</TabsTrigger
+          >
         </TabsList>
         <TabsContent value="upload">
           <FormField v-slot="{ handleChange, handleBlur }" name="file">
@@ -267,6 +269,7 @@ const removeFile = () => {
                   <Label for="url">URL eingeben</Label>
                   <Input
                     id="url"
+                    name="url"
                     :model-value="value"
                     class="w-full"
                     @update:model-value="handleChange" />
@@ -305,9 +308,9 @@ const removeFile = () => {
         </label>
       </FormField>
       <FormField
+        v-if="form.values.audio_only === false"
         v-slot="{ value, handleChange }"
-        name="audio"
-        v-if="form.values.audio_only === false">
+        name="audio">
         <label class="cursor-pointer" for="audio">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -366,9 +369,9 @@ const removeFile = () => {
         </Label>
       </FormField>
       <FormField
+        v-if="form.values.audio_only === false"
         v-slot="{ value, handleChange }"
-        name="maxSize"
-        v-if="form.values.audio_only === false">
+        name="maxSize">
         <Label for="maxSize">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -399,9 +402,9 @@ const removeFile = () => {
         </Label>
       </FormField>
       <FormField
+        v-if="form.values.audio_only === false"
         v-slot="{ value, handleChange }"
-        name="autoCrop"
-        v-if="form.values.audio_only === false">
+        name="autoCrop">
         <label class="cursor-pointer" for="autoCrop">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -426,9 +429,9 @@ const removeFile = () => {
         </label>
       </FormField>
       <FormField
+        v-if="form.values.audio_only === false"
         v-slot="{ value, handleChange }"
-        name="watermark"
-        v-if="form.values.audio_only === false">
+        name="watermark">
         <label class="cursor-pointer" for="watermark">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -450,9 +453,9 @@ const removeFile = () => {
         </label>
       </FormField>
       <FormField
+        v-if="form.values.audio_only === false"
         v-slot="{ value, handleChange }"
-        name="trimStart"
-        v-if="form.values.audio_only === false">
+        name="trimStart">
         <Label for="trimStart">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -479,9 +482,9 @@ const removeFile = () => {
         </Label>
       </FormField>
       <FormField
+        v-if="form.values.audio_only === false"
         v-slot="{ value, handleChange }"
-        name="trimEnd"
-        v-if="form.values.audio_only === false">
+        name="trimEnd">
         <Label for="trimEnd">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
@@ -507,7 +510,7 @@ const removeFile = () => {
           </FormItem>
         </Label>
       </FormField>
-      <FormField name="segments" v-if="form.values.audio_only === false">
+      <FormField v-if="form.values.audio_only === false" name="segments">
         <FormItem
           class="flex flex-col items-start justify-between space-y-4 rounded-lg border p-4">
           <div
@@ -593,7 +596,7 @@ const removeFile = () => {
         </a>
       </p>
     </fieldset>
-    <Button type="submit">Konvertieren</Button>
+    <Button id="startConversionButton" type="submit">Konvertieren</Button>
   </form>
 </template>
 
