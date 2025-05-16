@@ -40,6 +40,10 @@ jobs:
         run: php artisan dusk:chrome-driver --detect
       - name: Start Chrome Driver
         run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
       - name: Build Assets
         run: npm install && npm run build
       - name: Migrate Database & Seed
