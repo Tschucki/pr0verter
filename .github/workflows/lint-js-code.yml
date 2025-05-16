@@ -31,14 +31,9 @@ jobs:
           php_version: '8.2'
           args: --ignore-platform-reqs --optimize-autoloader --no-progress --prefer-dist --optimize-autoloader
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 21
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 21
+          node-version: "21.7.3"
           cache: 'npm'
           cache-dependency-path: subdir/package-lock.json
 
