@@ -61,7 +61,7 @@ jobs:
         run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
       - uses: actions/setup-node@v4
         with:
-          node-version: "21.7.3"
+          node-version: "latest"
           cache: 'npm'
           cache-dependency-path: subdir/package-lock.json
       - run: npm run build
