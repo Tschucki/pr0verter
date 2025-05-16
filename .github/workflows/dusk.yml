@@ -9,7 +9,7 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  dusk-php:
+  test-app-with-dusk:
     runs-on: ubuntu-latest
     services:
       redis:
@@ -27,6 +27,7 @@ jobs:
       DB_PASSWORD: root
       MAIL_MAILER: log
       REDIS_HOST: localhost
+      QUEUE_CONNECTION: redis
     steps:
       - uses: actions/checkout@v4
       - name: Install yt-dlp and ffmpeg
