@@ -1,4 +1,4 @@
-name: 'JavaScript Code Linting'
+name: 'Lint JavaScript Code'
 
 on:
   push:

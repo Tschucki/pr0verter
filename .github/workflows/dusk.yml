@@ -11,11 +11,20 @@ on:
 jobs:
   dusk-php:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       APP_URL: "http://127.0.0.1:8000"
       DB_USERNAME: root
       DB_PASSWORD: root
       MAIL_MAILER: log
+      REDIS_HOST: redis
     steps:
       - uses: actions/checkout@v4
       - name: Install yt-dlp and ffmpeg
