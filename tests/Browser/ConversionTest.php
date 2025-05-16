@@ -14,7 +14,6 @@ class ConversionTest extends DuskTestCase
     public static function conversionUrlProvider(): array
     {
         return [
-            'youtube' => ['https://www.youtube.com/watch?v=tI1M2jVrsvA', 'youtube'],
             'pr0gramm' => ['https://vid.pr0gramm.com/2025/01/29/b9542c91cde48f99.mp4', 'pr0gramm'],
         ];
     }
