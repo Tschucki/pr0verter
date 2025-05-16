@@ -19,12 +19,14 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 6379:6379
     env:
       APP_URL: "http://127.0.0.1:8000"
       DB_USERNAME: root
       DB_PASSWORD: root
       MAIL_MAILER: log
-      REDIS_HOST: redis
+      REDIS_HOST: localhost
     steps:
       - uses: actions/checkout@v4
       - name: Install yt-dlp and ffmpeg
