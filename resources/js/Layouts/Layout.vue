@@ -24,8 +24,9 @@ const props = usePage().props;
 const sessionId = props.session.id;
 const version = ref(props.github_version || '');
 const alert = ref({
-  title: null,
-  description: null,
+  title: 'Probleme mit YouTube-Videos',
+  description:
+    'Die letzten Tage gabe es Probleme beim Download von YouTube-Videos. Das Problem sollte nun behoben sein.',
 });
 
 onMounted(() => {
