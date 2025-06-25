@@ -24,9 +24,8 @@ const props = usePage().props;
 const sessionId = props.session.id;
 const version = ref(props.github_version || '');
 const alert = ref({
-  title: 'YouTube Konvertierungen funktionieren wieder',
-  description:
-    'YouTube hat die API geändert und yt-dlp wurde aktualisiert. YouTube-Videos sollten nun wieder konvertiert werden können.',
+  title: null,
+  description: null,
 });
 
 onMounted(() => {
