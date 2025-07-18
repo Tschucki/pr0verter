@@ -11440,16 +11440,16 @@
         },
         {
             "name": "spatie/laravel-horizon-watcher",
-            "version": "1.1.3",
+            "version": "1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-horizon-watcher.git",
-                "reference": "cbebdaab800f9fd1bbb446223502466170d09363"
+                "reference": "141b94e8eea18f465c4419e8eea54936308a8788"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-horizon-watcher/zipball/cbebdaab800f9fd1bbb446223502466170d09363",
-                "reference": "cbebdaab800f9fd1bbb446223502466170d09363",
+                "url": "https://api.github.com/repos/spatie/laravel-horizon-watcher/zipball/141b94e8eea18f465c4419e8eea54936308a8788",
+                "reference": "141b94e8eea18f465c4419e8eea54936308a8788",
                 "shasum": ""
             },
             "require": {
@@ -11504,22 +11504,22 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-horizon-watcher/issues",
-                "source": "https://github.com/spatie/laravel-horizon-watcher/tree/1.1.3"
+                "source": "https://github.com/spatie/laravel-horizon-watcher/tree/1.1.4"
             },
-            "time": "2025-04-17T06:26:21+00:00"
+            "time": "2025-07-17T15:43:23+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
-            "version": "1.92.4",
+            "version": "1.92.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-package-tools.git",
-                "reference": "d20b1969f836d210459b78683d85c9cd5c5f508c"
+                "reference": "f09a799850b1ed765103a4f0b4355006360c49a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/d20b1969f836d210459b78683d85c9cd5c5f508c",
-                "reference": "d20b1969f836d210459b78683d85c9cd5c5f508c",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/f09a799850b1ed765103a4f0b4355006360c49a5",
+                "reference": "f09a799850b1ed765103a4f0b4355006360c49a5",
                 "shasum": ""
             },
             "require": {
@@ -11559,7 +11559,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-package-tools/issues",
-                "source": "https://github.com/spatie/laravel-package-tools/tree/1.92.4"
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.92.7"
             },
             "funding": [
                 {
@@ -11567,7 +11567,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-11T15:27:14+00:00"
+            "time": "2025-07-17T15:46:43+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
@@ -11759,6 +11759,6 @@
         "ext-sodium": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
