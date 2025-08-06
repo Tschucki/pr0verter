@@ -3133,16 +3133,16 @@
         },
         {
             "name": "norkunas/youtube-dl-php",
-            "version": "v2.10.0",
+            "version": "v2.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/norkunas/youtube-dl-php.git",
-                "reference": "4c954b3b8c6b30d0c0135ec758b61a91f0ac3b6a"
+                "reference": "f1cf998b510467633343ce76fef24c96a8225a93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/norkunas/youtube-dl-php/zipball/4c954b3b8c6b30d0c0135ec758b61a91f0ac3b6a",
-                "reference": "4c954b3b8c6b30d0c0135ec758b61a91f0ac3b6a",
+                "url": "https://api.github.com/repos/norkunas/youtube-dl-php/zipball/f1cf998b510467633343ce76fef24c96a8225a93",
+                "reference": "f1cf998b510467633343ce76fef24c96a8225a93",
                 "shasum": ""
             },
             "require": {
@@ -3189,9 +3189,9 @@
             ],
             "support": {
                 "issues": "https://github.com/norkunas/youtube-dl-php/issues",
-                "source": "https://github.com/norkunas/youtube-dl-php/tree/v2.10.0"
+                "source": "https://github.com/norkunas/youtube-dl-php/tree/v2.11.0"
             },
-            "time": "2025-02-20T17:32:37+00:00"
+            "time": "2025-08-01T03:42:27+00:00"
         },
         {
             "name": "nunomaduro/termwind",
@@ -5772,16 +5772,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v7.3.0",
+            "version": "v7.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "b8dce482de9d7c9fe2891155035a7248ab5c7fdb"
+                "reference": "edcbb768a186b5c3f25d0643159a787d3e63b7fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/b8dce482de9d7c9fe2891155035a7248ab5c7fdb",
-                "reference": "b8dce482de9d7c9fe2891155035a7248ab5c7fdb",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/edcbb768a186b5c3f25d0643159a787d3e63b7fd",
+                "reference": "edcbb768a186b5c3f25d0643159a787d3e63b7fd",
                 "shasum": ""
             },
             "require": {
@@ -5818,7 +5818,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v7.3.0"
+                "source": "https://github.com/symfony/filesystem/tree/v7.3.2"
             },
             "funding": [
                 {
@@ -5830,11 +5830,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-10-25T15:15:23+00:00"
+            "time": "2025-07-07T08:17:47+00:00"
         },
         {
             "name": "symfony/finder",
