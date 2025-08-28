@@ -19,6 +19,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from '@/components/ui/alert/index.js';
+import 'vue-sonner/style.css';
 
 const props = usePage().props;
 const sessionId = props.session.id;
