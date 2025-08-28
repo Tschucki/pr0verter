@@ -15,6 +15,8 @@ class FileUploadFailed implements ShouldBroadcast, ShouldQueue
     use InteractsWithSockets;
     use SerializesModels;
 
+    public string $queue = 'events';
+
     public function __construct(public string $sessionId) {}
 
     public function broadcastOn(): array

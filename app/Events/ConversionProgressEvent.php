@@ -26,6 +26,8 @@ class ConversionProgressEvent implements ShouldBroadcast, ShouldQueue
 
     public string $rate;
 
+    public string $queue = 'events';
+
     public function __construct(
         string $conversionId,
         string $percentage,

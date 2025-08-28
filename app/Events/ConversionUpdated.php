@@ -22,6 +22,8 @@ class ConversionUpdated implements ShouldBroadcast, ShouldQueue
 
     public array $conversion;
 
+    public string $queue = 'events';
+
     public function __construct(string $conversionId)
     {
         $this->conversionId = $conversionId;

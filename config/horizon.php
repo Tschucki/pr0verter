@@ -208,6 +208,19 @@ return [
             'timeout' => 1200,
             'nice' => 1,
         ],
+        'events' => [
+            'connection' => 'redis',
+            'queue' => ['events'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 600,
+            'tries' => 1,
+            'timeout' => 20,
+            'nice' => 1,
+        ],
     ],
 
     'environments' => [
@@ -222,6 +235,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'events' => [
+                'maxProcesses' => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 1,
+            ],
         ],
 
         'local' => [
@@ -230,6 +248,9 @@ return [
             ],
             'converter' => [
                 'maxProcesses' => 3,
+            ],
+            'events' => [
+                'maxProcesses' => 1,
             ],
         ],
     ],
