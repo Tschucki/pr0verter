@@ -12,7 +12,7 @@ const url = ref();
       <div class="space-y-1">
         <Label for="url">URL eingeben</Label>
         <Input id="url" v-model="url" class="w-full" />
-        <p class="text-sm text-muted-foreground">
+        <p class="text-muted-foreground text-sm">
           Kann alles sein. YouTube, einfache Datei oder sonst was
         </p>
       </div>

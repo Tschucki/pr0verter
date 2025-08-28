@@ -39,7 +39,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
           isOverDropZone ? 'Lass die Maus los' : 'Datei hochladen oder ablegen'
         }}
       </h3>
-      <p class="mb-4 mt-2 text-sm text-muted-foreground">
+      <p class="text-muted-foreground mt-2 mb-4 text-sm">
         Datei hier hineinziehen oder anklicken um Datei hochzuladen.<br />
         Upload beginnt erst beim Starten der Konvertierung!
       </p>

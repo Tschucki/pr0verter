@@ -187,14 +187,14 @@ onMounted(() => {
                       conversion.progress.filter((s) => s.visible).length - 1
                     ]
                   "
-                  class="absolute left-[18px] top-[38px] block h-[105%] w-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary" />
+                  class="bg-muted group-data-[state=completed]:bg-primary absolute top-[38px] left-[18px] block h-[105%] w-0.5 shrink-0 rounded-full" />
 
                 <StepperTrigger as-child>
                   <Button
                     :class="[
                       step.completed &&
                         step.current_step &&
-                        'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                        'ring-ring ring-offset-background ring-2 ring-offset-2',
                     ]"
                     :disabled="step.current_step === false"
                     :variant="
@@ -225,7 +225,7 @@ onMounted(() => {
                   </StepperTitle>
                   <StepperDescription
                     :class="[step.current_step && 'text-primary']"
-                    class="text-xs text-muted-foreground transition lg:text-sm">
+                    class="text-muted-foreground text-xs transition lg:text-sm">
                     {{ step.description }}
                     <strong
                       v-if="
@@ -304,7 +304,7 @@ onMounted(() => {
               <StopCircle class="mr-2 size-4"></StopCircle>
               Konvertierung abbrechen
             </Button>
-            <p class="text-sm text-muted-foreground">
+            <p class="text-muted-foreground text-sm">
               Öffentliche Links können direkt beim Upload auf pr0gramm
               eingegeben werden.
               <a

@@ -214,7 +214,7 @@ const removeFile = () => {
                       : 'Datei hochladen oder ablegen'
                   }}
                 </h3>
-                <p class="mb-4 mt-2 text-sm text-muted-foreground">
+                <p class="text-muted-foreground mt-2 mb-4 text-sm">
                   Datei hier hineinziehen oder anklicken um Datei
                   hochzuladen.<br />
                   Upload beginnt erst beim Starten der Konvertierung!
@@ -273,7 +273,7 @@ const removeFile = () => {
                     :model-value="value"
                     class="w-full"
                     @update:model-value="handleChange" />
-                  <p class="text-sm text-muted-foreground">
+                  <p class="text-muted-foreground text-sm">
                     Kann alles sein. YouTube, einfache Datei oder sonst was
                   </p>
                 </div>
@@ -343,7 +343,7 @@ const removeFile = () => {
             <FormControl>
               <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
                 <RotateCcw
-                  class="size-4 cursor-pointer text-muted-foreground"
+                  class="text-muted-foreground size-4 cursor-pointer"
                   @click="resetAudioQuality" />
                 <NumberField
                   id="audioQuality"
@@ -586,7 +586,7 @@ const removeFile = () => {
           </div>
         </FormItem>
       </FormField>
-      <p class="text-sm text-muted-foreground">
+      <p class="text-muted-foreground text-sm">
         <a
           target="_blank"
           href="https://pr0gramm.com/inbox/messages/PimmelmannJones"

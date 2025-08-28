@@ -23,7 +23,7 @@ const forwarded = useForwardProps(delegatedProps);
   <StepperIndicator
     :class="
       cn(
-        'inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground/50',
+        'text-muted-foreground/50 inline-flex h-10 w-10 items-center justify-center rounded-full',
         // Disabled
         'group-data-disabled:text-muted-foreground group-data-disabled:opacity-50',
         // Active
