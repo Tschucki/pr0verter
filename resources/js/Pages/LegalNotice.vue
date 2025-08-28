@@ -15,7 +15,7 @@ defineProps({
   </Head>
 
   <div
-    class="markdown prose mx-auto max-w-5xl flex-grow py-6"
+    class="markdown prose mx-auto max-w-5xl grow py-6"
     v-html="content"></div>
 </template>
 

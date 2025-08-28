@@ -27,7 +27,7 @@ const forwarded = useForwardProps(delegatedProps);
     v-slot="slotProps"
     :class="
       cn(
-        'group flex items-center gap-2 data-[disabled]:pointer-events-none',
+        'group flex items-center gap-2 data-disabled:pointer-events-none',
         props.class
       )
     "

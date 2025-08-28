@@ -200,7 +200,7 @@ onMounted(() => {
                     :variant="
                       step.completed || step.current_step
                         ? 'default'
-                        : 'outline'
+                        : 'outline-solid'
                     "
                     class="pointer-events-none z-10 shrink-0 rounded-full"
                     size="icon">

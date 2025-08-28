@@ -25,7 +25,8 @@ const sessionId = props.session.id;
 const version = ref(props.github_version || '');
 const alert = ref({
   title: 'Infrastruktur Upgrade',
-  description: 'Innerhalb der nächsten Tage werden ich die Infrastruktur upgraden. Der pr0verter und der pr0texter werden für einige Zeit möglicherweise nicht nicht erreichbar sein.',
+  description:
+    'Innerhalb der nächsten Tage werden ich die Infrastruktur upgraden. Der pr0verter und der pr0texter werden für einige Zeit möglicherweise nicht nicht erreichbar sein.',
 });
 
 onMounted(() => {
@@ -91,7 +92,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-center',
+                  'w-full! justify-center!',
                 ]">
                 Converter
               </NavigationMenuLink>
@@ -102,7 +103,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-center',
+                  'w-full! justify-center!',
                 ]">
                 Statistik
               </NavigationMenuLink>
@@ -113,7 +114,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-center',
+                  'w-full! justify-center!',
                 ]">
                 Konvertierungen
               </NavigationMenuLink>
@@ -125,7 +126,7 @@ const logout = async () => {
               href="https://github.com/Tschucki/pr0verter"
               :class="[
                 navigationMenuTriggerStyle(),
-                '!w-full !justify-center',
+                'w-full! justify-center!',
               ]">
               <GithubIcon />
             </NavigationMenuLink>
@@ -134,7 +135,7 @@ const logout = async () => {
             v-if="$page.props.user !== null"
             class="block w-full cursor-pointer">
             <NavigationMenuLink
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-center']"
+              :class="[navigationMenuTriggerStyle(), 'w-full! justify-center!']"
               @click="logout">
               Logout
             </NavigationMenuLink>
@@ -153,7 +154,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-start',
+                  'w-full! justify-start!',
                 ]">
                 Converter
               </NavigationMenuLink>
@@ -164,7 +165,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-start',
+                  'w-full! justify-start!',
                 ]">
                 Konvertierungen
               </NavigationMenuLink>
@@ -175,7 +176,7 @@ const logout = async () => {
               <NavigationMenuLink
                 :class="[
                   navigationMenuTriggerStyle(),
-                  '!w-full !justify-start',
+                  'w-full! justify-start!',
                 ]">
                 Statistik
               </NavigationMenuLink>
@@ -185,7 +186,7 @@ const logout = async () => {
             <NavigationMenuLink
               target="_blank"
               href="https://github.com/Tschucki/pr0verter"
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']">
+              :class="[navigationMenuTriggerStyle(), 'w-full! justify-start!']">
               <GithubIcon />
               - GitHub
             </NavigationMenuLink>
@@ -194,7 +195,7 @@ const logout = async () => {
             v-if="$page.props.user !== null"
             class="block w-full">
             <NavigationMenuLink
-              :class="[navigationMenuTriggerStyle(), '!w-full !justify-start']"
+              :class="[navigationMenuTriggerStyle(), 'w-full! justify-start!']"
               @click="logout">
               Logout
             </NavigationMenuLink>
@@ -211,9 +212,9 @@ const logout = async () => {
       </AlertDescription>
     </Alert>
     <slot />
-    <div class="group fixed bottom-5 right-5 z-20">
+    <div class="group fixed right-5 bottom-5 z-20">
       <h4
-        class="mb-2 cursor-default text-center text-4xl font-extrabold tracking-wide text-gray-200 transition-colors duration-200 group-hover:text-primary">
+        class="group-hover:text-primary mb-2 cursor-default text-center text-4xl font-extrabold tracking-wide text-gray-200 transition-colors duration-200">
         {{ version }}
       </h4>
       <a
@@ -237,12 +238,12 @@ const logout = async () => {
         <nav aria-label="quick links" class="mt-10 text-sm">
           <div class="-my-1 flex flex-wrap justify-center gap-2 lg:gap-6">
             <Link
-              class="inline-block rounded-lg px-2 py-1 text-sm hover:text-primary"
+              class="hover:text-primary inline-block rounded-lg px-2 py-1 text-sm"
               :href="route('legal-notice')"
               >Impressum
             </Link>
             <Link
-              class="inline-block rounded-lg px-2 py-1 text-sm hover:text-primary"
+              class="hover:text-primary inline-block rounded-lg px-2 py-1 text-sm"
               :href="route('privacy-policy')"
               >Datenschutz
             </Link>
@@ -250,7 +251,7 @@ const logout = async () => {
         </nav>
       </div>
       <div
-        class="flex flex-col items-center border-t border-muted py-10 sm:flex-row-reverse sm:justify-between">
+        class="border-muted flex flex-col items-center border-t py-10 sm:flex-row-reverse sm:justify-between">
         <a :href="route('home')" target="_blank" class="text-sm sm:mt-0"
           >{{ new Date().getFullYear() }} - pr0verter</a
         >
