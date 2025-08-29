@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\WeeklyReportCommand;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('app:cleanup')->hourly();
+        $schedule->command(WeeklyReportCommand::class)->sundays()->at('19:30')->timezone('Europe/Berlin');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

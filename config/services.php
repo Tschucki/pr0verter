@@ -37,4 +37,10 @@ return [
         ],
     ],
 
+    'pr0gramm' => [
+        'username' => env('PR0GRAMM_USERNAME'),
+        'password' => env('PR0GRAMM_PASSWORD'),
+        'cookie' => env('PR0GRAMM_COOKIE'),
+    ],
+
 ];

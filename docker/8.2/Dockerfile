@@ -5,11 +5,12 @@ LABEL maintainer="Taylor Otwell"
 ARG WWWGROUP
 ARG NODE_VERSION=22
 ARG POSTGRES_VERSION=17
+ARG IMAGEMAGICK_VERSION=7.1.1-30
 
 WORKDIR /var/www/html
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=UTC
+ENV TZ=Europe/Berlin
 ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80"
 ENV SUPERVISOR_PHP_USER="sail"
 
@@ -63,6 +64,33 @@ RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.2
 RUN userdel -r ubuntu
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+
+ENV PUPPETEER_CACHE_DIR=/var/www/html/.cache/puppeteer
+RUN mkdir -p $PUPPETEER_CACHE_DIR
+RUN chown -R sail:$WWWGROUP $PUPPETEER_CACHE_DIR
+
+RUN apt-get update \
+    && apt-get install -y nodejs libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libnss3 lsb-release xdg-utils wget libgbm-dev libxshmfence-dev \
+    && apt-get install -y libx11-xcb1 libxcomposite1 libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    && apt-get install -y chromium \
+    && apt-get install chromium-browser \
+    && PUPPETEER_SKIP_DOWNLOAD=true npm install --location=global --unsafe-perm puppeteer@^24.17.1 \
+    && npx puppeteer browsers install chrome-headless-shell
+
+RUN cp /etc/apt/sources.list /etc/apt/sources.list~
+RUN echo "deb-src http://archive.ubuntu.com/ubuntu noble main restricted universe multiverse" | tee -a /etc/apt/sources.list
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install build-essential git -y
+RUN apt-get build-dep imagemagick -y
+RUN git clone https://github.com/ImageMagick/ImageMagick.git /tmp/ImageMagick
+WORKDIR /tmp/ImageMagick
+RUN git checkout tags/$IMAGEMAGICK_VERSION
+RUN ./configure --disable-shared
+RUN make
+RUN make install
+
+WORKDIR /var/www/html
+RUN rm -rf /tmp/ImageMagick
 
 COPY start-container /usr/local/bin/start-container
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

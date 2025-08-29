@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ConversionStatus;
 use App\Models\Statistic;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Number;
@@ -36,27 +37,32 @@ class StatController extends Controller
     {
         $stats = [];
 
-        $allUrls = Statistic::whereNotNull('url')->get();
+        $allUrls = Statistic::where('status', ConversionStatus::FINISHED)->whereNotNull('url')->pluck('url');
+
         $urls = null;
+
         try {
-            $urls = $allUrls->groupBy(static function ($item) {
-                return parse_url($item->url, PHP_URL_HOST);
+            $urls = $allUrls->groupBy(static function ($url) {
+                return parse_url($url, PHP_URL_HOST);
             });
+
+            $urlsWithCounts = $urls->map(fn ($item) => $item->count());
 
             $synonyms = self::YOUTUBE_SYNONYMS;
 
+            $youtubeCount = 0;
             foreach ($synonyms as $synonym) {
-                $mainDomain = $synonym[0];
-                $urls[$mainDomain] = $urls[$mainDomain] ?? collect();
-                foreach ($synonym as $domain) {
-                    if ($domain !== $mainDomain) {
-                        $urls[$mainDomain] = $urls[$mainDomain]->merge($urls[$domain]);
-                        unset($urls[$domain]);
-                    }
+                if (isset($urlsWithCounts[$synonym])) {
+                    $youtubeCount += $urlsWithCounts[$synonym];
+                    unset($urlsWithCounts[$synonym]);
                 }
             }
 
-            $urls = $urls->sortByDesc(fn ($item) => $item->count());
+            if ($youtubeCount > 0) {
+                $urlsWithCounts->put('youtube.com', $youtubeCount);
+            }
+
+            $urls = $urlsWithCounts->sortDesc();
         } catch (Throwable $th) {
             Log::error('Could not group urls by domain', ['exception' => $th]);
         }
@@ -119,7 +125,9 @@ class StatController extends Controller
 
         $stats['trimmed'] = [
             'title' => 'Videos zugeschnitten',
-            'value' => Statistic::whereNotNull('trim_start')->orWhereNotNull('trim_end')->count() . ' Videos',
+            'value' => Statistic::where('status', ConversionStatus::FINISHED)->where(function (Builder $query) {
+                $query->whereNotNull('trim_start')->orWhereNotNull('trim_end');
+            })->count() . ' Videos',
         ];
 
         $stats['removed_audio'] = [
