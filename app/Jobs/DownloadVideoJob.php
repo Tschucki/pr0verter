@@ -121,7 +121,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
         } catch (Throwable $th) {
             $conversion->update([
                 'status' => ConversionStatus::FAILED,
-                'error_message' => Str::limit($th->getMessage(),250),
+                'error_message' => Str::limit($th->getMessage(), 250),
             ]);
 
             Log::error('Failed to download video', [

@@ -23,7 +23,10 @@
     "laravel/tinker": "^2.9",
     "norkunas/youtube-dl-php": "^2.9",
     "pbmedia/laravel-ffmpeg": "^8.6",
-    "tightenco/ziggy": "^2.4"
+    "spatie/browsershot": "^5.0",
+    "spatie/image": "^3.8",
+    "tightenco/ziggy": "^2.4",
+    "tschucki/laravel-pr0gramm-api": "^1.0"
   },
   "require-dev": {
     "fakerphp/faker": "^1.23",

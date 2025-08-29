@@ -30,9 +30,9 @@ class DownloadProgress implements ShouldBroadcast, ShouldQueue
 
     public ?string $eta;
 
-    private ?string $totalTime;
-
     public string $queue = 'events';
+
+    private ?string $totalTime;
 
     public function __construct(string $conversionId, ?string $progressTarget = null, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null)
     {
