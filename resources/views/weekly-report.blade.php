@@ -75,7 +75,7 @@
                     Dieser Post wurde automatisch generiert und gepostet.
                 </p>
                 <p class="mt-1 text-sm/8 font-semibold tracking-wide text-center text-primary">
-                    pr0verter.com
+                    pr0verter.de
                 </p>
             </div>
         </div>
