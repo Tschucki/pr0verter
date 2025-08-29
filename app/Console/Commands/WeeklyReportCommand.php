@@ -47,6 +47,7 @@ class WeeklyReportCommand extends Command
             'to' => $to,
             'generatedAt' => now(),
         ])->render())
+            ->noSandbox()
             ->deviceScaleFactor(3)
             ->fullPage()
             ->disableCaptureURLs()
