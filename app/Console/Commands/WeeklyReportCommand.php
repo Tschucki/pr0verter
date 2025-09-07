@@ -70,7 +70,7 @@ class WeeklyReportCommand extends Command
         $pr0PostService = new Pr0PostService;
 
         $pr0PostService->postImage($imagePath,
-            'Wöchentlicher Bericht von ' . $from->format('d.m.Y') . ' bis ' . $to->format('d.m.Y'),
+            'Wöchentlicher Bericht vom ' . $from->format('d.m.Y') . ' bis ' . $to->format('d.m.Y') . ' | https://pr0verter.de',
             ['pr0verter', 'Statistiken', 'Wochenstatistik', 'das pr0 programmiert', 'sfw', 'image', 'api']
         );
     }
