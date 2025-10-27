@@ -97,7 +97,7 @@ class StatController extends Controller
 
         $stats['finished'] = [
             'title' => 'Erfolgreiche Konvertierungen',
-            'value' => Statistic::where('status', ConversionStatus::FINISHED)->count(),
+            'value' => Number::format(Statistic::where('status', ConversionStatus::FINISHED)->count()),
         ];
 
         $stats['average_conversion_time'] = [
@@ -115,29 +115,29 @@ class StatController extends Controller
 
         $stats['added_watermarks'] = [
             'title' => 'Wasserzeichen hinzugefügt',
-            'value' => Statistic::where('watermark', true)->where('status', ConversionStatus::FINISHED)->count() . ' Wasserzeichen',
+            'value' => Number::format(Statistic::where('watermark', true)->where('status', ConversionStatus::FINISHED)->count()) . ' Wasserzeichen',
         ];
 
         $stats['auto_crop'] = [
             'title' => 'Automatisch zugeschnittene Videos',
-            'value' => Statistic::where('auto_crop', true)->where('status', ConversionStatus::FINISHED)->count() . ' Videos',
+            'value' => Number::format(Statistic::where('auto_crop', true)->where('status', ConversionStatus::FINISHED)->count()) . ' Videos',
         ];
 
         $stats['trimmed'] = [
             'title' => 'Videos zugeschnitten',
-            'value' => Statistic::where('status', ConversionStatus::FINISHED)->where(function (Builder $query) {
+            'value' => Number::format(Statistic::where('status', ConversionStatus::FINISHED)->where(function (Builder $query) {
                 $query->whereNotNull('trim_start')->orWhereNotNull('trim_end');
-            })->count() . ' Videos',
+            })->count()) . ' Videos',
         ];
 
         $stats['removed_audio'] = [
             'title' => 'Audio entfernt',
-            'value' => Statistic::where('audio', false)->count() . ' mal',
+            'value' => Number::format(Statistic::where('audio', false)->count()) . ' mal',
         ];
 
         $stats['audio_only'] = [
             'title' => 'Nur Audio extrahiert',
-            'value' => Statistic::where('audio_only', true)->count() . ' mal',
+            'value' => Number::format(Statistic::where('audio_only', true)->count()) . ' mal',
         ];
 
         return $stats;
