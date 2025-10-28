@@ -8,7 +8,7 @@ return [
         \App\Conversion\MediaOperations\RemoveExifDataFilterOperation::class,
     ],
     'default_format_operations' => [
-
+        \App\Conversion\MediaOperations\ColorDepthOperation::class,
     ],
     'binaries' => [
         'ffmpeg' => config('laravel-ffmpeg.ffmpeg.binaries'),
