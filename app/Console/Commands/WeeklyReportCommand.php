@@ -70,7 +70,7 @@ class WeeklyReportCommand extends Command
         $pr0PostService = new Pr0PostService;
 
         $pr0PostService->postImage($imagePath,
-            'Wöchentlicher Bericht vom ' . $from->format('d.m.Y') . ' bis ' . $to->format('d.m.Y') . ' | https://pr0verter.de',
+            'Wöchentlicher Bericht vom ' . $from->format('d.m.Y') . ' bis ' . $to->format('d.m.Y') . ' | https://pr0verter.de | https://github.com/Tschucki/pr0verter',
             ['pr0verter', 'Statistiken', 'Wochenstatistik', 'das pr0 programmiert', 'sfw', 'image', 'api']
         );
     }
@@ -120,7 +120,7 @@ class WeeklyReportCommand extends Command
                 ->groupBy('extension')
                 ->orderByRaw('COUNT(extension) DESC')
                 ->first()->extension,
-            'average_conversion_time' => Number::format((int) $newBaseQuery()->avg('conversion_time'), 2, locale: 'de-DE') . ' Sekunden',
+            'average_conversion_time' => Number::format((int) $newBaseQuery()->avg('conversion_time'), 0, locale: 'de-DE') . ' Sekunden',
             'favorite_time_to_convert' => $newBaseQuery()->selectRaw('HOUR(created_at) as hour, COUNT(id) as count')
                 ->groupBy('hour')
                 ->orderByRaw('COUNT(id) DESC')
