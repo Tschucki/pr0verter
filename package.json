@@ -19,7 +19,7 @@
         "eslint": "^9.34.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.4",
-        "eslint-plugin-vue": "^10.4.0",
+        "eslint-plugin-vue": "^10.6.2",
         "laravel-echo": "^2.2.0",
         "laravel-vite-plugin": "^2.0",
         "postcss": "^8.5.6",
