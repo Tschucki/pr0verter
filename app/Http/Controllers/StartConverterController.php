@@ -39,7 +39,9 @@ class StartConverterController extends Controller
 
         // ConversionJob::dispatchSync($conversion->id);
 
-        ConversionJob::dispatch($conversion->id)->onQueue('converter');
+        if ($request->hasFile('file')) {
+            ConversionJob::dispatch($conversion->id)->onQueue('converter');
+        }
 
         return redirect()->route('conversions.list');
     }
