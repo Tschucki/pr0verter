@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Conversion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,7 +14,7 @@ class ListConverterController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->sessionId = $request->session()->getId();
+        $this->sessionId = Session::getId();
     }
 
     public function index(Request $request): Response

@@ -7,6 +7,7 @@ use App\Events\ConversionUpdated;
 use App\Models\Conversion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -23,7 +24,7 @@ class ConversionController extends Controller
         }
 
         $conversionSessionId = $file->session_id;
-        $sessionId = $request->session()->getId();
+        $sessionId = Session::getId();
 
         if ($file->isPublic() === false) {
             abort_unless($conversionSessionId === $sessionId, 403);
@@ -44,7 +45,7 @@ class ConversionController extends Controller
 
     public function togglePublicFlag(Conversion $conversion, Request $request): JsonResponse
     {
-        $sessionId = $request->session()->getId();
+        $sessionId = Session::getId();
         $conversionSessionId = $conversion->file->session_id;
 
         abort_unless($conversionSessionId === $sessionId, 403);
@@ -62,7 +63,7 @@ class ConversionController extends Controller
 
     public function cancel(Conversion $conversion, Request $request): JsonResponse
     {
-        $sessionId = $request->session()->getId();
+        $sessionId = Session::getId();
         $conversionSessionId = $conversion->file->session_id;
 
         abort_unless($conversionSessionId === $sessionId, 403);

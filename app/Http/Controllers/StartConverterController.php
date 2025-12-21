@@ -13,6 +13,7 @@ use App\Models\Conversion;
 use App\Models\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class StartConverterController extends Controller
 {
@@ -20,7 +21,7 @@ class StartConverterController extends Controller
 
     public function __construct()
     {
-        $this->sessionId = request()->session()->getId();
+        $this->sessionId = Session::getId();
     }
 
     public function __invoke(StartConverterRequest $request)

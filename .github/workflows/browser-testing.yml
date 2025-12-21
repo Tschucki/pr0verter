@@ -51,7 +51,7 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_extensions: intl zip sodium pcntl bcmath
-          php_version: '8.2'
+          php_version: '8.4'
           args: --ignore-platform-reqs --optimize-autoloader --no-progress --prefer-dist --optimize-autoloader
       - name: Generate Application Key
         run: php artisan key:generate
@@ -69,6 +69,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - run: npm run build
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Migrate Database & Seed
         run: php artisan migrate:fresh --seed --force
       - name: Run Laravel Server
@@ -77,17 +79,5 @@ jobs:
         run: php artisan reverb:start --host="0.0.0.0" --port=8080 --no-interaction &
       - name: Run Laravel Horizon
         run: php artisan horizon &
-      - name: Run Dusk Tests
-        run: php artisan dusk
-      - name: Upload Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: tests/Browser/screenshots
-      - name: Upload Console Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: console
-          path: tests/Browser/console
+      - name: Run Browser Tests
+        run: ./vendor/bin/pest --ci --parallel

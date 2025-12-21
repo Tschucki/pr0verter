@@ -22,7 +22,7 @@ jobs:
       - uses: php-actions/composer@v6
         with:
           php_extensions: intl zip sodium pcntl bcmath
-          php_version: '8.2'
+          php_version: '8.4'
           args: --ignore-platform-reqs --optimize-autoloader --no-progress --prefer-dist --optimize-autoloader
       - uses: php-actions/phpstan@v3
         with:
