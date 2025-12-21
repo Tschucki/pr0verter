@@ -66,7 +66,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     ->audioFormat('mp3')
                     ->audioQuality(0);
             } else {
-                $options = $options->format('bestvideo+bestaudio/best');
+                $options = $options->format('bestvideo*+bestaudio/best');
             }
 
             $video = $youtubeDl->download($options)->getVideos()[0] ?? null;
@@ -74,7 +74,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             if ($video === null || $video->getError() !== null) {
                 $conversion->update([
                     'status' => ConversionStatus::FAILED,
-                    'error_message' => $video->getError(),
+                    'error_message' => Str::limit($video->getError(), 255),
                 ]);
 
                 Log::error('Failed to download video', [

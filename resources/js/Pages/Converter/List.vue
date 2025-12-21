@@ -1,5 +1,6 @@
 <script setup>
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 import {
   Card,
@@ -126,6 +127,28 @@ const cancelConversion = async (conversion) => {
   });
 };
 
+const formatQualityTier = (tier) => {
+  const tiers = {
+    ultra_hd: '4K Ultra HD (2160p)',
+    full_hd: 'Full HD (1080p)',
+    hd: 'HD (720p)',
+    sd: 'SD (480p)',
+    low_res: 'Low Resolution (360p)',
+  };
+  return tiers[tier] || tier;
+};
+
+const getQualityTierVariant = (tier) => {
+  const variants = {
+    ultra_hd: 'default',
+    full_hd: 'default',
+    hd: 'secondary',
+    sd: 'secondary',
+    low_res: 'outline',
+  };
+  return variants[tier] || 'outline';
+};
+
 onMounted(() => {
   // eslint-disable-next-line no-undef
   Echo.channel(`session.${sessionId}`)
@@ -167,6 +190,13 @@ onMounted(() => {
               >Hochgeladen {{ conversion.file.created_at_diff }}</span
             >
           </CardDescription>
+          <div v-if="conversion.quality_tier" class="mt-4 flex flex-wrap gap-2">
+            <Badge
+              v-if="conversion.quality_tier"
+              :variant="getQualityTierVariant(conversion.quality_tier)">
+              {{ formatQualityTier(conversion.quality_tier) }}
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent class="grid gap-4">
           <div>

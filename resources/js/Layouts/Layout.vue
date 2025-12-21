@@ -25,9 +25,9 @@ const props = usePage().props;
 const sessionId = props.session.id;
 const version = ref(props.github_version || '');
 const alert = ref({
-  title: 'Infrastruktur Upgrade',
+  title: 'Update',
   description:
-    'Innerhalb der nächsten Tage werden ich die Infrastruktur upgraden. Der pr0verter und der pr0texter werden für einige Zeit möglicherweise nicht nicht erreichbar sein.',
+    'Standard Maximalgröße beträgt nun 2000 MB. Auf dem pr0gramm können wir nun Videos bis zu 2 GB hochladen.',
 });
 
 onMounted(() => {

@@ -18,6 +18,8 @@ class MaxSizeOperation implements MediaFormatOperation
 
     private $currentAudioBitrate;
 
+    private $currentVideoBitrate;
+
     public function __construct(Conversion $conversion)
     {
         $this->conversion = $conversion;
@@ -47,6 +49,11 @@ class MaxSizeOperation implements MediaFormatOperation
 
         $kiloBitRate = (int) floor($videoBitrate / 1024);
 
+        if (isset($this->currentVideoBitrate) && $this->currentVideoBitrate > 0) {
+            $originalVideoBitrateInKiloBits = (int) floor($this->currentVideoBitrate / 1024);
+            $kiloBitRate = min($kiloBitRate, $originalVideoBitrateInKiloBits);
+        }
+
         $input = Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename);
 
         $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
@@ -68,7 +75,9 @@ class MaxSizeOperation implements MediaFormatOperation
         foreach ($streams as $stream) {
             if ($stream->get('codec_type') === 'audio') {
                 $this->currentAudioBitrate = $stream->get('bit_rate');
-                break;
+            }
+            if ($stream->get('codec_type') === 'video') {
+                $this->currentVideoBitrate = $stream->get('bit_rate');
             }
         }
     }

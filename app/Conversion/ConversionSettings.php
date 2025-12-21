@@ -10,8 +10,6 @@ class ConversionSettings
 {
     public bool $audio;
 
-    public bool $keepResolution;
-
     public float $audioQuality;
 
     public ?int $trimStart;
@@ -66,7 +64,6 @@ class ConversionSettings
         $settings = $this->convertKeysToSnakeCase($settings);
 
         $this->audio = $settings['audio'] ?? true;
-        $this->keepResolution = $settings['keep_resolution'] ?? false;
         $this->audioQuality = $settings['audio_quality'] ?? 1.0;
         $this->trimStart = $this->convertToSeconds($settings['trim_start'] ?? null);
         $this->trimEnd = $this->convertToSeconds($settings['trim_end'] ?? null);
@@ -79,7 +76,6 @@ class ConversionSettings
 
         if ($this->audio_only === true) {
             $this->audio = true;
-            $this->keepResolution = false;
             $this->autoCrop = false;
             $this->watermark = false;
             $this->interpolation = false;
@@ -97,7 +93,6 @@ class ConversionSettings
     {
         return [
             'audio' => $this->audio,
-            'keep_resolution' => $this->keepResolution,
             'audio_quality' => $this->audioQuality,
             'trim_start' => $this->trimStart,
             'trim_end' => $this->trimEnd,

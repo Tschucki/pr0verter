@@ -6,6 +6,7 @@ use App\Models\Conversion;
 use App\Services\GitHubVersionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -43,9 +44,9 @@ class HandleInertiaRequests extends Middleware
                 ? Auth::user()->only('id', 'name', 'email')
                 : null,
             'session' => [
-                'id' => $request->session()->getId(),
+                'id' => Session::getId(),
             ],
-            'conversions' => fn () => Conversion::where('session_id', $request->session()->getId())->select('id')->get(),
+            'conversions' => fn () => Conversion::where('session_id', Session::getId())->select('id')->get(),
             'github_version' => app(GitHubVersionService::class)->getVersion(),
         ]);
     }

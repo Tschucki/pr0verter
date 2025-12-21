@@ -119,12 +119,12 @@ class WeeklyReportCommand extends Command
             'most_used_input_extension' => $newBaseQuery()->select('extension')
                 ->groupBy('extension')
                 ->orderByRaw('COUNT(extension) DESC')
-                ->first()->extension,
+                ->first()?->extension,
             'average_conversion_time' => Number::format((int) $newBaseQuery()->avg('conversion_time'), 0, locale: 'de-DE') . ' Sekunden',
             'favorite_time_to_convert' => $newBaseQuery()->selectRaw('HOUR(created_at) as hour, COUNT(id) as count')
                 ->groupBy('hour')
                 ->orderByRaw('COUNT(id) DESC')
-                ->first()->hour . ' Uhr',
+                ->first()?->hour . ' Uhr',
             'added_watermarks' => $newBaseQuery()->where('watermark', true)->count(),
             'auto_copped' => $newBaseQuery()->where('auto_crop', true)->count(),
             'trimmed' => $newBaseQuery()->where(function (Builder $query) {

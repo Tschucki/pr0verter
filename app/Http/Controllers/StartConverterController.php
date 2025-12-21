@@ -13,16 +13,10 @@ use App\Models\Conversion;
 use App\Models\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class StartConverterController extends Controller
 {
-    private string $sessionId;
-
-    public function __construct()
-    {
-        $this->sessionId = request()->session()->getId();
-    }
-
     public function __invoke(StartConverterRequest $request)
     {
         $validated = $request->validated();
@@ -38,16 +32,14 @@ class StartConverterController extends Controller
         $conversion = Conversion::create([
             ...$conversionSettings->toArray(),
             'status' => ConversionStatus::PENDING,
-            'session_id' => $this->sessionId,
+            'session_id' => Session::getId(),
             'file_id' => $file->id ?? null,
             'url' => $validated['url'] ?? null,
         ]);
 
         // ConversionJob::dispatchSync($conversion->id);
 
-        if ($request->hasFile('file')) {
-            ConversionJob::dispatch($conversion->id)->onQueue('converter');
-        }
+        ConversionJob::dispatch($conversion->id)->onQueue('converter');
 
         return redirect()->route('conversions.list');
     }
@@ -57,10 +49,10 @@ class StartConverterController extends Controller
         $file = $this->storeUploadedFile($request->file('file'));
 
         if ($file === null) {
-            FileUploadFailed::dispatch($this->sessionId);
+            FileUploadFailed::dispatch(Session::getId());
         }
 
-        FileUploadSuccessful::dispatch($this->sessionId);
+        FileUploadSuccessful::dispatch(Session::getId());
 
         return $file;
     }
@@ -72,30 +64,30 @@ class StartConverterController extends Controller
 
         Log::info('Uploaded File has been stored', [
             'fullPath' => $fullPath,
-            'sessionId' => $this->sessionId,
+            'sessionId' => Session::getId(),
         ]);
 
         return File::firstOrCreate([
-            'session_id' => $this->sessionId,
+            'session_id' => Session::getId(),
         ], [
             'disk' => 'conversions',
             'size' => $uploadedFile->getSize(),
             'extension' => $uploadedFile->extension(),
             'filename' => $fileName,
-            'session_id' => $this->sessionId,
+            'session_id' => Session::getId(),
             'mime_type' => $uploadedFile->getMimeType(),
         ]);
     }
 
     private function deleteOldFiles(): void
     {
-        $countOldFiles = File::where('session_id', $this->sessionId)->count();
+        $countOldFiles = File::where('session_id', Session::getId())->count();
 
-        Conversion::where('session_id', $this->sessionId)->delete();
-        File::where('session_id', $this->sessionId)->delete();
+        Conversion::where('session_id', Session::getId())->delete();
+        File::where('session_id', Session::getId())->delete();
 
         if ($countOldFiles > 0) {
-            PreviousFilesDeleted::dispatch($this->sessionId);
+            PreviousFilesDeleted::dispatch(Session::getId());
         }
     }
 }

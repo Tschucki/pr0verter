@@ -92,7 +92,7 @@ class StatController extends Controller
             'value' => Statistic::select('extension')
                 ->groupBy('extension')
                 ->orderByRaw('COUNT(extension) DESC')
-                ->first()->extension,
+                ->first()?->extension,
         ];
 
         $stats['finished'] = [

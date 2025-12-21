@@ -1,11 +1,11 @@
 services:
     pr0verter.test:
         build:
-            context: './docker/8.2'
+            context: './docker/8.4'
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.2/app'
+        image: 'sail-8.4/app'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -25,7 +25,6 @@ services:
         depends_on:
             - mysql
             - redis
-            - selenium
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -65,14 +64,6 @@ services:
                 - ping
             retries: 3
             timeout: 5s
-    selenium:
-        image: selenium/standalone-chromium
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
-        volumes:
-            - '/dev/shm:/dev/shm'
-        networks:
-            - sail
 networks:
     sail:
         driver: bridge
