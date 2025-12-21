@@ -3,32 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Conversion;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ListConverterController extends Controller
 {
-    private string $sessionId;
-
-    public function __construct(Request $request)
+    public function index(): Response
     {
-        $this->sessionId = Session::getId();
-    }
-
-    public function index(Request $request): Response
-    {
-        $conversions = Conversion::with('file')->where('session_id', $this->sessionId)->get();
+        $conversions = Conversion::with('file')->where('session_id', Session::getId())->get();
 
         return Inertia::render('Converter/List', [
             'conversions' => $conversions->toArray(),
         ]);
     }
 
-    public function myConversions(Request $request): array
+    public function myConversions(): array
     {
-        $conversions = Conversion::with('file')->where('session_id', $this->sessionId)->get();
+        $conversions = Conversion::with('file')->where('session_id', Session::getId())->get();
 
         return $conversions->toArray();
     }
