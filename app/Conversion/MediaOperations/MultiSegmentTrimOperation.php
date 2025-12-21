@@ -115,7 +115,7 @@ class MultiSegmentTrimOperation implements MediaFilterOperation
             $filterComplex[] = "movie='{$watermarkPath}'[watermark]";
             $filterComplex[] = "[concatv][watermark]overlay=main_w-{$watermarkOffsetX}-overlay_w:main_h-{$watermarkOffsetY}-overlay_h[outv]";
         } else {
-            $filterComplex[] = "[concatv]copy[outv]";
+            $filterComplex[] = '[concatv]copy[outv]';
         }
 
         $media->addFilter(['-filter_complex', implode(';', $filterComplex)]);
