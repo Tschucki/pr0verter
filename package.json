@@ -41,6 +41,7 @@
         "lucide-vue-next": "^0.555.0",
         "puppeteer": "^24.17.1",
         "radix-vue": "^1.9.17",
+        "reka-ui": "^2.6.1",
         "tailwind-merge": "^3.4.0",
         "tailwindcss-animate": "^1.0.7",
         "vee-validate": "^4.15.1",

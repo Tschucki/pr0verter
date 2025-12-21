@@ -25,6 +25,10 @@ class AddPr0GrammWatermarkFilterOperation implements MediaFilterOperation
 
     public function applyToMedia(MediaOpener $media): MediaOpener
     {
+        if (! empty($this->conversion->segments)) {
+            return $media;
+        }
+
         return $media->addWatermark(function (WatermarkFactory $watermark) {
             $watermark->fromDisk('watermarks')
                 ->open('pr0gramm-logo.png')

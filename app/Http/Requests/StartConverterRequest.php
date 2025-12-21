@@ -17,19 +17,17 @@ class StartConverterRequest extends FormRequest
         return [
             'file' => ['file', 'bail', new VideoRule, 'nullable'],
             'url' => 'string|url|nullable|bail',
-            // 'keepResolution' => 'required|boolean',
             'audio' => 'required|boolean',
             'audioQuality' => 'required|numeric|min:0,01|max:1',
             'trimStart' => 'nullable|string',
             'trimEnd' => 'nullable|string',
-            'maxSize' => 'nullable|numeric|min:10|max:500',
+            'maxSize' => 'nullable|numeric|min:10|max:2000',
             'segments' => 'nullable|array',
             'segments.*.start' => 'required|numeric|min:0',
             'segments.*.duration' => 'nullable|numeric|min:1',
             'autoCrop' => 'nullable|boolean',
             'watermark' => 'nullable|boolean',
             'audio_only' => 'nullable|boolean',
-            // 'interpolation' => 'nullable|boolean',
         ];
     }
 }

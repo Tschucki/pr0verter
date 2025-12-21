@@ -55,7 +55,6 @@ const formSchema = toTypedSchema(
   z.object({
     file: z.any().optional(),
     url: z.string().url('Keine valide URL').nullish().optional().default(null),
-    // keepResolution: z.boolean().default(false),
     audio: z.boolean().default(true),
     audioQuality: z
       .number()
@@ -66,7 +65,7 @@ const formSchema = toTypedSchema(
     trimStart: z.string().nullish(),
     trimEnd: z.string().nullish(),
     segments: z.array().optional(), // Zod Form sucks
-    maxSize: z.number().min(1).max(500).default(200),
+    maxSize: z.number().min(1).max(2000).default(2000),
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
     audio_only: z.boolean().default(false),
@@ -100,7 +99,6 @@ const onSubmit = form.handleSubmit(async (values) => {
 
   inertiaForm.file = values.file;
   inertiaForm.url = values.url;
-  //inertiaForm.segments
   inertiaForm.audio = values.audio;
   inertiaForm.audioQuality = values.audioQuality;
   inertiaForm.trimStart = values.trimStart;
@@ -129,9 +127,11 @@ const onSubmit = form.handleSubmit(async (values) => {
         preserverState: true,
         preserveScroll: true,
         onSuccess: (data) => {
+          console.log(error);
           resolve(data);
         },
         onError: (error) => {
+          console.log(error);
           reject(error);
         },
       });
@@ -177,15 +177,36 @@ const removeFile = () => {
     </h1>
     <fieldset class="grid gap-6 rounded-lg border p-4">
       <legend class="-ml-1 px-1 text-sm font-medium">Datei auswählen</legend>
-      <Tabs class="w-full" default-value="upload">
+      <Tabs class="w-full" default-value="download">
         <TabsList class="w-full">
-          <TabsTrigger class="w-full" value="upload">
-            Datei hochladen
-          </TabsTrigger>
           <TabsTrigger class="download-tab-trigger w-full" value="download">
             Download</TabsTrigger
           >
+          <TabsTrigger class="w-full" value="upload">
+            Datei hochladen
+          </TabsTrigger>
         </TabsList>
+        <TabsContent value="download">
+          <FormField v-slot="{ value, handleChange }" name="url">
+            <div class="flex h-60 shrink-0 rounded-md border p-4">
+              <div class="flex w-full flex-col">
+                <div class="space-y-1">
+                  <Label for="url">URL eingeben</Label>
+                  <Input
+                    id="url"
+                    name="url"
+                    :model-value="value"
+                    class="w-full"
+                    @update:model-value="handleChange" />
+                  <p class="text-muted-foreground text-sm">
+                    Kann alles sein. YouTube, einfache Datei oder sonst was
+                  </p>
+                </div>
+              </div>
+            </div>
+            <FormMessage class="mt-2" />
+          </FormField>
+        </TabsContent>
         <TabsContent value="upload">
           <FormField v-slot="{ handleChange, handleBlur }" name="file">
             <FormItem
@@ -258,27 +279,6 @@ const removeFile = () => {
                   @change="handleChange" />
               </FormControl>
             </FormItem>
-            <FormMessage class="mt-2" />
-          </FormField>
-        </TabsContent>
-        <TabsContent value="download">
-          <FormField v-slot="{ value, handleChange }" name="url">
-            <div class="flex h-60 shrink-0 rounded-md border p-4">
-              <div class="flex w-full flex-col">
-                <div class="space-y-1">
-                  <Label for="url">URL eingeben</Label>
-                  <Input
-                    id="url"
-                    name="url"
-                    :model-value="value"
-                    class="w-full"
-                    @update:model-value="handleChange" />
-                  <p class="text-muted-foreground text-sm">
-                    Kann alles sein. YouTube, einfache Datei oder sonst was
-                  </p>
-                </div>
-              </div>
-            </div>
             <FormMessage class="mt-2" />
           </FormField>
         </TabsContent>
@@ -387,10 +387,11 @@ const removeFile = () => {
                 <NumberField
                   id="maxSize"
                   class="w-full"
-                  :default-value="200"
-                  :max="500"
+                  :default-value="2000"
+                  :max="2000"
                   :model-value="value"
                   :step="1"
+                  locale="de-DE"
                   @update:model-value="handleChange">
                   <NumberFieldContent>
                     <NumberFieldInput />

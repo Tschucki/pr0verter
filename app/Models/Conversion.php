@@ -7,11 +7,15 @@ use App\Contracts\MediaFormatOperation;
 use App\Conversion\MediaOperations\AddPr0GrammWatermarkFilterOperation;
 use App\Conversion\MediaOperations\AudioExtractionOperation;
 use App\Conversion\MediaOperations\AudioQualityFilterOperation;
+use App\Conversion\MediaOperations\AudioSampleRateLimitFilterOperation;
 use App\Conversion\MediaOperations\AutoCropFilterOperation;
+use App\Conversion\MediaOperations\FramerateLimitFilterOperation;
 use App\Conversion\MediaOperations\InterpolateFilterOperation;
 use App\Conversion\MediaOperations\MaxSizeOperation;
 use App\Conversion\MediaOperations\MultiSegmentTrimOperation;
 use App\Conversion\MediaOperations\RemoveAudioFilterOperation;
+use App\Conversion\MediaOperations\RotationFilterOperation;
+use App\Conversion\MediaOperations\ShortEdgeScalingFilterOperation;
 use App\Conversion\MediaOperations\TrimFilterOperation;
 use App\Enums\ConversionStatus;
 use App\Observers\ConversionObserver;
@@ -42,6 +46,7 @@ class Conversion extends Model
         'downloadable' => 'boolean',
         'segments' => 'array',
         'audio_only' => 'boolean',
+        'metadata' => 'array',
     ];
 
     public function toArray(): array
@@ -112,7 +117,7 @@ class Conversion extends Model
                 'current_step' => $this->status === ConversionStatus::FAILED,
                 'status' => ConversionStatus::FAILED,
                 'title' => 'Konvertierung fehlgeschlagen',
-                'description' => 'Die Konvertierung ist fehlgeschlagen.',
+                'description' => 'Die Konvertierung ist fehlgeschlagen. ' . $this->error_message,
                 'visible' => $this->status === ConversionStatus::FAILED,
             ],
             [
@@ -133,6 +138,18 @@ class Conversion extends Model
     public function getMediaOperations(): array
     {
         $operations = [];
+
+        if (isset($this->metadata['rotation']) && $this->metadata['rotation'] !== 0) {
+            $operations[] = new RotationFilterOperation($this);
+        }
+
+        $operations[] = new FramerateLimitFilterOperation($this);
+
+        $operations[] = new AudioSampleRateLimitFilterOperation($this);
+
+        if ($this->quality_tier) {
+            $operations[] = new ShortEdgeScalingFilterOperation($this);
+        }
 
         if ($this->audio === false) {
             $operations[] = new RemoveAudioFilterOperation;
@@ -209,7 +226,6 @@ class Conversion extends Model
             'extension' => $this->file->extension ?? '',
             'size' => $this->file->size ?? 0,
             'status' => $this->status,
-            'keep_resolution' => $this->keep_resolution,
             'audio' => $this->audio,
             'audio_only' => $this->audio_only,
             'auto_crop' => $this->auto_crop,
