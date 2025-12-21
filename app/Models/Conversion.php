@@ -163,7 +163,6 @@ class Conversion extends Model
             $operations[] = new TrimFilterOperation($this);
         }
 
-
         if ($this->watermark) {
             $operations[] = new AddPr0GrammWatermarkFilterOperation($this);
         }

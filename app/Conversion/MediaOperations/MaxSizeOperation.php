@@ -106,4 +106,3 @@ class MaxSizeOperation implements MediaFormatOperation
         return $endSeconds - $startSeconds;
     }
 }
-
