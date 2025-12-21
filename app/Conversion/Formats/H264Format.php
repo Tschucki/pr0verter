@@ -34,9 +34,6 @@ class H264Format extends X264
             '-color_primaries', '1',
             '-color_trc', '1',
             '-colorspace', '1',
-            '-ar', '44100',
-            '-maxrate', $this->qualityTier->getH264MaxBitrate() . 'k',
-            '-bufsize', ($this->qualityTier->getH264MaxBitrate() * 2) . 'k',
         ]);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Conversion\MediaOperations;
 
 use App\Contracts\MediaFilterOperation;
 use App\Models\Conversion;
+use FFMpeg\Filters\Video\VideoFilters;
 use ProtoneMedia\LaravelFFMpeg\MediaOpener;
 
 readonly class RotationFilterOperation implements MediaFilterOperation
@@ -20,11 +21,17 @@ readonly class RotationFilterOperation implements MediaFilterOperation
             $rotation = (int) $this->conversion->metadata['rotation'];
 
             if ($rotation === 90) {
-                $media->addFilter(['-vf', 'transpose=1']);
+                $media->addFilter(function (VideoFilters $filters) {
+                    $filters->custom('transpose=1');
+                });
             } elseif ($rotation === 180) {
-                $media->addFilter(['-vf', 'transpose=2,transpose=2']);
+                $media->addFilter(function (VideoFilters $filters) {
+                    $filters->custom('transpose=2,transpose=2');
+                });
             } elseif ($rotation === 270) {
-                $media->addFilter(['-vf', 'transpose=2']);
+                $media->addFilter(function (VideoFilters $filters) {
+                    $filters->custom('transpose=2');
+                });
             }
         }
 

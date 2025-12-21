@@ -4,6 +4,8 @@ namespace App\Conversion\MediaOperations;
 
 use App\Contracts\MediaFilterOperation;
 use App\Models\Conversion;
+use FFMpeg\Filters\Video\VideoFilters;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\MediaOpener;
@@ -22,7 +24,13 @@ class AutoCropFilterOperation implements MediaFilterOperation
 
     public function applyToMedia(MediaOpener $media): MediaOpener
     {
-        $media->addFilter(['-vf', $this->crop]);
+        $cropFilter = $this->crop;
+
+        if (! empty($cropFilter) && str_contains($cropFilter, 'crop=')) {
+            $media->addFilter(function (VideoFilters $filters) use ($cropFilter) {
+                $filters->custom($cropFilter);
+            });
+        }
 
         return $media;
     }
@@ -34,8 +42,54 @@ class AutoCropFilterOperation implements MediaFilterOperation
         $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
         $timeout = config('laravel-ffmpeg.timeout');
 
-        $process = Process::run("{$ffmpeg} -timeout {$timeout} -flags2 +export_mvs -i {$path} -vf cropdetect -f null - 2>&1 | awk '/crop/ { print \$NF }' | tail -1");
+        $escapedPath = escapeshellarg($path);
 
-        $this->crop = trim($process->output());
+        $command = "{$ffmpeg} -i {$escapedPath} -vf cropdetect -f null - 2>&1 | grep -o 'crop=[0-9:]*' | tail -1";
+
+        $process = Process::run($command);
+
+        $output = trim($process->output());
+
+        if (! empty($output) && preg_match('/^crop=(\d+):(\d+):(\d+):(\d+)$/', $output, $matches)) {
+            $cropWidth = (int) $matches[1];
+            $cropHeight = (int) $matches[2];
+            $cropX = (int) $matches[3];
+            $cropY = (int) $matches[4];
+
+            $originalWidth = $this->conversion->metadata['width'] ?? 0;
+            $originalHeight = $this->conversion->metadata['height'] ?? 0;
+
+            $isValid = $cropWidth > 0 &&
+                       $cropHeight > 0 &&
+                       $cropX >= 0 &&
+                       $cropY >= 0 &&
+                       $originalWidth > 0 &&
+                       $originalHeight > 0 &&
+                       ($cropX + $cropWidth) <= $originalWidth &&
+                       ($cropY + $cropHeight) <= $originalHeight;
+
+            if ($isValid) {
+                $this->crop = $output;
+            } else {
+                Log::warning('AutoCrop parameters are invalid or out of bounds', [
+                    'conversion_id' => $this->conversion->id,
+                    'crop_output' => $output,
+                    'original_width' => $originalWidth,
+                    'original_height' => $originalHeight,
+                    'crop_width' => $cropWidth,
+                    'crop_height' => $cropHeight,
+                ]);
+
+                $this->crop = '';
+            }
+        } else {
+            Log::warning('AutoCrop detection failed or returned invalid output', [
+                'conversion_id' => $this->conversion->id,
+                'output' => $output,
+                'exit_code' => $process->exitCode(),
+            ]);
+
+            $this->crop = '';
+        }
     }
 }

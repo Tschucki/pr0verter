@@ -30,6 +30,8 @@ class AudioSampleRateLimitFilterOperation implements MediaFilterOperation
 
         if ($sampleRate > self::MAX_SAMPLE_RATE) {
             $media->addFilter(['-ar', (string) self::DEFAULT_SAMPLE_RATE]);
+        } else {
+            $media->addFilter(['-ar', (string) $sampleRate]);
         }
 
         return $media;

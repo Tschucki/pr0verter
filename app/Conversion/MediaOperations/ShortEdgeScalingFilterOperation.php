@@ -7,6 +7,7 @@ namespace App\Conversion\MediaOperations;
 use App\Contracts\MediaFilterOperation;
 use App\Enums\QualityTier;
 use App\Models\Conversion;
+use FFMpeg\Filters\Video\VideoFilters;
 use ProtoneMedia\LaravelFFMpeg\MediaOpener;
 
 readonly class ShortEdgeScalingFilterOperation implements MediaFilterOperation
@@ -81,7 +82,9 @@ readonly class ShortEdgeScalingFilterOperation implements MediaFilterOperation
             $targetHeight = $targetHeight % 2 === 0 ? $targetHeight : $targetHeight - 1;
         }
 
-        $media->addFilter(['-vf', "scale={$targetWidth}:{$targetHeight}:force_original_aspect_ratio=decrease"]);
+        $media->addFilter(function (VideoFilters $filters) use ($targetWidth, $targetHeight) {
+            $filters->custom("scale='min({$targetWidth},iw)':'min({$targetHeight},ih)':force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2");
+        });
 
         return $media;
     }

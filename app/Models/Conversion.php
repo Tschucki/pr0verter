@@ -147,6 +147,10 @@ class Conversion extends Model
 
         $operations[] = new AudioSampleRateLimitFilterOperation($this);
 
+        if ($this->auto_crop) {
+            $operations[] = new AutoCropFilterOperation($this);
+        }
+
         if ($this->quality_tier) {
             $operations[] = new ShortEdgeScalingFilterOperation($this);
         }
@@ -159,9 +163,6 @@ class Conversion extends Model
             $operations[] = new TrimFilterOperation($this);
         }
 
-        if ($this->auto_crop) {
-            $operations[] = new AutoCropFilterOperation($this);
-        }
 
         if ($this->watermark) {
             $operations[] = new AddPr0GrammWatermarkFilterOperation($this);

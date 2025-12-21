@@ -7,7 +7,7 @@ use App\Models\Conversion;
 use FFMpeg\FFProbe;
 use FFMpeg\FFProbe\DataMapping\Format;
 use FFMpeg\Format\Video\DefaultVideo;
-use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class MaxSizeOperation implements MediaFormatOperation
@@ -28,37 +28,45 @@ class MaxSizeOperation implements MediaFormatOperation
 
     public function applyToFormat(DefaultVideo $format): DefaultVideo
     {
-        // removing 4MB from the max size to make sure the video fits
-        // TODO: feels wrong to hardcode this :/
+        $containerOverheadPercent = 0.03;
+        $maxSizeInMB = $this->conversion->max_size;
+        $usableSize = $maxSizeInMB * (1 - $containerOverheadPercent);
 
-        $maxSizeInMB = $this->conversion->max_size - 4;
         $duration = $this->actualDuration();
 
         if ($duration === 0) {
             return $format;
         }
 
-        $audioBitrate = $this->conversion->audio ? $this->currentAudioBitrate * $this->conversion->audio_quality : 0;
-        $audioBitrateInKiloBits = $audioBitrate / 1024;
-        $maxSizeInBits = $maxSizeInMB * 1024 * 1024 * 8;
-        $videoBitrate = floor(($maxSizeInBits / $duration) - floor($audioBitrateInKiloBits));
-
-        if ($videoBitrate < 0) {
-            $videoBitrate = 0;
+        $audioBitrateKbps = 0;
+        if ($this->conversion->audio && $this->currentAudioBitrate) {
+            $audioBitrateKbps = ($this->currentAudioBitrate / 1000) * $this->conversion->audio_quality;
         }
 
-        $kiloBitRate = (int) floor($videoBitrate / 1024);
+        $totalBitrateKbps = ($usableSize * 8192) / $duration;
+
+        $videoBitrateKbps = $totalBitrateKbps - $audioBitrateKbps;
+
+        if ($videoBitrateKbps < 100) {
+            $videoBitrateKbps = 100;
+        }
 
         if (isset($this->currentVideoBitrate) && $this->currentVideoBitrate > 0) {
-            $originalVideoBitrateInKiloBits = (int) floor($this->currentVideoBitrate / 1024);
-            $kiloBitRate = min($kiloBitRate, $originalVideoBitrateInKiloBits);
+            $originalVideoBitrateKbps = $this->currentVideoBitrate / 1000;
+            $videoBitrateKbps = min($videoBitrateKbps, $originalVideoBitrateKbps);
         }
 
-        $input = Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename);
+        $kiloBitRate = (int) round($videoBitrateKbps);
 
-        $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
-        $timeout = config('laravel-ffmpeg.timeout');
-        Process::run("{$ffmpeg} -timeout {$timeout}  -y -i {$input} -c:v libx264 -b:v {$kiloBitRate}k -pass 1 -f null /dev/null");
+        Log::info('Bitrate calculation', [
+            'conversion_id' => $this->conversion->id,
+            'max_size_mb' => $maxSizeInMB,
+            'usable_size_mb' => $usableSize,
+            'duration_seconds' => $duration,
+            'total_bitrate_kbps' => $totalBitrateKbps,
+            'audio_bitrate_kbps' => $audioBitrateKbps,
+            'video_bitrate_kbps' => $kiloBitRate,
+        ]);
 
         $format->setKiloBitrate($kiloBitRate);
         $format->setPasses(2);
@@ -98,3 +106,4 @@ class MaxSizeOperation implements MediaFormatOperation
         return $endSeconds - $startSeconds;
     }
 }
+
