@@ -46,7 +46,7 @@ class AutoCropFilterOperation implements MediaFilterOperation
 
         $command = "{$ffmpeg} -i {$escapedPath} -vf cropdetect -f null - 2>&1 | grep -o 'crop=[0-9:]*' | tail -1";
 
-        $process = Process::run($command);
+        $process = Process::timeout(3 * 60)->run($command);
 
         $output = trim($process->output());
 
