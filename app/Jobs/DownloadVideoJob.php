@@ -66,7 +66,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     ->audioFormat('mp3')
                     ->audioQuality(0);
             } else {
-                $options = $options->format('bestvideo*+bestaudio/best');
+                $options = $options->format('bestvideo+bestaudio/best');
             }
 
             $video = $youtubeDl->download($options)->getVideos()[0] ?? null;
