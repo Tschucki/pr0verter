@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
 use YoutubeDl\Options;
-use YoutubeDl\YoutubeDl;
 
 class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
 {
@@ -36,7 +35,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 'status' => ConversionStatus::DOWNLOADING,
             ]);
 
-            $youtubeDl = app(YoutubeDl::class);
+            $youtubeDl = app('pr0verter-yt-dlp');
 
             $youtubeDl->onProgress(function (?string $progressTarget, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null) use ($conversion): void {
                 $iPercentage = $percentage !== null ? (int) str_replace('%', '', $percentage) : null;
