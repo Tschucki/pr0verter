@@ -26,6 +26,15 @@ const sessionId = props.session.id;
 const version = ref(props.github_version || '');
 const alerts = ref([
   {
+    title: 'Probleme mit YouTube-Downloads gelöst',
+    description:
+      'YouTube macht es einem immer schwerer, Vidoes herunterzuladen. Das Problem sollte jetzt behoben sein. Falls ihr weiterhin Probleme habt, meldet euch gerne bei mir.',
+    button: {
+      text: 'Mehr Infos dazu',
+      link: 'https://github.com/yt-dlp/yt-dlp/issues/15012',
+    },
+  },
+  {
     title: 'Discord Server',
     description:
       'Ich habe einen Discord-Server angelegt, auf dem ihr mir Feedback geben könnt und über fehlgeschlagene Konvertierungen berichten könnt.',
