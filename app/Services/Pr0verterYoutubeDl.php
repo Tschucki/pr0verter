@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use YoutubeDl\Entity\Extractor;
 use YoutubeDl\Entity\Mso;
