@@ -299,10 +299,20 @@ const logout = async () => {
         </nav>
       </div>
       <div
-        class="border-muted flex flex-col items-center border-t py-10 sm:flex-row-reverse sm:justify-between">
+        class="border-muted flex flex-col items-center gap-4 border-t py-10 sm:flex-row-reverse sm:justify-between">
         <a :href="route('home')" target="_blank" class="text-sm sm:mt-0"
           >{{ new Date().getFullYear() }} - pr0verter</a
         >
+        <p class="text-muted-foreground text-xs">
+          Gehostet auf
+          <a
+            href="https://hetzner.cloud/?ref=7V6N8i5122gH"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-primary underline underline-offset-2"
+            >Hetzner</a
+          >
+        </p>
       </div>
     </div>
   </footer>
