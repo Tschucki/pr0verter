@@ -71,14 +71,16 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             $video = $youtubeDl->download($options)->getVideos()[0] ?? null;
 
             if ($video === null || $video->getError() !== null) {
+                $errorMessage = $video?->getError() ?? 'yt-dlp lieferte kein Video zurück.';
+
                 $conversion->update([
                     'status' => ConversionStatus::FAILED,
-                    'error_message' => Str::limit($video->getError(), 255),
+                    'error_message' => Str::limit($errorMessage, 255),
                 ]);
 
                 Log::error('Failed to download video', [
                     'conversion_id' => $conversion->id,
-                    'error' => $video->getError(),
+                    'error' => $errorMessage,
                 ]);
 
                 return;
