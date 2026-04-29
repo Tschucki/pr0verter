@@ -13,7 +13,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import pr0verterLogo from '../../assets/pr0verter.png';
 import { Button } from '@/components/ui/button/index.js';
-import { GithubIcon } from 'lucide-vue-next';
+import { GithubIcon, Sparkles, X } from 'lucide-vue-next';
 import {
   Alert,
   AlertDescription,
@@ -24,9 +24,41 @@ import 'vue-sonner/style.css';
 const props = usePage().props;
 const sessionId = props.session.id;
 const version = ref(props.github_version || '');
+
+const ALERT_DISMISS_KEY = 'pr0verter.dismissedAlerts';
+const releaseNotes = [
+  {
+    id: 'subtitles-thumbnails-2026-04',
+    variant: 'default',
+    title: 'Neu: Untertitel & Vorschaubilder',
+    description:
+      'Ihr könnt jetzt Untertitel direkt ins Video rendern. Natürlich nur, wenn das Video auch welche hinterlegt hat. Außerdem ziehe ich jetzt auch das Thumbnail vom Video, um es in der Übersicht darzustellen.',
+  },
+];
 const alerts = ref([]);
 
+const loadDismissedAlerts = () => {
+  try {
+    const raw = localStorage.getItem(ALERT_DISMISS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const dismissAlert = (id) => {
+  const dismissed = loadDismissedAlerts();
+  if (!dismissed.includes(id)) {
+    dismissed.push(id);
+    localStorage.setItem(ALERT_DISMISS_KEY, JSON.stringify(dismissed));
+  }
+  alerts.value = alerts.value.filter((alert) => alert.id !== id);
+};
+
 onMounted(() => {
+  const dismissed = loadDismissedAlerts();
+  alerts.value = releaseNotes.filter((alert) => !dismissed.includes(alert.id));
+
   // eslint-disable-next-line no-undef
   Echo.channel(`session.${sessionId}`)
     .listen('FileUploadFailed', () => {
@@ -242,9 +274,10 @@ const logout = async () => {
   <main class="mx-auto max-w-4xl px-4 py-6">
     <Alert
       v-for="alert in alerts.filter((a) => a.title && a.description)"
-      class="mb-8"
-      :key="index"
-      :variant="alert.variant || 'info'">
+      :key="alert.id"
+      class="mb-8 pr-12"
+      :variant="alert.variant || 'default'">
+      <Sparkles class="size-4" />
       <AlertTitle>{{ alert.title }}</AlertTitle>
       <AlertDescription>
         {{ alert.description }}
@@ -258,6 +291,14 @@ const logout = async () => {
           </a>
         </template>
       </AlertDescription>
+      <Button
+        :aria-label="`Hinweis „${alert.title}“ ausblenden`"
+        class="text-muted-foreground hover:text-foreground absolute top-2 right-2 size-7"
+        size="icon"
+        variant="ghost"
+        @click="dismissAlert(alert.id)">
+        <X class="size-4" />
+      </Button>
     </Alert>
     <slot />
     <div class="group fixed right-5 bottom-5 z-20">

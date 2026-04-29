@@ -21,6 +21,11 @@ class H264Format extends X264
         $this->setAudioKiloBitrate($qualityTier->getAudioBitrate());
     }
 
+    public function getQualityTier(): QualityTier
+    {
+        return $this->qualityTier;
+    }
+
     public function getExtraParams(): array
     {
         return array_merge(parent::getExtraParams(), [

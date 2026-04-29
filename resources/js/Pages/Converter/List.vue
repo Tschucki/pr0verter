@@ -20,12 +20,16 @@ import {
   StepperTrigger,
 } from '@/components/ui/stepper';
 import {
+  Captions,
+  CaptionsOff,
   Check,
   Dot,
   Download,
+  Film,
   Link as LinkIcon,
   Loader,
   Loader2,
+  Music,
   StopCircle,
   X,
 } from 'lucide-vue-next';
@@ -127,6 +131,19 @@ const cancelConversion = async (conversion) => {
   });
 };
 
+const subtitleTooltip = (status) => {
+  switch (status) {
+    case 'embedded':
+      return 'Untertitel zuschaltbar (im Player ein-/ausblendbar)';
+    case 'burnt':
+      return 'Untertitel immer sichtbar (fest im Bild)';
+    case 'unavailable':
+      return 'Keine Untertitel gefunden';
+    default:
+      return '';
+  }
+};
+
 const formatQualityTier = (tier) => {
   const tiers = {
     ultra_hd: '4K Ultra HD (2160p)',
@@ -181,171 +198,232 @@ onMounted(() => {
         v-for="(conversion, idx) in allConversions"
         :key="idx"
         :class="cn($attrs.class ?? '')">
-        <CardHeader>
-          <CardTitle class="truncate"
-            >{{ conversion.file?.filename ?? 'Noch nicht vorhanden' }}
-          </CardTitle>
-          <CardDescription>
-            <span v-if="conversion.file?.created_at_diff"
-              >Hochgeladen {{ conversion.file.created_at_diff }}</span
-            >
-          </CardDescription>
-          <div v-if="conversion.quality_tier" class="mt-4 flex flex-wrap gap-2">
-            <Badge
-              v-if="conversion.quality_tier"
-              :variant="getQualityTierVariant(conversion.quality_tier)">
-              {{ formatQualityTier(conversion.quality_tier) }}
-            </Badge>
+        <div class="flex flex-col gap-4 p-6 md:flex-row">
+          <div
+            class="bg-muted relative aspect-video h-28 shrink-0 overflow-hidden rounded">
+            <img
+              v-if="conversion.thumbnail_path"
+              :src="`${route('conversions.thumbnail', conversion.id)}?v=${conversion.updated_at}`"
+              :alt="`Vorschau für ${conversion.file?.filename ?? 'Konvertierung'}`"
+              class="absolute inset-0 h-full w-full object-contain"
+              loading="lazy" />
+            <div v-else class="flex h-full w-full items-center justify-center">
+              <Music
+                v-if="conversion.audio_only"
+                aria-hidden="true"
+                class="text-muted-foreground h-6 w-6" />
+              <Film
+                v-else
+                aria-hidden="true"
+                class="text-muted-foreground h-6 w-6" />
+            </div>
           </div>
-        </CardHeader>
-        <CardContent class="grid gap-4">
-          <div>
-            <Stepper
-              class="mx-auto flex w-full flex-col justify-start gap-10"
-              orientation="vertical">
-              <StepperItem
-                v-for="step in conversion.progress.filter(
-                  (step) => step.visible
-                )"
-                :key="step.order"
-                :step="step.order"
-                class="relative flex w-full items-start gap-6">
-                <StepperSeparator
+          <div class="-m-6 min-w-0 flex-1 md:-my-6 md:-mr-6 md:ml-0">
+            <CardHeader>
+              <CardTitle class="truncate"
+                >{{ conversion.file?.filename ?? 'Noch nicht vorhanden' }}
+              </CardTitle>
+              <CardDescription>
+                <span v-if="conversion.file?.created_at_diff"
+                  >Hochgeladen {{ conversion.file.created_at_diff }}</span
+                >
+              </CardDescription>
+              <div
+                v-if="
+                  conversion.quality_tier ||
+                  (conversion.status === 'finished' &&
+                    conversion.subtitle_status)
+                "
+                class="mt-4 flex flex-wrap items-center gap-2">
+                <Badge
+                  v-if="conversion.quality_tier"
+                  :variant="getQualityTierVariant(conversion.quality_tier)">
+                  {{ formatQualityTier(conversion.quality_tier) }}
+                </Badge>
+                <span
                   v-if="
-                    step !==
-                    conversion.progress.filter((s) => s.visible)[
-                      conversion.progress.filter((s) => s.visible).length - 1
-                    ]
+                    conversion.status === 'finished' &&
+                    conversion.subtitle_status
                   "
-                  class="bg-muted group-data-[state=completed]:bg-primary absolute top-[38px] left-[18px] block h-[105%] w-0.5 shrink-0 rounded-full" />
-
-                <StepperTrigger as-child>
-                  <Button
-                    :class="[
-                      step.completed &&
-                        step.current_step &&
-                        'ring-ring ring-offset-background ring-2 ring-offset-2',
-                    ]"
-                    :disabled="step.current_step === false"
-                    :variant="
-                      step.completed || step.current_step
-                        ? 'default'
-                        : 'outline-solid'
+                  class="inline-flex items-center"
+                  :title="subtitleTooltip(conversion.subtitle_status)">
+                  <Captions
+                    v-if="
+                      conversion.subtitle_status === 'embedded' ||
+                      conversion.subtitle_status === 'burnt'
                     "
-                    class="pointer-events-none z-10 shrink-0 rounded-full"
-                    size="icon">
-                    <Check v-if="step.completed" class="size-5" />
-                    <X
-                      v-else-if="
-                        step.completed === false && step.current_step === false
+                    :class="[
+                      'size-4',
+                      conversion.subtitle_status === 'burnt'
+                        ? 'text-foreground'
+                        : 'text-muted-foreground',
+                    ]" />
+                  <CaptionsOff
+                    v-else-if="conversion.subtitle_status === 'unavailable'"
+                    class="text-muted-foreground size-4" />
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent class="grid gap-4">
+              <div>
+                <Stepper
+                  class="mx-auto flex w-full flex-col justify-start gap-10"
+                  orientation="vertical">
+                  <StepperItem
+                    v-for="step in conversion.progress.filter(
+                      (step) => step.visible
+                    )"
+                    :key="step.order"
+                    :step="step.order"
+                    class="relative flex w-full items-start gap-6">
+                    <StepperSeparator
+                      v-if="
+                        step !==
+                        conversion.progress.filter((s) => s.visible)[
+                          conversion.progress.filter((s) => s.visible).length -
+                            1
+                        ]
                       "
-                      class="size-5" />
-                    <Loader
-                      v-else-if="step.current_step && step.completed === false"
-                      class="size-5 animate-spin" />
-                    <Dot v-else />
-                  </Button>
-                </StepperTrigger>
+                      class="bg-muted group-data-[state=completed]:bg-primary absolute top-[38px] left-[18px] block h-[105%] w-0.5 shrink-0 rounded-full" />
 
-                <div class="flex flex-col gap-1">
-                  <StepperTitle
-                    :class="[step.current_step && 'text-primary']"
-                    class="text-sm font-semibold transition lg:text-base">
-                    {{ step.title }}
-                  </StepperTitle>
-                  <StepperDescription
-                    :class="[step.current_step && 'text-primary']"
-                    class="text-muted-foreground text-xs transition lg:text-sm">
-                    {{ step.description }}
-                    <strong
-                      v-if="
-                        step.status === 'processing' && conversion.progressEvent
-                      ">
-                      <br />
-                      Fortschritt: {{ conversion.progressEvent.percentage }}%
-                    </strong>
-                    <strong
-                      v-if="
-                        step.status === 'downloading' &&
-                        conversion.downloadProgressEvent
-                      ">
-                      <br />
-                      Fortschritt:
-                      {{ conversion.downloadProgressEvent.percentage }}<br />
-                      Geschwindigkeit:
-                      {{ conversion.downloadProgressEvent.speed }}<br />
-                      Verbleibend: {{ conversion.downloadProgressEvent.eta }}
-                    </strong>
-                    <strong
-                      v-if="
-                        step.status === 'failed' && conversion.error_message
-                      ">
-                      <br />
-                      {{ conversion.error_message }}
-                    </strong>
-                  </StepperDescription>
-                </div>
-              </StepperItem>
-            </Stepper>
+                    <StepperTrigger as-child>
+                      <Button
+                        :class="[
+                          step.completed &&
+                            step.current_step &&
+                            'ring-ring ring-offset-background ring-2 ring-offset-2',
+                        ]"
+                        :disabled="step.current_step === false"
+                        :variant="
+                          step.completed || step.current_step
+                            ? 'default'
+                            : 'outline-solid'
+                        "
+                        class="pointer-events-none z-10 shrink-0 rounded-full"
+                        size="icon">
+                        <Check v-if="step.completed" class="size-5" />
+                        <X
+                          v-else-if="
+                            step.completed === false &&
+                            step.current_step === false
+                          "
+                          class="size-5" />
+                        <Loader
+                          v-else-if="
+                            step.current_step && step.completed === false
+                          "
+                          class="size-5 animate-spin" />
+                        <Dot v-else />
+                      </Button>
+                    </StepperTrigger>
+
+                    <div class="flex flex-col gap-1">
+                      <StepperTitle
+                        :class="[step.current_step && 'text-primary']"
+                        class="text-sm font-semibold transition lg:text-base">
+                        {{ step.title }}
+                      </StepperTitle>
+                      <StepperDescription
+                        :class="[step.current_step && 'text-primary']"
+                        class="text-muted-foreground text-xs transition lg:text-sm">
+                        {{ step.description }}
+                        <strong
+                          v-if="
+                            step.status === 'processing' &&
+                            conversion.progressEvent
+                          ">
+                          <br />
+                          Fortschritt:
+                          {{ conversion.progressEvent.percentage }}%
+                        </strong>
+                        <strong
+                          v-if="
+                            step.status === 'downloading' &&
+                            conversion.downloadProgressEvent
+                          ">
+                          <br />
+                          Fortschritt:
+                          {{ conversion.downloadProgressEvent.percentage
+                          }}<br />
+                          Geschwindigkeit:
+                          {{ conversion.downloadProgressEvent.speed }}<br />
+                          Verbleibend:
+                          {{ conversion.downloadProgressEvent.eta }}
+                        </strong>
+                        <strong
+                          v-if="
+                            step.status === 'failed' && conversion.error_message
+                          ">
+                          <br />
+                          {{ conversion.error_message }}
+                        </strong>
+                      </StepperDescription>
+                    </div>
+                  </StepperItem>
+                </Stepper>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <div class="grid w-full grid-cols-1 gap-4">
+                <a
+                  :class="{
+                    'cursor-not-allowed': !conversion.downloadable,
+                    'w-full': true,
+                  }"
+                  :href="
+                    conversion.downloadable
+                      ? route('conversions.download', conversion.id)
+                      : null
+                  "
+                  target="_blank">
+                  <Button
+                    id="download-button"
+                    :disabled="!conversion.downloadable"
+                    class="w-full">
+                    <Download
+                      v-if="conversion.downloadable"
+                      class="mr-2 h-4 w-4" />
+                    <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />
+                    {{ conversion.downloadable ? 'Datei herunterladen' : '' }}
+                  </Button>
+                </a>
+                <Button
+                  :disabled="!conversion.downloadable"
+                  class="w-full"
+                  variant="outline"
+                  @click="togglePublic(conversion)">
+                  <LinkIcon class="mr-2 size-4"></LinkIcon>
+                  {{
+                    conversion.public === false
+                      ? 'Link öffentlich machen & kopieren'
+                      : 'Öffentlichen Link deaktivieren'
+                  }}
+                </Button>
+                <Button
+                  id="cancel-conversion-button"
+                  :disabled="
+                    conversion.downloadable || conversion.status === 'canceled'
+                  "
+                  class="w-full"
+                  variant="outline"
+                  @click="cancelConversion(conversion)">
+                  <StopCircle class="mr-2 size-4"></StopCircle>
+                  Konvertierung abbrechen
+                </Button>
+                <p class="text-muted-foreground text-sm">
+                  Öffentliche Links können direkt beim Upload auf pr0gramm
+                  eingegeben werden.
+                  <a
+                    target="_blank"
+                    href="https://pr0gramm.com/upload"
+                    class="text-primary"
+                    >Direkt zum Upload</a
+                  >
+                </p>
+              </div>
+            </CardFooter>
           </div>
-        </CardContent>
-        <CardFooter>
-          <div class="grid w-full grid-cols-1 gap-4">
-            <a
-              :class="{
-                'cursor-not-allowed': !conversion.downloadable,
-                'w-full': true,
-              }"
-              :href="
-                conversion.downloadable
-                  ? route('conversions.download', conversion.id)
-                  : null
-              "
-              target="_blank">
-              <Button
-                id="download-button"
-                :disabled="!conversion.downloadable"
-                class="w-full">
-                <Download v-if="conversion.downloadable" class="mr-2 h-4 w-4" />
-                <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />
-                {{ conversion.downloadable ? 'Datei herunterladen' : '' }}
-              </Button>
-            </a>
-            <Button
-              :disabled="!conversion.downloadable"
-              class="w-full"
-              variant="outline"
-              @click="togglePublic(conversion)">
-              <LinkIcon class="mr-2 size-4"></LinkIcon>
-              {{
-                conversion.public === false
-                  ? 'Link öffentlich machen & kopieren'
-                  : 'Öffentlichen Link deaktivieren'
-              }}
-            </Button>
-            <Button
-              id="cancel-conversion-button"
-              :disabled="
-                conversion.downloadable || conversion.status === 'canceled'
-              "
-              class="w-full"
-              variant="outline"
-              @click="cancelConversion(conversion)">
-              <StopCircle class="mr-2 size-4"></StopCircle>
-              Konvertierung abbrechen
-            </Button>
-            <p class="text-muted-foreground text-sm">
-              Öffentliche Links können direkt beim Upload auf pr0gramm
-              eingegeben werden.
-              <a
-                target="_blank"
-                href="https://pr0gramm.com/upload"
-                class="text-primary"
-                >Direkt zum Upload</a
-              >
-            </p>
-          </div>
-        </CardFooter>
+        </div>
       </Card>
       <Card v-if="allConversions.length === 0" class="text-center">
         <CardHeader>

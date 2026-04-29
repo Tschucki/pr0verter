@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ConversionStatus;
+use App\Enums\SubtitleStatus;
 use App\Models\Statistic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -138,6 +139,24 @@ class StatController extends Controller
         $stats['audio_only'] = [
             'title' => 'Nur Audio extrahiert',
             'value' => Number::format(Statistic::where('audio_only', true)->count()) . ' mal',
+        ];
+
+        $stats['subtitles_burnt'] = [
+            'title' => 'Untertitel gerendert',
+            'value' => Number::format(
+                Statistic::where('status', ConversionStatus::FINISHED)
+                    ->where('subtitle_status', SubtitleStatus::Burnt)
+                    ->count()
+            ) . ' Videos',
+        ];
+
+        $stats['subtitles_embedded'] = [
+            'title' => 'Untertitel in Metadaten geschrieben',
+            'value' => Number::format(
+                Statistic::where('status', ConversionStatus::FINISHED)
+                    ->where('subtitle_status', SubtitleStatus::Embedded)
+                    ->count()
+            ) . ' Videos',
         ];
 
         return $stats;

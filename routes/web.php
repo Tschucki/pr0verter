@@ -10,6 +10,7 @@ use App\Http\Controllers\ListConverterController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\StartConverterController;
 use App\Http\Controllers\StatController;
+use App\Http\Controllers\ThumbnailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -27,6 +28,9 @@ Route::post('/converter/start', StartConverterController::class)
 
 Route::get('conversions/download/{conversion}', [ConversionController::class, 'download'])
     ->name('conversions.download');
+
+Route::get('conversions/thumbnail/{conversion}', ThumbnailController::class)
+    ->name('conversions.thumbnail');
 
 Route::patch('conversions/toggle-public/{conversion}', [ConversionController::class, 'togglePublicFlag'])
     ->name('conversions.toggle-public');

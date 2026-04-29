@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\SubtitleMode;
+use App\Enums\SubtitleStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,8 @@ class Statistic extends Model
         'audio_quality' => 'float',
         'watermark' => 'boolean',
         'segments' => 'array',
+        'subtitle_mode' => SubtitleMode::class,
+        'subtitle_status' => SubtitleStatus::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
