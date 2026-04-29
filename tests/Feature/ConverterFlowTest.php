@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function (): void {
+    // The Inertia root view loads the Vite manifest — CI doesn't run `npm run
+    // build`, so stub Vite to no-ops for this test.
+    $this->withoutVite();
+
     // VideoRule probes the upload via FFprobe — fake the binary so a hollow
     // UploadedFile passes validation.
     $format = Mockery::mock(FFProbeFormat::class);
