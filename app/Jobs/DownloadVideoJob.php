@@ -27,6 +27,16 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
 
     public function __construct(public string $conversionId) {}
 
+    public function uniqueId(): string
+    {
+        return $this->conversionId;
+    }
+
+    public function uniqueFor(): int
+    {
+        return (int) now()->addMinutes(3)->diffInSeconds();
+    }
+
     public function handle(): void
     {
         $conversion = Conversion::find($this->conversionId);
@@ -81,6 +91,10 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     ->extractAudio(true)
                     ->audioFormat('mp3')
                     ->audioQuality(0);
+            } else {
+                $options = $options->format(
+                    'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best[ext=mp4]/best'
+                );
             }
 
             $video = $youtubeDl->download($options)->getVideos()[0] ?? null;
@@ -104,11 +118,14 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             if ($wantsSubs && $video !== null) {
                 $videoPath = $video->getFile()->getPathname();
                 $subPath = $youtubeDl->resolveSubtitlePath($videoPath);
+                $storedSubtitlePath = $subPath !== null
+                    ? $this->moveSubtitleToConversionsDisk($conversion, $subPath)
+                    : null;
 
                 $conversion->update([
-                    'subtitle_path' => $subPath,
+                    'subtitle_path' => $storedSubtitlePath,
                     'subtitle_status' => match (true) {
-                        $subPath === null => SubtitleStatus::Unavailable,
+                        $storedSubtitlePath === null => SubtitleStatus::Unavailable,
                         $conversion->subtitle_mode === SubtitleMode::Soft => SubtitleStatus::Embedded,
                         $conversion->subtitle_mode === SubtitleMode::Burn => SubtitleStatus::Burnt,
                     },
@@ -167,5 +184,43 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 'error' => $th->getMessage(),
             ]);
         }
+    }
+
+    private function moveSubtitleToConversionsDisk(Conversion $conversion, string $subPath): string
+    {
+        $disk = Storage::disk('conversions');
+        $lang = $this->extractSubtitleLanguage($subPath);
+        $relativeTarget = 'subs/' . $conversion->id . ($lang !== null ? '.' . $lang : '') . '.srt';
+        $disk->makeDirectory('subs');
+
+        $absoluteSource = str_starts_with($subPath, '/')
+            ? $subPath
+            : $disk->path($subPath);
+        $absoluteTarget = $disk->path($relativeTarget);
+
+        if ($absoluteSource === $absoluteTarget) {
+            return $relativeTarget;
+        }
+
+        if (! \Illuminate\Support\Facades\File::exists($absoluteSource)) {
+            return $subPath;
+        }
+
+        $moved = \Illuminate\Support\Facades\File::move($absoluteSource, $absoluteTarget);
+
+        return $moved ? $relativeTarget : $subPath;
+    }
+
+    private function extractSubtitleLanguage(string $subPath): ?string
+    {
+        $baseName = pathinfo($subPath, PATHINFO_FILENAME);
+        $parts = explode('.', $baseName);
+        $candidate = end($parts);
+
+        if ($candidate !== false && preg_match('/^[a-z]{2}$/i', $candidate) === 1) {
+            return strtolower($candidate);
+        }
+
+        return null;
     }
 }

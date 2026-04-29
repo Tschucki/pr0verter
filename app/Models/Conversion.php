@@ -251,6 +251,8 @@ class Conversion extends Model
             'segments' => $this->segments,
             'max_size' => $this->max_size,
             'url' => $this->url,
+            'subtitle_mode' => $this->subtitle_mode,
+            'subtitle_status' => $this->subtitle_status,
             'conversion_started_at' => $this->created_at,
             'conversion_ended_at' => $conversionEnd,
             'error_message' => $this->error_message,

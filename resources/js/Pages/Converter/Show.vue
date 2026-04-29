@@ -482,9 +482,7 @@ const removeFile = () => {
             </div>
             <FormControl>
               <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                <Select
-                  :model-value="value"
-                  @update:model-value="handleChange">
+                <Select :model-value="value" @update:model-value="handleChange">
                   <SelectTrigger id="subtitleMode" class="w-full lg:w-52">
                     <SelectValue placeholder="Keine" />
                   </SelectTrigger>

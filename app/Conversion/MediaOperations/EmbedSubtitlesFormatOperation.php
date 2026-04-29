@@ -21,8 +21,10 @@ final class EmbedSubtitlesFormatOperation implements MediaFormatOperation
             return $format;
         }
 
-        $absolutePath = Storage::disk($this->conversion->file->disk)
-            ->path($this->conversion->subtitle_path);
+        $subtitlePath = $this->conversion->subtitle_path;
+        $absolutePath = str_starts_with($subtitlePath, '/')
+            ? $subtitlePath
+            : Storage::disk($this->conversion->file->disk)->path($subtitlePath);
 
         return new H264FormatWithSubs($format->getQualityTier(), $absolutePath);
     }

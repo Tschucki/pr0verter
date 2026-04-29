@@ -200,12 +200,12 @@ onMounted(() => {
         :class="cn($attrs.class ?? '')">
         <div class="flex flex-col gap-4 p-6 md:flex-row">
           <div
-            class="bg-muted relative h-28 w-full shrink-0 overflow-hidden rounded md:w-48">
+            class="bg-muted relative aspect-video h-28 shrink-0 overflow-hidden rounded">
             <img
               v-if="conversion.thumbnail_path"
               :src="`${route('conversions.thumbnail', conversion.id)}?v=${conversion.updated_at}`"
               :alt="`Vorschau für ${conversion.file?.filename ?? 'Konvertierung'}`"
-              class="h-full w-full object-cover"
+              class="absolute inset-0 h-full w-full object-contain"
               loading="lazy" />
             <div v-else class="flex h-full w-full items-center justify-center">
               <Music
