@@ -6,6 +6,8 @@ use App\Enums\ConversionStatus;
 use App\Events\DownloadProgress;
 use App\Models\Conversion;
 use App\Models\File;
+use App\Services\Pr0verterYoutubeDl;
+use App\Services\ThumbnailService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -85,7 +87,8 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             $fileName = Str::uuid()->toString() . '.' . $video->getFile()->getExtension();
             $exists = Storage::disk('conversions')->exists($video->getFile()->getFilename());
 
-            $moved = \Illuminate\Support\Facades\File::move($video->getFile()->getPathname(), Storage::disk('conversions')->path($fileName));
+            $videoFullPath = $video->getFile()->getPathname();
+            $moved = \Illuminate\Support\Facades\File::move($videoFullPath, Storage::disk('conversions')->path($fileName));
 
             if (! $exists || ! $moved) {
                 $conversion->update([
@@ -113,6 +116,13 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 'file_id' => $file->id,
                 'status' => ConversionStatus::PREPARING,
             ]);
+
+            if ($conversion->audio_only === false) {
+                $thumbnailPath = app(Pr0verterYoutubeDl::class)->getThumbnailPath($videoFullPath);
+                if ($thumbnailPath !== null) {
+                    app(ThumbnailService::class)->storeFromYoutubeDl($conversion, $thumbnailPath);
+                }
+            }
 
             ConversionJob::dispatch($conversion->id)->onQueue('converter');
         } catch (Throwable $th) {

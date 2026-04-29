@@ -109,6 +109,9 @@ class Pr0verterYoutubeDl
         $arguments = [
             '--ignore-errors',
             '--write-info-json',
+            '--write-thumbnail',
+            '--convert-thumbnails',
+            'jpg',
             ...ArgvBuilder::build($options),
         ];
 
@@ -188,6 +191,18 @@ class Pr0verterYoutubeDl
         }
 
         return new VideoCollection($videos);
+    }
+
+    /**
+     * Resolve the absolute path to the JPG thumbnail yt-dlp wrote next to a downloaded video.
+     *
+     * Returns null when no companion .jpg exists (e.g. extractor produced no cover, or audio-only).
+     */
+    public function getThumbnailPath(string $videoFullPath): ?string
+    {
+        $candidate = preg_replace('/\.[^.]+$/', '.jpg', $videoFullPath);
+
+        return ($candidate !== null && is_file($candidate)) ? $candidate : null;
     }
 
     /**

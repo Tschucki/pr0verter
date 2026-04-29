@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Observers;
 
 use App\Enums\ConversionStatus;
@@ -7,6 +9,7 @@ use App\Events\ConversionFinished;
 use App\Events\ConversionUpdated;
 use App\Jobs\DownloadVideoJob;
 use App\Models\Conversion;
+use App\Services\ThumbnailService;
 
 class ConversionObserver
 {
@@ -33,5 +36,7 @@ class ConversionObserver
     public function deleting(Conversion $conversion): void
     {
         $conversion->trackStatistic();
+
+        app(ThumbnailService::class)->delete($conversion);
     }
 }

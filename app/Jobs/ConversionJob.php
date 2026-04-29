@@ -6,8 +6,10 @@ use App\Conversion\Formats\H264Format;
 use App\Enums\ConversionStatus;
 use App\Events\ConversionProgressEvent;
 use App\Models\Conversion;
+use App\Services\ThumbnailService;
 use App\Services\VideoAnalysisService;
 use App\ValueObjects\VideoMetadata;
+use FFMpeg\FFProbe;
 use FFMpeg\Format\Audio\Mp3;
 use FFMpeg\Format\Video\DefaultVideo;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -74,6 +76,15 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             ],
             'quality_tier' => $qualityTier->value,
         ]);
+
+        $conversion->refresh();
+        if ($conversion->thumbnail_path === null
+            && $metadata->videoCodec !== null
+            && $conversion->audio_only === false
+        ) {
+            app(ThumbnailService::class)
+                ->captureSourceFrame($conversion, $metadata->duration);
+        }
 
         $conversionNeeded = $this->checkIfConversionIsActuallyNeeded($conversion, $metadata);
 
@@ -217,6 +228,27 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
             if ($oldFileName !== $newFileName && Storage::disk($conversion->file->disk)->exists($oldFileName)) {
                 Storage::disk($conversion->file->disk)->delete($oldFileName);
                 Log::info('Deleted old input file', ['filename' => $oldFileName]);
+            }
+
+            if ($conversion->audio_only === false) {
+                try {
+                    $outputAbsolutePath = Storage::disk($conversion->file->disk)->path($newFileName);
+                    $outputDuration = (float) FFProbe::create()
+                        ->format($outputAbsolutePath)
+                        ->get('duration');
+
+                    app(ThumbnailService::class)->captureOutputFrame(
+                        $conversion->fresh(),
+                        $conversion->file->disk,
+                        $newFileName,
+                        $outputDuration,
+                    );
+                } catch (Throwable $e) {
+                    Log::warning('Output thumbnail probe/capture failed', [
+                        'conversion' => $conversion->id,
+                        'exception' => $e->getMessage(),
+                    ]);
+                }
             }
 
             $conversion->update([
