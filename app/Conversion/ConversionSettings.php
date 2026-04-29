@@ -2,6 +2,7 @@
 
 namespace App\Conversion;
 
+use App\Enums\SubtitleMode;
 use App\Models\Conversion;
 use Illuminate\Support\Str;
 use JsonException;
@@ -27,6 +28,8 @@ class ConversionSettings
     public array $segments;
 
     public bool $audio_only;
+
+    public SubtitleMode $subtitleMode;
 
     public function __construct(array $settings = [])
     {
@@ -73,6 +76,9 @@ class ConversionSettings
         $this->interpolation = $settings['interpolation'] ?? false;
         $this->segments = $settings['segments'] ?? [];
         $this->audio_only = $settings['audio_only'] ?? false;
+        $this->subtitleMode = isset($settings['subtitle_mode'])
+            ? SubtitleMode::from($settings['subtitle_mode'])
+            : SubtitleMode::None;
 
         if ($this->audio_only === true) {
             $this->audio = true;
@@ -81,6 +87,7 @@ class ConversionSettings
             $this->interpolation = false;
             $this->trimStart = null;
             $this->trimEnd = null;
+            $this->subtitleMode = SubtitleMode::None;
         }
 
         if (count($this->segments) > 0) {
@@ -101,6 +108,7 @@ class ConversionSettings
             'watermark' => $this->watermark,
             'interpolation' => $this->interpolation,
             'segments' => $this->segments,
+            'subtitle_mode' => $this->subtitleMode->value,
             'audio_only' => $this->audio_only,
         ];
     }

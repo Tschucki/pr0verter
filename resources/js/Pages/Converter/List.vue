@@ -20,6 +20,8 @@ import {
   StepperTrigger,
 } from '@/components/ui/stepper';
 import {
+  Captions,
+  CaptionsOff,
   Check,
   Dot,
   Download,
@@ -129,6 +131,19 @@ const cancelConversion = async (conversion) => {
   });
 };
 
+const subtitleTooltip = (status) => {
+  switch (status) {
+    case 'embedded':
+      return 'Untertitel als Soft-Track eingebettet';
+    case 'burnt':
+      return 'Untertitel ins Video eingebrannt';
+    case 'unavailable':
+      return 'Keine Untertitel gefunden';
+    default:
+      return '';
+  }
+};
+
 const formatQualityTier = (tier) => {
   const tiers = {
     ultra_hd: '4K Ultra HD (2160p)',
@@ -214,13 +229,39 @@ onMounted(() => {
                 >
               </CardDescription>
               <div
-                v-if="conversion.quality_tier"
-                class="mt-4 flex flex-wrap gap-2">
+                v-if="
+                  conversion.quality_tier ||
+                  (conversion.status === 'finished' &&
+                    conversion.subtitle_status)
+                "
+                class="mt-4 flex flex-wrap items-center gap-2">
                 <Badge
                   v-if="conversion.quality_tier"
                   :variant="getQualityTierVariant(conversion.quality_tier)">
                   {{ formatQualityTier(conversion.quality_tier) }}
                 </Badge>
+                <span
+                  v-if="
+                    conversion.status === 'finished' &&
+                    conversion.subtitle_status
+                  "
+                  class="inline-flex items-center"
+                  :title="subtitleTooltip(conversion.subtitle_status)">
+                  <Captions
+                    v-if="
+                      conversion.subtitle_status === 'embedded' ||
+                      conversion.subtitle_status === 'burnt'
+                    "
+                    :class="[
+                      'size-4',
+                      conversion.subtitle_status === 'burnt'
+                        ? 'text-foreground'
+                        : 'text-muted-foreground',
+                    ]" />
+                  <CaptionsOff
+                    v-else-if="conversion.subtitle_status === 'unavailable'"
+                    class="text-muted-foreground size-4" />
+                </span>
               </div>
             </CardHeader>
             <CardContent class="grid gap-4">

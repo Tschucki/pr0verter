@@ -27,6 +27,7 @@ class StartConverterRequest extends FormRequest
             'segments.*.duration' => 'nullable|numeric|min:1',
             'autoCrop' => 'nullable|boolean',
             'watermark' => 'nullable|boolean',
+            'subtitleMode' => 'nullable|string|in:none,soft,burn',
             'audio_only' => 'nullable|boolean',
         ];
     }

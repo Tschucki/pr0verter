@@ -51,6 +51,11 @@ class Pr0verterYoutubeDl
      */
     private $debug;
 
+    /**
+     * @var array<int, string>
+     */
+    private array $extraArgs = [];
+
     public function __construct(?ProcessBuilderInterface $processBuilder = null, ?MetadataReaderInterface $metadataReader = null, ?Filesystem $filesystem = null)
     {
         $this->processBuilder = $processBuilder ?? new DefaultProcessBuilder;
@@ -94,6 +99,37 @@ class Pr0verterYoutubeDl
         return $this;
     }
 
+    /**
+     * @param  array<int, string>  $args
+     */
+    public function withExtraArgs(array $args): self
+    {
+        $this->extraArgs = array_merge($this->extraArgs, $args);
+
+        return $this;
+    }
+
+    public function resolveSubtitlePath(string $videoPath): ?string
+    {
+        $base = pathinfo($videoPath, PATHINFO_DIRNAME) . '/' . pathinfo($videoPath, PATHINFO_FILENAME);
+
+        foreach (['de', 'en'] as $lang) {
+            $manual = "{$base}.{$lang}.srt";
+            if (file_exists($manual)) {
+                return $manual;
+            }
+        }
+
+        foreach (['de', 'en'] as $lang) {
+            $matches = glob("{$base}.{$lang}*.srt") ?: [];
+            if ($matches !== []) {
+                return $matches[0];
+            }
+        }
+
+        return null;
+    }
+
     public function download(Options $options): VideoCollection
     {
         $urls = $options->getUrl();
@@ -112,6 +148,7 @@ class Pr0verterYoutubeDl
             '--write-thumbnail',
             '--convert-thumbnails',
             'jpg',
+            ...$this->extraArgs,
             ...ArgvBuilder::build($options),
         ];
 
@@ -189,6 +226,8 @@ class Pr0verterYoutubeDl
         if ($options->getCleanupMetadata()) {
             $this->filesystem->remove($metadataFiles);
         }
+
+        $this->extraArgs = [];
 
         return new VideoCollection($videos);
     }

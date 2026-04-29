@@ -9,6 +9,8 @@ use App\Conversion\MediaOperations\AudioExtractionOperation;
 use App\Conversion\MediaOperations\AudioQualityFilterOperation;
 use App\Conversion\MediaOperations\AudioSampleRateLimitFilterOperation;
 use App\Conversion\MediaOperations\AutoCropFilterOperation;
+use App\Conversion\MediaOperations\BurnSubtitlesFilterOperation;
+use App\Conversion\MediaOperations\EmbedSubtitlesFormatOperation;
 use App\Conversion\MediaOperations\FramerateLimitFilterOperation;
 use App\Conversion\MediaOperations\InterpolateFilterOperation;
 use App\Conversion\MediaOperations\MaxSizeOperation;
@@ -18,6 +20,8 @@ use App\Conversion\MediaOperations\RotationFilterOperation;
 use App\Conversion\MediaOperations\ShortEdgeScalingFilterOperation;
 use App\Conversion\MediaOperations\TrimFilterOperation;
 use App\Enums\ConversionStatus;
+use App\Enums\SubtitleMode;
+use App\Enums\SubtitleStatus;
 use App\Observers\ConversionObserver;
 use Database\Factories\ConversionFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -46,6 +50,8 @@ class Conversion extends Model
         'downloadable' => 'boolean',
         'segments' => 'array',
         'audio_only' => 'boolean',
+        'subtitle_mode' => SubtitleMode::class,
+        'subtitle_status' => SubtitleStatus::class,
         'metadata' => 'array',
     ];
 
@@ -163,6 +169,10 @@ class Conversion extends Model
             $operations[] = new TrimFilterOperation($this);
         }
 
+        if ($this->subtitle_mode === SubtitleMode::Burn && $this->subtitle_path !== null) {
+            $operations[] = new BurnSubtitlesFilterOperation($this);
+        }
+
         if ($this->watermark) {
             $operations[] = new AddPr0GrammWatermarkFilterOperation($this);
         }
@@ -207,6 +217,10 @@ class Conversion extends Model
 
         if ($this->audio_quality) {
             $operations[] = new AudioQualityFilterOperation($this);
+        }
+
+        if ($this->subtitle_mode === SubtitleMode::Soft && $this->subtitle_path !== null) {
+            $operations[] = new EmbedSubtitlesFormatOperation($this);
         }
 
         return $operations;

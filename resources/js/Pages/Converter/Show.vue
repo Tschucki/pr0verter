@@ -2,6 +2,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   NumberField,
   NumberFieldContent,
   NumberFieldDecrement,
@@ -69,6 +76,7 @@ const formSchema = toTypedSchema(
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
     audio_only: z.boolean().default(false),
+    subtitleMode: z.enum(['none', 'soft', 'burn']).default('none'),
   })
 );
 
@@ -90,6 +98,7 @@ const inertiaForm = useInertiaForm({
   autoCrop: null,
   watermark: null,
   audio_only: false,
+  subtitleMode: 'none',
 });
 
 const onSubmit = form.handleSubmit(async (values) => {
@@ -107,6 +116,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   inertiaForm.autoCrop = values.autoCrop;
   inertiaForm.watermark = values.watermark;
   inertiaForm.audio_only = values.audio_only;
+  inertiaForm.subtitleMode = values.subtitleMode;
 
   if (!values.file && !values.url) {
     form.setErrors({
@@ -205,6 +215,34 @@ const removeFile = () => {
               </div>
             </div>
             <FormMessage class="mt-2" />
+          </FormField>
+          <FormField
+            v-if="form.values.audio_only === false"
+            v-slot="{ value, handleChange }"
+            name="subtitleMode">
+            <FormItem class="mt-4">
+              <FormLabel>Untertitel</FormLabel>
+              <FormControl>
+                <Select :model-value="value" @update:model-value="handleChange">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Keine" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Keine</SelectItem>
+                    <SelectItem value="soft">
+                      Eingebettet (Soft-Subs)
+                    </SelectItem>
+                    <SelectItem value="burn">Eingebrannt</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormDescription>
+                Lädt verfügbare Untertitel (de/en, manuell oder auto-generiert)
+                von der Quelle. Eingebettet bleiben als separater Track im
+                Video, eingebrannt sind fest sichtbar.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
           </FormField>
         </TabsContent>
         <TabsContent value="upload">

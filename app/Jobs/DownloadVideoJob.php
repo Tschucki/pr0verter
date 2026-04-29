@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\Enums\ConversionStatus;
+use App\Enums\SubtitleMode;
+use App\Enums\SubtitleStatus;
 use App\Events\DownloadProgress;
 use App\Models\Conversion;
 use App\Models\File;
@@ -49,6 +51,19 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 DownloadProgress::dispatch($conversion->id, $progressTarget, $percentage, $size, $speed, $eta, $totalTime);
             });
 
+            $wantsSubs = $conversion->subtitle_mode !== SubtitleMode::None
+                && $conversion->audio_only !== true;
+
+            if ($wantsSubs) {
+                $youtubeDl->withExtraArgs([
+                    '--write-sub',
+                    '--write-auto-sub',
+                    '--sub-langs', 'de,en',
+                    '--convert-subs', 'srt',
+                    '--sub-format', 'best',
+                ]);
+            }
+
             // only supporting one video for now
             $options = Options::create()
                 ->downloadPath(Storage::disk('conversions')->path('/'))
@@ -84,6 +99,20 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 ]);
 
                 return;
+            }
+
+            if ($wantsSubs && $video !== null) {
+                $videoPath = $video->getFile()->getPathname();
+                $subPath = $youtubeDl->resolveSubtitlePath($videoPath);
+
+                $conversion->update([
+                    'subtitle_path' => $subPath,
+                    'subtitle_status' => match (true) {
+                        $subPath === null => SubtitleStatus::Unavailable,
+                        $conversion->subtitle_mode === SubtitleMode::Soft => SubtitleStatus::Embedded,
+                        $conversion->subtitle_mode === SubtitleMode::Burn => SubtitleStatus::Burnt,
+                    },
+                ]);
             }
 
             $fileName = Str::uuid()->toString() . '.' . $video->getFile()->getExtension();
