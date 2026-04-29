@@ -134,9 +134,9 @@ const cancelConversion = async (conversion) => {
 const subtitleTooltip = (status) => {
   switch (status) {
     case 'embedded':
-      return 'Untertitel als Soft-Track eingebettet';
+      return 'Untertitel zuschaltbar (im Player ein-/ausblendbar)';
     case 'burnt':
-      return 'Untertitel ins Video eingebrannt';
+      return 'Untertitel immer sichtbar (fest im Bild)';
     case 'unavailable':
       return 'Keine Untertitel gefunden';
     default:

@@ -216,34 +216,6 @@ const removeFile = () => {
             </div>
             <FormMessage class="mt-2" />
           </FormField>
-          <FormField
-            v-if="form.values.audio_only === false"
-            v-slot="{ value, handleChange }"
-            name="subtitleMode">
-            <FormItem class="mt-4">
-              <FormLabel>Untertitel</FormLabel>
-              <FormControl>
-                <Select :model-value="value" @update:model-value="handleChange">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Keine" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Keine</SelectItem>
-                    <SelectItem value="soft">
-                      Eingebettet (Soft-Subs)
-                    </SelectItem>
-                    <SelectItem value="burn">Eingebrannt</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormDescription>
-                Lädt verfügbare Untertitel (de/en, manuell oder auto-generiert)
-                von der Quelle. Eingebettet bleiben als separater Track im
-                Video, eingebrannt sind fest sichtbar.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          </FormField>
         </TabsContent>
         <TabsContent value="upload">
           <FormField v-slot="{ handleChange, handleBlur }" name="file">
@@ -490,6 +462,42 @@ const removeFile = () => {
             </FormControl>
           </FormItem>
         </label>
+      </FormField>
+      <FormField
+        v-if="form.values.audio_only === false"
+        v-slot="{ value, handleChange }"
+        name="subtitleMode">
+        <Label for="subtitleMode">
+          <FormItem
+            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+            <div class="space-y-0.5">
+              <FormLabel class="text-base"> Untertitel</FormLabel>
+              <FormDescription>
+                Holt verfügbare Untertitel (Deutsch oder Englisch) von der
+                Quelle.<br />
+                „Zuschaltbar" lässt sich im Player ein- und ausblenden.<br />
+                „Immer sichtbar" bleibt fest im Bild.
+              </FormDescription>
+              <FormMessage />
+            </div>
+            <FormControl>
+              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                <Select
+                  :model-value="value"
+                  @update:model-value="handleChange">
+                  <SelectTrigger id="subtitleMode" class="w-full lg:w-52">
+                    <SelectValue placeholder="Keine" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Keine</SelectItem>
+                    <SelectItem value="soft">Zuschaltbar</SelectItem>
+                    <SelectItem value="burn">Immer sichtbar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </FormControl>
+          </FormItem>
+        </Label>
       </FormField>
       <FormField
         v-if="form.values.audio_only === false"
