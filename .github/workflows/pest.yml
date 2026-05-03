@@ -93,6 +93,11 @@ jobs:
         # system libs Chromium needs on the runner.
         run: npx playwright install --with-deps chromium
 
+      - name: Build frontend assets
+        # The weekly-report blade pulls Tailwind via @vite(); without a build
+        # manifest the browser tests fail to render the page.
+        run: npm run build
+
       - name: Copy .env
         run: cp .env.example .env
 
