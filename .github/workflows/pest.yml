@@ -66,6 +66,33 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install npm dependencies
+        # Skip Playwright's postinstall browser download here; we install only
+        # the chromium variant we actually need a few steps later.
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        # The pest-plugin-browser drives Playwright; --with-deps grabs the
+        # system libs Chromium needs on the runner.
+        run: npx playwright install --with-deps chromium
+
       - name: Copy .env
         run: cp .env.example .env
 
