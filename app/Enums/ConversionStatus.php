@@ -2,19 +2,13 @@
 
 namespace App\Enums;
 
-enum ConversionStatus
+enum ConversionStatus: string
 {
-    public const DOWNLOADING = 'downloading';
-
-    public const PREPARING = 'preparing';
-
-    public const PENDING = 'pending';
-
-    public const PROCESSING = 'processing';
-
-    public const FINISHED = 'finished';
-
-    public const FAILED = 'failed';
-
-    public const CANCELED = 'canceled';
+    case DOWNLOADING = 'downloading';
+    case PREPARING = 'preparing';
+    case PENDING = 'pending';
+    case PROCESSING = 'processing';
+    case FINISHED = 'finished';
+    case FAILED = 'failed';
+    case CANCELED = 'canceled';
 }

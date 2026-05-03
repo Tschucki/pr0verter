@@ -56,6 +56,21 @@ class Cleanup extends Command
             Storage::disk('conversions')->delete($fileName);
         });
 
+        $this->info("\nDeleting weekly report PNGs older than 30 days");
+
+        $reportFiles = collect(Storage::disk('local')->files('weekly-reports'));
+        $staleReports = $reportFiles->filter(function (string $path): bool {
+            $mtime = Storage::disk('local')->lastModified($path);
+
+            return $mtime !== null && $mtime < now()->subDays(30)->timestamp;
+        });
+
+        $this->info('Found ' . $staleReports->count() . ' stale reports');
+
+        $this->withProgressBar($staleReports, function (string $path): void {
+            Storage::disk('local')->delete($path);
+        });
+
         $this->info("\nCleanup FFmpeg temp files");
 
         FFMpeg::cleanupTemporaryFiles();

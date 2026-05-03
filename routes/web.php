@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\RenderWeeklyReportPngController;
+use App\Http\Controllers\Admin\WeeklyReportPreviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\HomeController;
@@ -48,3 +50,12 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 Route::get('/impressum', LegalNoticeController::class)->name('legal-notice');
 Route::get('/datenschutz', PrivacyPolicyController::class)->name('privacy-policy');
+
+Route::middleware(['auth', 'can:admin'])->prefix('admin/weekly-report')->group(function () {
+    Route::get('preview', WeeklyReportPreviewController::class)
+        ->name('admin.weekly-report.preview');
+
+    Route::post('render-png', RenderWeeklyReportPngController::class)
+        ->middleware('throttle:weekly-report-render')
+        ->name('admin.weekly-report.render-png');
+});
