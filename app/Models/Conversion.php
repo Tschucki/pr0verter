@@ -53,6 +53,7 @@ class Conversion extends Model
         'subtitle_mode' => SubtitleMode::class,
         'subtitle_status' => SubtitleStatus::class,
         'metadata' => 'array',
+        'status' => ConversionStatus::class,
     ];
 
     public function toArray(): array
@@ -115,7 +116,7 @@ class Conversion extends Model
                 'status' => ConversionStatus::FINISHED,
                 'title' => 'Konvertierung abgeschlossen',
                 'description' => 'Das Video wurde erfolgreich konvertiert und kann heruntergeladen werden.',
-                'visible' => $this->status !== 'cancelled' && $this->status !== ConversionStatus::FAILED,
+                'visible' => $this->status !== ConversionStatus::CANCELED && $this->status !== ConversionStatus::FAILED,
             ],
             [
                 'order' => 6,
