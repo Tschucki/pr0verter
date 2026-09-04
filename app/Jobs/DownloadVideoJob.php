@@ -62,7 +62,8 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             });
 
             $wantsSubs = $conversion->subtitle_mode !== SubtitleMode::None
-                && $conversion->audio_only !== true;
+                && $conversion->audio_only !== true
+                && $conversion->raw_download !== true;
 
             if ($wantsSubs) {
                 $youtubeDl->withExtraArgs([
@@ -86,7 +87,10 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 ->maxDownloads(1)
                 ->url($conversion->url);
 
-            if ($conversion->audio_only === true) {
+            if ($conversion->raw_download === true) {
+                // Raw download: best available quality, no container forced.
+                $options = $options->format('bestvideo*+bestaudio/best');
+            } elseif ($conversion->audio_only === true) {
                 $options = $options->format('bestaudio/best')
                     ->extractAudio(true)
                     ->audioFormat('mp3')

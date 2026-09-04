@@ -26,6 +26,8 @@ class StatisticFactory extends Factory
             'status' => ConversionStatus::FINISHED,
             'audio' => true,
             'audio_only' => false,
+
+            'raw_download' => false,
             'auto_crop' => false,
             'watermark' => false,
             'interpolation' => false,

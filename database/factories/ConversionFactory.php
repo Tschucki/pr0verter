@@ -30,6 +30,8 @@ class ConversionFactory extends Factory
             'status' => 'pending',
             'audio' => true,
             'audio_only' => false,
+
+            'raw_download' => false,
             'auto_crop' => false,
             'watermark' => false,
             'interpolation' => false,

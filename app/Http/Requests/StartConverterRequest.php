@@ -29,6 +29,7 @@ class StartConverterRequest extends FormRequest
             'watermark' => 'nullable|boolean',
             'subtitleMode' => 'nullable|string|in:none,soft,burn',
             'audio_only' => 'nullable|boolean',
+            'rawDownload' => 'nullable|boolean',
         ];
     }
 }
