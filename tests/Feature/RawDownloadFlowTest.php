@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Conversion\MediaOperations\RemoveExifDataFilterOperation;
 use App\Enums\ConversionStatus;
 use App\Enums\SubtitleMode;
 use App\Jobs\DownloadVideoJob;
@@ -57,14 +58,21 @@ it('stores a raw download conversion without any media operation settings', func
     Bus::assertDispatched(DownloadVideoJob::class);
 });
 
-it('still builds media operations for regular conversions', function (): void {
-    $conversion = Conversion::factory()->create([
-        'raw_download' => false,
-        'watermark' => true,
-        'max_size' => 200,
+it('builds the regular operations for the very same conversion without the flag', function (): void {
+    $attributes = [
+        'audio' => true,
         'audio_quality' => 1.0,
-    ]);
+        'max_size' => null,
+    ];
 
-    expect($conversion->getMediaOperations())->not->toBe([]);
-    expect($conversion->getFormatOperations())->not->toBe([]);
+    $raw = Conversion::factory()->create([...$attributes, 'raw_download' => true]);
+    $regular = Conversion::factory()->create([...$attributes, 'raw_download' => false]);
+
+    // Operations whose constructor probes the media file (watermark, auto crop,
+    // max size) are left out here — this guards the raw_download short circuit,
+    // not the operation list itself.
+    expect($raw->getMediaOperations())->toBe([])
+        ->and($regular->getMediaOperations())->not->toBeEmpty()
+        ->and(array_map(fn (object $operation): string => $operation::class, $regular->getMediaOperations()))
+        ->toContain(RemoveExifDataFilterOperation::class);
 });
