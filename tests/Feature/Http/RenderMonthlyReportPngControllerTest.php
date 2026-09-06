@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
 
 beforeEach(function (): void {
-    RateLimiter::clear('weekly-report-render');
+    RateLimiter::clear('monthly-report-render');
 });
 
 it('redirects unauthenticated users', function (): void {
-    $this->post(route('admin.weekly-report.render-png'))
+    $this->post(route('admin.monthly-report.render-png'))
         ->assertRedirect(route('login'));
 });
 
@@ -21,7 +21,7 @@ it('returns 403 for non-admin users', function (): void {
     $user = User::factory()->create(['admin' => false]);
 
     $this->actingAs($user)
-        ->post(route('admin.weekly-report.render-png'))
+        ->post(route('admin.monthly-report.render-png'))
         ->assertForbidden();
 });
 
@@ -38,7 +38,7 @@ it('renders a PNG via the renderer for admins', function (): void {
     });
 
     $response = $this->actingAs($user)
-        ->post(route('admin.weekly-report.render-png'));
+        ->post(route('admin.monthly-report.render-png'));
 
     $response->assertOk();
     expect($response->headers->get('Content-Type'))->toContain('image/png');

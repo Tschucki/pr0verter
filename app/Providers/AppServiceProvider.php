@@ -35,5 +35,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('weekly-report-render', function (Request $request) {
             return Limit::perMinute(5)->by((string) $request->user()?->id);
         });
+
+        RateLimiter::for('monthly-report-render', function (Request $request) {
+            return Limit::perMinute(5)->by((string) $request->user()?->id);
+        });
     }
 }
