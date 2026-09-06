@@ -76,6 +76,7 @@ const formSchema = toTypedSchema(
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
     audio_only: z.boolean().default(false),
+    rawDownload: z.boolean().default(false),
     subtitleMode: z.enum(['none', 'soft', 'burn']).default('none'),
   })
 );
@@ -98,6 +99,7 @@ const inertiaForm = useInertiaForm({
   autoCrop: null,
   watermark: null,
   audio_only: false,
+  rawDownload: false,
   subtitleMode: 'none',
 });
 
@@ -108,15 +110,31 @@ const onSubmit = form.handleSubmit(async (values) => {
 
   inertiaForm.file = values.file;
   inertiaForm.url = values.url;
-  inertiaForm.audio = values.audio;
-  inertiaForm.audioQuality = values.audioQuality;
-  inertiaForm.trimStart = values.trimStart;
-  inertiaForm.trimEnd = values.trimEnd;
-  inertiaForm.maxSize = values.maxSize;
-  inertiaForm.autoCrop = values.autoCrop;
-  inertiaForm.watermark = values.watermark;
-  inertiaForm.audio_only = values.audio_only;
-  inertiaForm.subtitleMode = values.subtitleMode;
+  inertiaForm.rawDownload = values.rawDownload;
+
+  if (values.rawDownload) {
+    // Rohdatei: keine Mediaoperations, keine Größenbegrenzung.
+    inertiaForm.audio = true;
+    inertiaForm.audioQuality = 1.0;
+    inertiaForm.trimStart = null;
+    inertiaForm.trimEnd = null;
+    inertiaForm.maxSize = null;
+    inertiaForm.autoCrop = false;
+    inertiaForm.watermark = false;
+    inertiaForm.audio_only = false;
+    inertiaForm.subtitleMode = 'none';
+    inertiaForm.segments = [];
+  } else {
+    inertiaForm.audio = values.audio;
+    inertiaForm.audioQuality = values.audioQuality;
+    inertiaForm.trimStart = values.trimStart;
+    inertiaForm.trimEnd = values.trimEnd;
+    inertiaForm.maxSize = values.maxSize;
+    inertiaForm.autoCrop = values.autoCrop;
+    inertiaForm.watermark = values.watermark;
+    inertiaForm.audio_only = values.audio_only;
+    inertiaForm.subtitleMode = values.subtitleMode;
+  }
 
   if (!values.file && !values.url) {
     form.setErrors({
@@ -296,341 +314,376 @@ const removeFile = () => {
     </fieldset>
     <fieldset class="grid gap-6 rounded-lg border p-4">
       <legend class="-ml-1 px-1 text-sm font-medium">Einstellungen</legend>
-      <FormField v-slot="{ value, handleChange }" name="audio_only">
-        <label class="cursor-pointer" for="audio_only">
+      <FormField v-slot="{ value, handleChange }" name="rawDownload">
+        <label class="cursor-pointer" for="rawDownload">
           <FormItem
             class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
             <div class="space-y-0.5">
-              <FormLabel class="text-base">Nur Audio</FormLabel>
+              <FormLabel class="text-base">Rohdatei herunterladen</FormLabel>
               <FormDescription>
-                Lädt nur die Audiospur des Videos als MP3-Datei herunter.<br />
-                Ideal für Musik oder Podcasts ohne unnötige Videodaten.
+                Lädt die Datei unverändert herunter. Keine Konvertierung, keine
+                pr0gramm-Anpassungen und keine Größenbegrenzung.<br />
+                Alle weiteren Einstellungen entfallen.
               </FormDescription>
               <FormMessage />
             </div>
             <FormControl>
               <Switch
-                id="audio_only"
+                id="rawDownload"
                 :checked="value"
                 @update:checked="handleChange" />
             </FormControl>
           </FormItem>
         </label>
       </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="audio">
-        <label class="cursor-pointer" for="audio">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Audio</FormLabel>
-              <FormDescription> Audiospur beibehalten</FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <Switch
-                id="audio"
-                :checked="value"
-                @update:checked="handleChange" />
-            </FormControl>
-          </FormItem>
-        </label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio === true && form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="audioQuality">
-        <Label for="audioQuality">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Audio Qualität</FormLabel>
-              <FormDescription> Qualität der Audiospur</FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                <RotateCcw
-                  class="text-muted-foreground size-4 cursor-pointer"
-                  @click="resetAudioQuality" />
-                <NumberField
-                  id="audioQuality"
-                  class="w-full lg:w-auto"
-                  :default-value="1.0"
-                  :format-options="{
-                    style: 'percent',
-                  }"
-                  :max="1.0"
-                  :min="0.01"
-                  :model-value="value"
-                  :step="0.01"
-                  @update:model-value="handleChange">
-                  <NumberFieldContent>
-                    <NumberFieldDecrement />
-                    <NumberFieldInput />
-                    <NumberFieldIncrement />
-                  </NumberFieldContent>
-                </NumberField>
+      <template v-if="form.values.rawDownload === false">
+        <FormField v-slot="{ value, handleChange }" name="audio_only">
+          <label class="cursor-pointer" for="audio_only">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base">Nur Audio</FormLabel>
+                <FormDescription>
+                  Lädt nur die Audiospur des Videos als MP3-Datei herunter.<br />
+                  Ideal für Musik oder Podcasts ohne unnötige Videodaten.
+                </FormDescription>
+                <FormMessage />
               </div>
-            </FormControl>
-          </FormItem>
-        </Label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="maxSize">
-        <Label for="maxSize">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Gewünschte Maximalgröße</FormLabel>
-              <FormDescription>
-                Wie viel MB soll die Datei maximal haben?
-              </FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                <NumberField
-                  id="maxSize"
-                  class="w-full"
-                  :default-value="2000"
-                  :max="2000"
-                  :model-value="value"
-                  :step="1"
-                  locale="de-DE"
-                  @update:model-value="handleChange">
-                  <NumberFieldContent>
-                    <NumberFieldInput />
-                  </NumberFieldContent>
-                </NumberField>
+              <FormControl>
+                <Switch
+                  id="audio_only"
+                  :checked="value"
+                  @update:checked="handleChange" />
+              </FormControl>
+            </FormItem>
+          </label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="audio">
+          <label class="cursor-pointer" for="audio">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base"> Audio</FormLabel>
+                <FormDescription> Audiospur beibehalten</FormDescription>
+                <FormMessage />
               </div>
-            </FormControl>
-          </FormItem>
-        </Label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="autoCrop">
-        <label class="cursor-pointer" for="autoCrop">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base">
-                Automatisches Zuschneiden
-              </FormLabel>
-              <FormDescription>
-                Cropt deinen Unrat automatisch. Nutzt Bewegungsvektoren des
-                Decoders um den Videobereich zu erkennen.<br />
-                Dauert einen Moment länger und ist nicht immer perfekt.
-              </FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <Switch
-                id="autoCrop"
-                :checked="value"
-                @update:checked="handleChange" />
-            </FormControl>
-          </FormItem>
-        </label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="watermark">
-        <label class="cursor-pointer" for="watermark">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Wasserzeichen</FormLabel>
-              <FormDescription>
-                Fügt dem Video ein pr0gramm Wasserzeichen hinzu.<br />
-                50 Pixel in der unteren rechten Ecke.
-              </FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <Switch
-                id="watermark"
-                :checked="value"
-                @update:checked="handleChange" />
-            </FormControl>
-          </FormItem>
-        </label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="subtitleMode">
-        <Label for="subtitleMode">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Untertitel</FormLabel>
-              <FormDescription>
-                Holt verfügbare Untertitel (Deutsch oder Englisch) von der
-                Quelle.<br />
-                „Zuschaltbar" lässt sich im Player ein- und ausblenden.<br />
-                „Immer sichtbar" bleibt fest im Bild.
-              </FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                <Select :model-value="value" @update:model-value="handleChange">
-                  <SelectTrigger id="subtitleMode" class="w-full lg:w-52">
-                    <SelectValue placeholder="Keine" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Keine</SelectItem>
-                    <SelectItem value="soft">Zuschaltbar</SelectItem>
-                    <SelectItem value="burn">Immer sichtbar</SelectItem>
-                  </SelectContent>
-                </Select>
+              <FormControl>
+                <Switch
+                  id="audio"
+                  :checked="value"
+                  @update:checked="handleChange" />
+              </FormControl>
+            </FormItem>
+          </label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio === true && form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="audioQuality">
+          <Label for="audioQuality">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base"> Audio Qualität</FormLabel>
+                <FormDescription> Qualität der Audiospur</FormDescription>
+                <FormMessage />
               </div>
-            </FormControl>
-          </FormItem>
-        </Label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="trimStart">
-        <Label for="trimStart">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Startzeitpunkt</FormLabel>
-              <FormDescription>
-                Leer lassen, um von Anfang an zu konvertieren.<br />
-                Angabe in Sekunden oder Doppelpunktschreibweise (HH:MM:SS).<br />
-                Bsp.: 111 ≙ 1:51 ≙ 0:01:51
-              </FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                <Input
-                  id="trimStart"
-                  class="w-full"
-                  :disabled="inertiaForm.segments.length > 0"
-                  :model-value="value"
-                  @update:model-value="handleChange" />
+              <FormControl>
+                <div
+                  class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                  <RotateCcw
+                    class="text-muted-foreground size-4 cursor-pointer"
+                    @click="resetAudioQuality" />
+                  <NumberField
+                    id="audioQuality"
+                    class="w-full lg:w-auto"
+                    :default-value="1.0"
+                    :format-options="{
+                      style: 'percent',
+                    }"
+                    :max="1.0"
+                    :min="0.01"
+                    :model-value="value"
+                    :step="0.01"
+                    @update:model-value="handleChange">
+                    <NumberFieldContent>
+                      <NumberFieldDecrement />
+                      <NumberFieldInput />
+                      <NumberFieldIncrement />
+                    </NumberFieldContent>
+                  </NumberField>
+                </div>
+              </FormControl>
+            </FormItem>
+          </Label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="maxSize">
+          <Label for="maxSize">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base">
+                  Gewünschte Maximalgröße</FormLabel
+                >
+                <FormDescription>
+                  Wie viel MB soll die Datei maximal haben?
+                </FormDescription>
+                <FormMessage />
               </div>
-            </FormControl>
-          </FormItem>
-        </Label>
-      </FormField>
-      <FormField
-        v-if="form.values.audio_only === false"
-        v-slot="{ value, handleChange }"
-        name="trimEnd">
-        <Label for="trimEnd">
-          <FormItem
-            class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base"> Endzeitpunkt</FormLabel>
-              <FormDescription>
-                Leer lassen, um bis zum Ende zu konvertieren.<br />
-                Angabe in Sekunden oder Doppelpunktschreibweise (HH:MM:SS).<br />
-                Bsp.: 111 ≙ 1:51 ≙ 0:01:51
-              </FormDescription>
-              <FormMessage />
-            </div>
-            <FormControl>
-              <div class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                <Input
-                  id="trimEnd"
-                  class="w-full"
-                  :disabled="inertiaForm.segments.length > 0"
-                  :model-value="value"
-                  @update:model-value="handleChange" />
+              <FormControl>
+                <div
+                  class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                  <NumberField
+                    id="maxSize"
+                    class="w-full"
+                    :default-value="2000"
+                    :max="2000"
+                    :model-value="value"
+                    :step="1"
+                    locale="de-DE"
+                    @update:model-value="handleChange">
+                    <NumberFieldContent>
+                      <NumberFieldInput />
+                    </NumberFieldContent>
+                  </NumberField>
+                </div>
+              </FormControl>
+            </FormItem>
+          </Label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="autoCrop">
+          <label class="cursor-pointer" for="autoCrop">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base">
+                  Automatisches Zuschneiden
+                </FormLabel>
+                <FormDescription>
+                  Cropt deinen Unrat automatisch. Nutzt Bewegungsvektoren des
+                  Decoders um den Videobereich zu erkennen.<br />
+                  Dauert einen Moment länger und ist nicht immer perfekt.
+                </FormDescription>
+                <FormMessage />
               </div>
-            </FormControl>
-          </FormItem>
-        </Label>
-      </FormField>
-      <FormField v-if="form.values.audio_only === false" name="segments">
-        <FormItem
-          class="flex flex-col items-start justify-between space-y-4 rounded-lg border p-4">
-          <div
-            class="flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-            <div class="space-y-0.5">
-              <FormLabel class="text-base">Video-Segmente</FormLabel>
-              <FormDescription>
-                Definiere Abschnitte des Videos, die du behalten möchtest.
-                Aktuell noch in Entwicklung und noch nicht wirklich stabil.
-              </FormDescription>
-            </div>
-            <Button
-              class="w-full lg:w-auto"
-              type="button"
-              variant="outline"
-              @click="inertiaForm.segments.push({ start: 0, duration: 0 })">
-              Segment hinzufügen
-            </Button>
-          </div>
-
-          <div
-            v-for="(segment, index) in inertiaForm.segments"
-            :key="index"
-            class="mb-4 w-full rounded-lg border p-4">
+              <FormControl>
+                <Switch
+                  id="autoCrop"
+                  :checked="value"
+                  @update:checked="handleChange" />
+              </FormControl>
+            </FormItem>
+          </label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="watermark">
+          <label class="cursor-pointer" for="watermark">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base"> Wasserzeichen</FormLabel>
+                <FormDescription>
+                  Fügt dem Video ein pr0gramm Wasserzeichen hinzu.<br />
+                  50 Pixel in der unteren rechten Ecke.
+                </FormDescription>
+                <FormMessage />
+              </div>
+              <FormControl>
+                <Switch
+                  id="watermark"
+                  :checked="value"
+                  @update:checked="handleChange" />
+              </FormControl>
+            </FormItem>
+          </label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="subtitleMode">
+          <Label for="subtitleMode">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base"> Untertitel</FormLabel>
+                <FormDescription>
+                  Holt verfügbare Untertitel (Deutsch oder Englisch) von der
+                  Quelle.<br />
+                  „Zuschaltbar" lässt sich im Player ein- und ausblenden.<br />
+                  „Immer sichtbar" bleibt fest im Bild.
+                </FormDescription>
+                <FormMessage />
+              </div>
+              <FormControl>
+                <div
+                  class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                  <Select
+                    :model-value="value"
+                    @update:model-value="handleChange">
+                    <SelectTrigger id="subtitleMode" class="w-full lg:w-52">
+                      <SelectValue placeholder="Keine" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Keine</SelectItem>
+                      <SelectItem value="soft">Zuschaltbar</SelectItem>
+                      <SelectItem value="burn">Immer sichtbar</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </FormControl>
+            </FormItem>
+          </Label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="trimStart">
+          <Label for="trimStart">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base"> Startzeitpunkt</FormLabel>
+                <FormDescription>
+                  Leer lassen, um von Anfang an zu konvertieren.<br />
+                  Angabe in Sekunden oder Doppelpunktschreibweise (HH:MM:SS).<br />
+                  Bsp.: 111 ≙ 1:51 ≙ 0:01:51
+                </FormDescription>
+                <FormMessage />
+              </div>
+              <FormControl>
+                <div
+                  class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                  <Input
+                    id="trimStart"
+                    class="w-full"
+                    :disabled="inertiaForm.segments.length > 0"
+                    :model-value="value"
+                    @update:model-value="handleChange" />
+                </div>
+              </FormControl>
+            </FormItem>
+          </Label>
+        </FormField>
+        <FormField
+          v-if="form.values.audio_only === false"
+          v-slot="{ value, handleChange }"
+          name="trimEnd">
+          <Label for="trimEnd">
+            <FormItem
+              class="flex w-full flex-col items-start justify-between gap-4 rounded-lg border p-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base"> Endzeitpunkt</FormLabel>
+                <FormDescription>
+                  Leer lassen, um bis zum Ende zu konvertieren.<br />
+                  Angabe in Sekunden oder Doppelpunktschreibweise (HH:MM:SS).<br />
+                  Bsp.: 111 ≙ 1:51 ≙ 0:01:51
+                </FormDescription>
+                <FormMessage />
+              </div>
+              <FormControl>
+                <div
+                  class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
+                  <Input
+                    id="trimEnd"
+                    class="w-full"
+                    :disabled="inertiaForm.segments.length > 0"
+                    :model-value="value"
+                    @update:model-value="handleChange" />
+                </div>
+              </FormControl>
+            </FormItem>
+          </Label>
+        </FormField>
+        <FormField v-if="form.values.audio_only === false" name="segments">
+          <FormItem
+            class="flex flex-col items-start justify-between space-y-4 rounded-lg border p-4">
             <div
-              class="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
-              <div class="text-base font-medium">Segment {{ index + 1 }}</div>
+              class="flex w-full flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+              <div class="space-y-0.5">
+                <FormLabel class="text-base">Video-Segmente</FormLabel>
+                <FormDescription>
+                  Definiere Abschnitte des Videos, die du behalten möchtest.
+                  Aktuell noch in Entwicklung und noch nicht wirklich stabil.
+                </FormDescription>
+              </div>
               <Button
                 class="w-full lg:w-auto"
                 type="button"
-                variant="destructive"
-                size="sm"
-                @click="inertiaForm.segments.splice(index, 1)">
-                Entfernen
+                variant="outline"
+                @click="inertiaForm.segments.push({ start: 0, duration: 0 })">
+                Segment hinzufügen
               </Button>
             </div>
 
-            <div class="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-              <div class="flex flex-col gap-2">
-                <Label :for="`segment-${index}-start`">Start (Sekunden)</Label>
-                <NumberField
-                  :id="`segment-${index}-start`"
-                  :model-value="segment.start"
-                  :min="0"
-                  :step="1"
-                  @update:model-value="
-                    (val) => (inertiaForm.segments[index].start = val)
-                  ">
-                  <NumberFieldContent>
-                    <NumberFieldInput />
-                  </NumberFieldContent>
-                </NumberField>
+            <div
+              v-for="(segment, index) in inertiaForm.segments"
+              :key="index"
+              class="mb-4 w-full rounded-lg border p-4">
+              <div
+                class="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+                <div class="text-base font-medium">Segment {{ index + 1 }}</div>
+                <Button
+                  class="w-full lg:w-auto"
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  @click="inertiaForm.segments.splice(index, 1)">
+                  Entfernen
+                </Button>
               </div>
 
-              <div class="flex flex-col gap-2">
-                <Label :for="`segment-${index}-duration`"
-                  >Dauer (Sekunden)</Label
-                >
-                <NumberField
-                  :id="`segment-${index}-duration`"
-                  :model-value="segment.duration"
-                  :min="0.1"
-                  :step="0.1"
-                  @update:model-value="
-                    (val) => (inertiaForm.segments[index].duration = val)
-                  ">
-                  <NumberFieldContent>
-                    <NumberFieldInput />
-                  </NumberFieldContent>
-                </NumberField>
+              <div class="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="flex flex-col gap-2">
+                  <Label :for="`segment-${index}-start`"
+                    >Start (Sekunden)</Label
+                  >
+                  <NumberField
+                    :id="`segment-${index}-start`"
+                    :model-value="segment.start"
+                    :min="0"
+                    :step="1"
+                    @update:model-value="
+                      (val) => (inertiaForm.segments[index].start = val)
+                    ">
+                    <NumberFieldContent>
+                      <NumberFieldInput />
+                    </NumberFieldContent>
+                  </NumberField>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <Label :for="`segment-${index}-duration`"
+                    >Dauer (Sekunden)</Label
+                  >
+                  <NumberField
+                    :id="`segment-${index}-duration`"
+                    :model-value="segment.duration"
+                    :min="0.1"
+                    :step="0.1"
+                    @update:model-value="
+                      (val) => (inertiaForm.segments[index].duration = val)
+                    ">
+                    <NumberFieldContent>
+                      <NumberFieldInput />
+                    </NumberFieldContent>
+                  </NumberField>
+                </div>
               </div>
             </div>
-          </div>
-        </FormItem>
-      </FormField>
+          </FormItem>
+        </FormField>
+      </template>
       <p class="text-muted-foreground text-sm">
         <a
           target="_blank"

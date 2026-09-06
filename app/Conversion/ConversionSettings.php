@@ -29,6 +29,8 @@ class ConversionSettings
 
     public bool $audio_only;
 
+    public bool $rawDownload;
+
     public SubtitleMode $subtitleMode;
 
     public function __construct(array $settings = [])
@@ -76,9 +78,26 @@ class ConversionSettings
         $this->interpolation = $settings['interpolation'] ?? false;
         $this->segments = $settings['segments'] ?? [];
         $this->audio_only = $settings['audio_only'] ?? false;
+        $this->rawDownload = $settings['raw_download'] ?? false;
         $this->subtitleMode = isset($settings['subtitle_mode'])
             ? SubtitleMode::from($settings['subtitle_mode'])
             : SubtitleMode::None;
+
+        if ($this->rawDownload === true) {
+            $this->audio = true;
+            $this->audioQuality = 1.0;
+            $this->maxSize = null;
+            $this->autoCrop = false;
+            $this->watermark = false;
+            $this->interpolation = false;
+            $this->trimStart = null;
+            $this->trimEnd = null;
+            $this->segments = [];
+            $this->audio_only = false;
+            $this->subtitleMode = SubtitleMode::None;
+
+            return;
+        }
 
         if ($this->audio_only === true) {
             $this->audio = true;
@@ -110,6 +129,7 @@ class ConversionSettings
             'segments' => $this->segments,
             'subtitle_mode' => $this->subtitleMode->value,
             'audio_only' => $this->audio_only,
+            'raw_download' => $this->rawDownload,
         ];
     }
 

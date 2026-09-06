@@ -50,6 +50,7 @@ class Conversion extends Model
         'downloadable' => 'boolean',
         'segments' => 'array',
         'audio_only' => 'boolean',
+        'raw_download' => 'boolean',
         'subtitle_mode' => SubtitleMode::class,
         'subtitle_status' => SubtitleStatus::class,
         'metadata' => 'array',
@@ -144,6 +145,10 @@ class Conversion extends Model
      * */
     public function getMediaOperations(): array
     {
+        if ($this->raw_download) {
+            return [];
+        }
+
         $operations = [];
 
         if (isset($this->metadata['rotation']) && $this->metadata['rotation'] !== 0) {
@@ -200,6 +205,10 @@ class Conversion extends Model
      * */
     public function getFormatOperations(): array
     {
+        if ($this->raw_download) {
+            return [];
+        }
+
         $operations = [];
 
         foreach (config('converter.default_format_operations') as $operation) {
@@ -243,6 +252,7 @@ class Conversion extends Model
             'status' => $this->status,
             'audio' => $this->audio,
             'audio_only' => $this->audio_only,
+            'raw_download' => $this->raw_download,
             'auto_crop' => $this->auto_crop,
             'watermark' => $this->watermark,
             'interpolation' => $this->interpolation,

@@ -24,6 +24,7 @@ class Statistic extends Model
     protected $casts = [
         'audio' => 'boolean',
         'audio_only' => 'boolean',
+        'raw_download' => 'boolean',
         'interpolation' => 'boolean',
         'auto_crop' => 'boolean',
         'max_size' => 'integer',

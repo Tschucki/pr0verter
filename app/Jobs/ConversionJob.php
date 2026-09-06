@@ -57,6 +57,12 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
 
         $conversion = $conversion->loadMissing('file');
 
+        if ($conversion->raw_download) {
+            $this->finishWithoutEncoding($conversion);
+
+            return;
+        }
+
         $filePath = Storage::disk($conversion->file->disk)->path($conversion->file->filename);
         $analysisService = app(VideoAnalysisService::class);
         $metadata = $analysisService->analyze($filePath);
@@ -112,6 +118,49 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         }
 
         $this->performEncoding($conversion, $format, $newFileName);
+    }
+
+    /**
+     * Raw downloads keep the source file untouched: no media operations, no
+     * size limit, no re-encoding. Metadata and thumbnail are best-effort only
+     * so the list view still has something to show.
+     */
+    private function finishWithoutEncoding(Conversion $conversion): void
+    {
+        try {
+            $filePath = Storage::disk($conversion->file->disk)->path($conversion->file->filename);
+            $metadata = app(VideoAnalysisService::class)->analyze($filePath);
+
+            $conversion->update([
+                'metadata' => [
+                    'width' => $metadata->width,
+                    'height' => $metadata->height,
+                    'duration' => $metadata->duration,
+                    'framerate' => $metadata->framerate,
+                    'rotation' => $metadata->rotation,
+                    'audio_sample_rate' => $metadata->audioSampleRate,
+                    'video_codec' => $metadata->videoCodec?->value,
+                    'audio_codec' => $metadata->audioCodec?->value,
+                ],
+                'quality_tier' => $metadata->getQualityTier()->value,
+            ]);
+
+            $conversion->refresh();
+
+            if ($conversion->thumbnail_path === null && $metadata->videoCodec !== null) {
+                app(ThumbnailService::class)->captureSourceFrame($conversion, $metadata->duration);
+            }
+        } catch (Throwable $e) {
+            Log::warning('Raw download analysis failed', [
+                'conversionId' => $conversion->id,
+                'exception' => $e->getMessage(),
+            ]);
+        }
+
+        $conversion->update([
+            'status' => ConversionStatus::FINISHED,
+            'downloadable' => true,
+        ]);
     }
 
     private function checkIfConversionIsActuallyNeeded(Conversion $conversion, VideoMetadata $metadata): bool
