@@ -336,7 +336,7 @@ const removeFile = () => {
           </FormItem>
         </label>
       </FormField>
-      <template v-if="form.values.rawDownload === false">
+      <div v-show="form.values.rawDownload === false" class="grid gap-6">
         <FormField v-slot="{ value, handleChange }" name="audio_only">
           <label class="cursor-pointer" for="audio_only">
             <FormItem
@@ -683,7 +683,7 @@ const removeFile = () => {
             </div>
           </FormItem>
         </FormField>
-      </template>
+      </div>
       <p class="text-muted-foreground text-sm">
         <a
           target="_blank"
