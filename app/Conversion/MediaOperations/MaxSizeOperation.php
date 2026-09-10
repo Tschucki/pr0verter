@@ -6,6 +6,7 @@ use App\Contracts\MediaFormatOperation;
 use App\Models\Conversion;
 use FFMpeg\FFProbe;
 use FFMpeg\FFProbe\DataMapping\Format;
+use FFMpeg\Format\Audio\DefaultAudio;
 use FFMpeg\Format\Video\DefaultVideo;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -26,8 +27,13 @@ class MaxSizeOperation implements MediaFormatOperation
         $this->prepareData();
     }
 
-    public function applyToFormat(DefaultVideo $format): DefaultVideo
+    public function applyToFormat(DefaultAudio $format): DefaultAudio
     {
+        // Bitrate targeting and two-pass only exist on video formats.
+        if (! $format instanceof DefaultVideo) {
+            return $format;
+        }
+
         $containerOverheadPercent = 0.03;
         $maxSizeInMB = $this->conversion->max_size;
         $usableSize = $maxSizeInMB * (1 - $containerOverheadPercent);

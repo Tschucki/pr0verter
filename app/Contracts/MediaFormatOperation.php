@@ -2,9 +2,14 @@
 
 namespace App\Contracts;
 
-use FFMpeg\Format\Video\DefaultVideo;
+use FFMpeg\Format\Audio\DefaultAudio;
 
 interface MediaFormatOperation
 {
-    public function applyToFormat(DefaultVideo $format): DefaultVideo;
+    /**
+     * DefaultAudio is the common base of the video formats (X264 and friends)
+     * and Mp3, so audio-only conversions fit through here as well. Operations
+     * that touch video settings must check for DefaultVideo themselves.
+     */
+    public function applyToFormat(DefaultAudio $format): DefaultAudio;
 }
