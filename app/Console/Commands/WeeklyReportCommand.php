@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\Pr0PostService;
-use App\Services\WeeklyReportRenderer;
+use App\Services\ReportRenderer;
 use App\Services\WeeklyReportStatsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +20,7 @@ class WeeklyReportCommand extends Command
 
     public function handle(
         WeeklyReportStatsService $stats,
-        WeeklyReportRenderer $renderer,
+        ReportRenderer $renderer,
         Pr0PostService $poster,
     ): int {
         $data = $stats->buildReportData(now());

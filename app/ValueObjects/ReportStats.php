@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ValueObjects;
 
-class WeeklyStats
+class ReportStats
 {
     public function __construct(
         public readonly int $totalConversions,

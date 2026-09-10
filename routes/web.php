@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\MonthlyReportPreviewController;
+use App\Http\Controllers\Admin\RenderMonthlyReportPngController;
 use App\Http\Controllers\Admin\RenderWeeklyReportPngController;
 use App\Http\Controllers\Admin\WeeklyReportPreviewController;
 use App\Http\Controllers\AuthController;
@@ -58,4 +60,13 @@ Route::middleware(['auth', 'can:admin'])->prefix('admin/weekly-report')->group(f
     Route::post('render-png', RenderWeeklyReportPngController::class)
         ->middleware('throttle:weekly-report-render')
         ->name('admin.weekly-report.render-png');
+});
+
+Route::middleware(['auth', 'can:admin'])->prefix('admin/monthly-report')->group(function () {
+    Route::get('preview', MonthlyReportPreviewController::class)
+        ->name('admin.monthly-report.preview');
+
+    Route::post('render-png', RenderMonthlyReportPngController::class)
+        ->middleware('throttle:monthly-report-render')
+        ->name('admin.monthly-report.render-png');
 });

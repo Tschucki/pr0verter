@@ -7,7 +7,7 @@ namespace App\Services;
 use Spatie\Browsershot\Browsershot;
 use Spatie\Image\Image;
 
-class WeeklyReportRenderer
+class ReportRenderer
 {
     public function renderPng(string $html, string $targetPath): void
     {

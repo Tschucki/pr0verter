@@ -5,11 +5,11 @@ declare(strict_types=1);
 use App\Console\Commands\WeeklyReportCommand;
 use App\Models\Statistic;
 use App\Services\Pr0PostService;
-use App\Services\WeeklyReportRenderer;
+use App\Services\ReportRenderer;
 use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
 
-it('delegates rendering to WeeklyReportRenderer and posts via Pr0PostService', function (): void {
+it('delegates rendering to ReportRenderer and posts via Pr0PostService', function (): void {
     Storage::fake('local');
 
     Statistic::factory()->count(3)->create([
@@ -17,7 +17,7 @@ it('delegates rendering to WeeklyReportRenderer and posts via Pr0PostService', f
         'extension' => 'mp4',
     ]);
 
-    $renderer = $this->mock(WeeklyReportRenderer::class, function (MockInterface $m): void {
+    $renderer = $this->mock(ReportRenderer::class, function (MockInterface $m): void {
         $m->shouldReceive('renderPng')
             ->once()
             ->withArgs(function (string $html, string $path): bool {
@@ -38,7 +38,7 @@ it('delegates rendering to WeeklyReportRenderer and posts via Pr0PostService', f
 it('skips post when there are zero conversions in the current week', function (): void {
     // Keine Statistics in der aktuellen Woche
 
-    $renderer = $this->mock(WeeklyReportRenderer::class, function (MockInterface $m): void {
+    $renderer = $this->mock(ReportRenderer::class, function (MockInterface $m): void {
         $m->shouldNotReceive('renderPng');
     });
 
@@ -54,8 +54,8 @@ it('skips post when there are zero conversions in the current week', function ()
 it('returns failure exit code when renderer throws', function (): void {
     Statistic::factory()->count(3)->create(['created_at' => now()->subDays(2)]);
 
-    $this->mock(WeeklyReportRenderer::class, function (MockInterface $m): void {
-        $m->shouldReceive('renderPng')->andThrow(new \RuntimeException('chromium gone'));
+    $this->mock(ReportRenderer::class, function (MockInterface $m): void {
+        $m->shouldReceive('renderPng')->andThrow(new RuntimeException('chromium gone'));
     });
 
     $this->mock(Pr0PostService::class, function (MockInterface $m): void {
@@ -71,14 +71,14 @@ it('returns failure exit code when poster throws but keeps the PNG', function ()
     Storage::fake('local');
     Statistic::factory()->count(3)->create(['created_at' => now()->subDays(2)]);
 
-    $this->mock(WeeklyReportRenderer::class, function (MockInterface $m): void {
+    $this->mock(ReportRenderer::class, function (MockInterface $m): void {
         $m->shouldReceive('renderPng')->once()->andReturnUsing(function (string $html, string $path): void {
             file_put_contents($path, 'fake-png-bytes');
         });
     });
 
     $this->mock(Pr0PostService::class, function (MockInterface $m): void {
-        $m->shouldReceive('postImage')->andThrow(new \RuntimeException('pr0gramm api down'));
+        $m->shouldReceive('postImage')->andThrow(new RuntimeException('pr0gramm api down'));
     });
 
     $exitCode = $this->artisan(WeeklyReportCommand::class)->run();
