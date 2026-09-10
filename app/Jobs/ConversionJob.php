@@ -10,8 +10,8 @@ use App\Services\ThumbnailService;
 use App\Services\VideoAnalysisService;
 use App\ValueObjects\VideoMetadata;
 use FFMpeg\FFProbe;
+use FFMpeg\Format\Audio\DefaultAudio;
 use FFMpeg\Format\Audio\Mp3;
-use FFMpeg\Format\Video\DefaultVideo;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -206,7 +206,7 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
 
     private function performEncoding(
         Conversion $conversion,
-        DefaultVideo $format,
+        DefaultAudio $format,
         string $newFileName,
     ): void {
         $mediaOperations = $conversion->getMediaOperations();

@@ -60,7 +60,7 @@ onMounted(() => {
   alerts.value = releaseNotes.filter((alert) => !dismissed.includes(alert.id));
 
   // eslint-disable-next-line no-undef
-  Echo.channel(`session.${sessionId}`)
+  Echo?.channel(`session.${sessionId}`)
     .listen('FileUploadFailed', () => {
       toast.error('Datei konnte nicht hochgeladen werden');
     })
@@ -85,7 +85,7 @@ const menuVisible = ref(false);
 
 onBeforeUnmount(() => {
   // eslint-disable-next-line no-undef
-  Echo.leaveChannel(`session.${sessionId}`);
+  Echo?.leaveChannel(`session.${sessionId}`);
 });
 
 const logout = async () => {

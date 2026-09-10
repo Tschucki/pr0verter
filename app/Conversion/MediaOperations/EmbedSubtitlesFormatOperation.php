@@ -8,14 +8,14 @@ use App\Contracts\MediaFormatOperation;
 use App\Conversion\Formats\H264Format;
 use App\Conversion\Formats\H264FormatWithSubs;
 use App\Models\Conversion;
-use FFMpeg\Format\Video\DefaultVideo;
+use FFMpeg\Format\Audio\DefaultAudio;
 use Illuminate\Support\Facades\Storage;
 
 final class EmbedSubtitlesFormatOperation implements MediaFormatOperation
 {
     public function __construct(private readonly Conversion $conversion) {}
 
-    public function applyToFormat(DefaultVideo $format): DefaultVideo
+    public function applyToFormat(DefaultAudio $format): DefaultAudio
     {
         if (! $format instanceof H264Format) {
             return $format;

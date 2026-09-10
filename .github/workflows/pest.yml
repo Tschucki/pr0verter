@@ -12,6 +12,8 @@ permissions:
 jobs:
   pest:
     runs-on: ubuntu-latest
+    # Without this a hanging browser test runs into GitHub's 6h default.
+    timeout-minutes: 20
 
     services:
       mysql:
@@ -93,13 +95,17 @@ jobs:
         # system libs Chromium needs on the runner.
         run: npx playwright install --with-deps chromium
 
-      - name: Build frontend assets
-        # The weekly-report blade pulls Tailwind via @vite(); without a build
-        # manifest the browser tests fail to render the page.
-        run: npm run build
-
       - name: Copy .env
+        # Must run before the asset build: Vite inlines VITE_* variables at
+        # build time. Without them Echo is built with an undefined wsHost and
+        # keeps retrying a connection that never resolves, which hangs every
+        # browser test that loads the Inertia app.
         run: cp .env.example .env
+
+      - name: Build frontend assets
+        # The report blades pull Tailwind via @vite(); without a build manifest
+        # the browser tests fail to render the page.
+        run: npm run build
 
       - name: Generate application key
         run: php artisan key:generate
