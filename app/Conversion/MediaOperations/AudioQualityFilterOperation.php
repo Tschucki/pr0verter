@@ -5,7 +5,7 @@ namespace App\Conversion\MediaOperations;
 use App\Contracts\MediaFormatOperation;
 use App\Models\Conversion;
 use FFMpeg\FFProbe;
-use FFMpeg\Format\Video\DefaultVideo;
+use FFMpeg\Format\Audio\DefaultAudio;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
@@ -21,7 +21,7 @@ class AudioQualityFilterOperation implements MediaFormatOperation
         $this->prepareData();
     }
 
-    public function applyToFormat(DefaultVideo $format): DefaultVideo
+    public function applyToFormat(DefaultAudio $format): DefaultAudio
     {
         if ($this->conversion->audio === false || $this->currentBitrate === null) {
             return $format;

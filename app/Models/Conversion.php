@@ -149,6 +149,13 @@ class Conversion extends Model
             return [];
         }
 
+        // Audio-only exports as Mp3, and every operation below registers a
+        // filter through FFMpeg's video filter channel, which rejects a
+        // non-video format when the command is built.
+        if ($this->audio_only) {
+            return [];
+        }
+
         $operations = [];
 
         if (isset($this->metadata['rotation']) && $this->metadata['rotation'] !== 0) {
