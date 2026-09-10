@@ -168,7 +168,7 @@ const getQualityTierVariant = (tier) => {
 
 onMounted(() => {
   // eslint-disable-next-line no-undef
-  Echo.channel(`session.${sessionId}`)
+  Echo?.channel(`session.${sessionId}`)
     .listen('ConversionProgressEvent', (event) => {
       updateConversionWithProgress(event);
     })
