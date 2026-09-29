@@ -16,6 +16,9 @@
     @inertiaHead
 </head>
 <body>
-@inertia
+{{-- Written out instead of @inertia: a view compiled by Inertia 2 still emitted the
+     data-page attribute, which the Inertia 3 client cannot read. No SSR in use. --}}
+<script data-page="app" type="application/json">{!! json_encode($page, JSON_HEX_TAG) !!}</script>
+<div id="app"></div>
 </body>
 </html>
