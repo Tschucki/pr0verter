@@ -28,6 +28,11 @@ class DownloadProgress implements ShouldBroadcast, ShouldQueue
 
     public ?string $speed;
 
+    /**
+     * Download speed in megabytes (10^6 bytes) per second, null while yt-dlp reports it as unknown.
+     */
+    public ?float $speedInMegabytes;
+
     public ?string $eta;
 
     public string $queue = 'events';
@@ -43,6 +48,7 @@ class DownloadProgress implements ShouldBroadcast, ShouldQueue
         $this->percentage = $percentage;
         $this->size = $size;
         $this->speed = $speed;
+        $this->speedInMegabytes = self::toMegabytesPerSecond($speed);
         $this->eta = $eta;
         $this->totalTime = $totalTime;
     }
@@ -52,5 +58,23 @@ class DownloadProgress implements ShouldBroadcast, ShouldQueue
         return [
             new Channel('session.' . $this->sessionId),
         ];
+    }
+
+    private static function toMegabytesPerSecond(?string $speed): ?float
+    {
+        if ($speed === null || preg_match('/^(?<value>\d+(?:\.\d+)?)(?<unit>K|M|G|T)?(?<binary>i)?B\/s$/i', trim($speed), $match) !== 1) {
+            return null;
+        }
+
+        $base = ($match['binary'] ?? '') !== '' ? 1024 : 1000;
+        $exponent = match (strtoupper($match['unit'] ?? '')) {
+            'K' => 1,
+            'M' => 2,
+            'G' => 3,
+            'T' => 4,
+            default => 0,
+        };
+
+        return round((float) $match['value'] * $base ** $exponent / 1_000_000, 2);
     }
 }

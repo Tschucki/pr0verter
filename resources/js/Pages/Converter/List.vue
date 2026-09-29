@@ -60,12 +60,14 @@ const updateConversionWithProgress = (progressEvent) => {
 const updateConversionWithDownloadProgress = (downloadProgressEvent) => {
   allConversions.value = allConversions.value.map((conversion) => {
     if (conversion.id === downloadProgressEvent.conversionId) {
-      if (
-        downloadProgressEvent.speed !== null &&
-        downloadProgressEvent.speed !== ''
-      ) {
-        conversion.downloadProgressEvent = downloadProgressEvent;
-      }
+      // Keep the last known speed while yt-dlp briefly reports it as unknown.
+      conversion.downloadProgressEvent = {
+        ...downloadProgressEvent,
+        speedInMegabytes:
+          downloadProgressEvent.speedInMegabytes ??
+          conversion.downloadProgressEvent?.speedInMegabytes ??
+          null,
+      };
     }
     return conversion;
   });
@@ -130,6 +132,16 @@ const cancelConversion = async (conversion) => {
     error: 'Fehler beim Abbrechen des Konvertierung',
   });
 };
+
+const megabytesFormatter = new Intl.NumberFormat('de-DE', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatSpeed = (speedInMegabytes) =>
+  speedInMegabytes === null || speedInMegabytes === undefined
+    ? 'wird ermittelt …'
+    : `${megabytesFormatter.format(speedInMegabytes)} MB/s`;
 
 const subtitleTooltip = (status) => {
   switch (status) {
@@ -346,9 +358,16 @@ onMounted(() => {
                           {{ conversion.downloadProgressEvent.percentage
                           }}<br />
                           Geschwindigkeit:
-                          {{ conversion.downloadProgressEvent.speed }}<br />
-                          Verbleibend:
-                          {{ conversion.downloadProgressEvent.eta }}
+                          <span class="whitespace-nowrap tabular-nums">{{
+                            formatSpeed(
+                              conversion.downloadProgressEvent.speedInMegabytes
+                            )
+                          }}</span
+                          ><template v-if="conversion.downloadProgressEvent.eta"
+                            ><br />
+                            Verbleibend:
+                            {{ conversion.downloadProgressEvent.eta }}</template
+                          >
                         </strong>
                         <strong
                           v-if="

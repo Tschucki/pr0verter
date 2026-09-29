@@ -25,6 +25,8 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
     use Dispatchable;
     use Queueable;
 
+    private const PROGRESS_INTERVAL_SECONDS = 1.0;
+
     public function __construct(public string $conversionId) {}
 
     public function uniqueId(): string
@@ -51,12 +53,17 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
 
             $youtubeDl = app('pr0verter-yt-dlp');
 
-            $youtubeDl->onProgress(function (?string $progressTarget, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null) use ($conversion): void {
-                $iPercentage = $percentage !== null ? (int) str_replace('%', '', $percentage) : null;
+            $lastProgressAt = null;
 
-                if ($iPercentage % 5 !== 0) {
+            $youtubeDl->onProgress(function (?string $progressTarget, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null) use ($conversion, &$lastProgressAt): void {
+                $isFinished = $percentage !== null && (float) $percentage >= 100.0;
+
+                // yt-dlp prints several progress lines per second; one update per interval is enough.
+                if (! $isFinished && $lastProgressAt !== null && microtime(true) - $lastProgressAt < self::PROGRESS_INTERVAL_SECONDS) {
                     return;
                 }
+
+                $lastProgressAt = microtime(true);
 
                 DownloadProgress::dispatch($conversion->id, $progressTarget, $percentage, $size, $speed, $eta, $totalTime);
             });
