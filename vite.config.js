@@ -24,10 +24,15 @@ export default defineConfig({
   build: {
     cssCodeSplit: true,
     sourcemap: false,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          vendor: ['vue', 'radix-vue'],
+        codeSplitting: {
+          groups: [
+            {
+              name: 'vendor',
+              test: /[\\/]node_modules[\\/](vue|@vue|radix-vue)[\\/]/,
+            },
+          ],
         },
       },
     },

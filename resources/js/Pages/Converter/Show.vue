@@ -18,7 +18,7 @@ import {
 import { CloudUpload, RotateCcw, Trash2 } from 'lucide-vue-next';
 import { useForm } from 'vee-validate';
 import { Head, useForm as useInertiaForm } from '@inertiajs/vue3';
-import { toTypedSchema } from '@vee-validate/zod';
+import { toTypedSchema } from '@/lib/zodTypedSchema.js';
 import * as z from 'zod';
 
 import {
@@ -61,7 +61,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 const formSchema = toTypedSchema(
   z.object({
     file: z.any().optional(),
-    url: z.string().url('Keine valide URL').nullish().optional().default(null),
+    url: z.url('Keine valide URL').nullish().default(null),
     audio: z.boolean().default(true),
     audioQuality: z
       .number()
@@ -71,7 +71,7 @@ const formSchema = toTypedSchema(
       .default(1.0),
     trimStart: z.string().nullish(),
     trimEnd: z.string().nullish(),
-    segments: z.array().optional(), // Zod Form sucks
+    segments: z.array(z.any()).optional(), // Zod Form sucks
     maxSize: z.number().min(1).max(2000).default(2000),
     autoCrop: z.boolean().default(false),
     watermark: z.boolean().default(false),
@@ -155,7 +155,6 @@ const onSubmit = form.handleSubmit(async (values) => {
         preserverState: true,
         preserveScroll: true,
         onSuccess: (data) => {
-          console.log(error);
           resolve(data);
         },
         onError: (error) => {
