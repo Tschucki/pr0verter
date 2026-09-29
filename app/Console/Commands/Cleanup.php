@@ -20,19 +20,24 @@ class Cleanup extends Command
         $this->info('Starting cleanup');
 
         $files = File::where('created_at', '<', now()->subHours(2))->get();
-        $conversions = Conversion::where('created_at', '<', now()->subHours(2))->get();
 
-        $this->info('Deleting ' . $files->count() . ' files');
+        // Conversions go first: deleting a file cascades to its conversions in the
+        // database, which skips the observer and orphans the statistic row.
+        $conversions = Conversion::where('created_at', '<', now()->subHours(2))
+            ->orWhereIn('file_id', $files->modelKeys())
+            ->get();
+
+        $this->info('Deleting ' . $conversions->count() . ' conversions');
+
+        $this->withProgressBar($conversions, function ($conversion) {
+            $conversion->delete();
+        });
+
+        $this->info("\nDeleting " . $files->count() . ' files');
 
         $this->withProgressBar($files, function ($file) {
             // local file deletion runs in the observer
             $file->delete();
-        });
-
-        $this->info("\nDeleting " . $conversions->count() . ' conversions');
-
-        $this->withProgressBar($conversions, function ($conversion) {
-            $conversion->delete();
         });
 
         $this->info("\nScanning local disk for orphaned files");

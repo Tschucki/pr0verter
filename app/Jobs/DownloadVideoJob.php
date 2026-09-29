@@ -25,9 +25,21 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
     use Dispatchable;
     use Queueable;
 
+    /**
+     * Leaves room after the yt-dlp process limit for merging, moving and
+     * thumbnail handling, so a slow download fails with a readable message
+     * instead of the worker killing the job.
+     */
+    private const POST_DOWNLOAD_BUFFER_SECONDS = 120;
+
     private const PROGRESS_INTERVAL_SECONDS = 1.0;
 
-    public function __construct(public string $conversionId) {}
+    public int $timeout;
+
+    public function __construct(public string $conversionId)
+    {
+        $this->timeout = (int) config('converter.download.timeout') + self::POST_DOWNLOAD_BUFFER_SECONDS;
+    }
 
     public function uniqueId(): string
     {
@@ -36,7 +48,7 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
 
     public function uniqueFor(): int
     {
-        return (int) now()->addMinutes(3)->diffInSeconds();
+        return $this->timeout;
     }
 
     public function handle(): void

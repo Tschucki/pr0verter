@@ -56,6 +56,8 @@ class Pr0verterYoutubeDl
      */
     private array $extraArgs = [];
 
+    private ?float $timeout = null;
+
     public function __construct(?ProcessBuilderInterface $processBuilder = null, ?MetadataReaderInterface $metadataReader = null, ?Filesystem $filesystem = null)
     {
         $this->processBuilder = $processBuilder ?? new DefaultProcessBuilder;
@@ -63,6 +65,16 @@ class Pr0verterYoutubeDl
         $this->filesystem = $filesystem ?? new Filesystem;
         $this->progress = static function (?string $progressTarget, string $percentage, string $size, ?string $speed, ?string $eta, ?string $totalTime): void {};
         $this->debug = static function (string $type, string $buffer): void {};
+    }
+
+    /**
+     * Maximum runtime of a yt-dlp download in seconds, null for no limit.
+     */
+    public function setTimeout(?float $timeout): self
+    {
+        $this->timeout = $timeout;
+
+        return $this;
     }
 
     /**
@@ -157,6 +169,7 @@ class Pr0verterYoutubeDl
         $progressTarget = null;
 
         $process = $this->processBuilder->build($this->binPath, $this->pythonPath, $arguments);
+        $process->setTimeout($this->timeout);
         $process->run(function (string $type, string $buffer) use (&$currentVideo, &$parsedData, &$progressTarget): void {
             ($this->debug)($type, $buffer);
 
