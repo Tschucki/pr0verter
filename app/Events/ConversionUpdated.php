@@ -16,20 +16,29 @@ class ConversionUpdated implements ShouldBroadcast, ShouldQueue
     use InteractsWithSockets;
     use SerializesModels;
 
-    public string $sessionId;
+    public ?string $sessionId = null;
 
     public string $conversionId;
 
-    public array $conversion;
+    public array $conversion = [];
 
     public string $queue = 'events';
 
     public function __construct(string $conversionId)
     {
         $this->conversionId = $conversionId;
-        $conversion = Conversion::with('file')->where('id', $conversionId)->first();
-        $this->conversion = $conversion->toArray();
-        $this->sessionId = Conversion::find($conversionId)->session_id;
+        $conversion = Conversion::with('file')->find($conversionId);
+
+        // Null when the conversion was deleted before the event was dispatched.
+        if ($conversion !== null) {
+            $this->conversion = $conversion->toArray();
+            $this->sessionId = $conversion->session_id;
+        }
+    }
+
+    public function broadcastWhen(): bool
+    {
+        return $this->sessionId !== null;
     }
 
     public function broadcastOn(): array

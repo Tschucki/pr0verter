@@ -5,6 +5,7 @@ namespace App\Conversion\MediaOperations;
 use App\Contracts\MediaFilterOperation;
 use App\Models\Conversion;
 use FFMpeg\Filters\Video\VideoFilters;
+use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,8 @@ use ProtoneMedia\LaravelFFMpeg\MediaOpener;
 
 class AutoCropFilterOperation implements MediaFilterOperation
 {
+    private const DETECTION_TIMEOUT_SECONDS = 180;
+
     public Conversion $conversion;
 
     private string $crop;
@@ -40,13 +43,26 @@ class AutoCropFilterOperation implements MediaFilterOperation
         $path = Storage::disk($this->conversion->file->disk)->path($this->conversion->file->filename);
 
         $ffmpeg = config('laravel-ffmpeg.ffmpeg.binaries');
-        $timeout = config('laravel-ffmpeg.timeout');
 
         $escapedPath = escapeshellarg($path);
 
-        $command = "{$ffmpeg} -i {$escapedPath} -vf cropdetect -f null - 2>&1 | grep -o 'crop=[0-9:]*' | tail -1";
+        // Decoding only keyframes keeps cropdetect fast on long videos, where a
+        // full decode used to run into the timeout. Audio is not decoded at all.
+        $command = "{$ffmpeg} -skip_frame nokey -i {$escapedPath} -vf cropdetect -an -f null - 2>&1 | grep -o 'crop=[0-9:]*' | tail -1";
 
-        $process = Process::timeout(3 * 60)->run($command);
+        try {
+            $process = Process::timeout(self::DETECTION_TIMEOUT_SECONDS)->run($command);
+        } catch (ProcessTimedOutException) {
+            // Cropping is optional: convert uncropped instead of failing the job.
+            Log::warning('AutoCrop detection timed out, converting without crop', [
+                'conversion_id' => $this->conversion->id,
+                'timeout' => self::DETECTION_TIMEOUT_SECONDS,
+            ]);
+
+            $this->crop = '';
+
+            return;
+        }
 
         $output = trim($process->output());
 

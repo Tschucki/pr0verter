@@ -43,7 +43,10 @@ class WeeklyReportCommand extends Command
             $html = view('weekly-report', ['data' => $data])->render();
             $renderer->renderPng($html, $imagePath);
         } catch (Throwable $e) {
-            Log::error('Weekly report rendering failed', ['exception' => $e]);
+            // report() hands the real cause to the exception handler (Nightwatch);
+            // the scheduler itself only sees the exit code.
+            report($e);
+            Log::error('Weekly report rendering failed', ['message' => $e->getMessage()]);
 
             $this->error('Weekly report rendering failed: ' . $e->getMessage());
 
@@ -57,7 +60,8 @@ class WeeklyReportCommand extends Command
                 ['pr0verter', 'Statistiken', 'Wochenstatistik', 'das pr0 programmiert', 'sfw', 'image', 'api']
             );
         } catch (Throwable $e) {
-            Log::error('Weekly report post failed (PNG retained)', ['exception' => $e, 'path' => $imagePath]);
+            report($e);
+            Log::error('Weekly report post failed (PNG retained)', ['message' => $e->getMessage(), 'path' => $imagePath]);
 
             return self::FAILURE;
         }

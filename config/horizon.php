@@ -197,7 +197,7 @@ return [
         ],
         'converter' => [
             'connection' => 'redis',
-            'queue' => ['converter', 'downloader'],
+            'queue' => ['converter'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
@@ -206,6 +206,22 @@ return [
             'memory' => 600,
             'tries' => 1,
             'timeout' => 1200,
+            'nice' => 1,
+        ],
+        // Horizon kills a worker it scales down once this timeout has passed,
+        // so it has to cover the whole DownloadVideoJob (download timeout +
+        // 120s buffer) and stay below the redis retry_after (1260s).
+        'downloader' => [
+            'connection' => 'redis',
+            'queue' => ['downloader'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 256,
+            'tries' => 1,
+            'timeout' => (int) env('DOWNLOAD_TIMEOUT', 600) + 180,
             'nice' => 1,
         ],
         'events' => [
@@ -235,6 +251,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'downloader' => [
+                'maxProcesses' => 5,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
             'events' => [
                 'maxProcesses' => 1,
                 'balanceMaxShift' => 1,
@@ -248,6 +269,9 @@ return [
             ],
             'converter' => [
                 'maxProcesses' => 3,
+            ],
+            'downloader' => [
+                'maxProcesses' => 2,
             ],
             'events' => [
                 'maxProcesses' => 1,

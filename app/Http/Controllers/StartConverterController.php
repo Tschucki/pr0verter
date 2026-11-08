@@ -11,7 +11,9 @@ use App\Http\Requests\StartConverterRequest;
 use App\Jobs\ConversionJob;
 use App\Models\Conversion;
 use App\Models\File;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
@@ -20,6 +22,8 @@ class StartConverterController extends Controller
     public function __invoke(StartConverterRequest $request)
     {
         $validated = $request->validated();
+
+        $this->ensureSessionIsStored($request);
 
         $this->deleteOldFiles();
 
@@ -79,6 +83,35 @@ class StartConverterController extends Controller
             'session_id' => Session::getId(),
             'mime_type' => $uploadedFile->getMimeType(),
         ]);
+    }
+
+    /**
+     * Files and conversions reference the session row by foreign key, but the
+     * database session handler only writes that row after the response. A
+     * session that is not stored yet (first request, or its row was garbage
+     * collected while the page stayed open) is written now instead.
+     */
+    private function ensureSessionIsStored(Request $request): void
+    {
+        if (config('session.driver') !== 'database') {
+            return;
+        }
+
+        $session = $request->session();
+
+        $stored = DB::connection(config('session.connection'))
+            ->table(config('session.table'))
+            ->where('id', $session->getId())
+            ->exists();
+
+        if ($stored) {
+            return;
+        }
+
+        // The handler may still believe the row exists and would only run an UPDATE.
+        $session->setExists(false);
+        $session->save();
+        $session->start();
     }
 
     private function deleteOldFiles(): void
