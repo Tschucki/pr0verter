@@ -43,7 +43,10 @@ class MonthlyReportCommand extends Command
             $html = view('monthly-report', ['data' => $data])->render();
             $renderer->renderPng($html, $imagePath);
         } catch (Throwable $e) {
-            Log::error('Monthly report rendering failed', ['exception' => $e]);
+            // report() hands the real cause to the exception handler (Nightwatch);
+            // the scheduler itself only sees the exit code.
+            report($e);
+            Log::error('Monthly report rendering failed', ['message' => $e->getMessage()]);
 
             $this->error('Monthly report rendering failed: ' . $e->getMessage());
 
@@ -59,7 +62,8 @@ class MonthlyReportCommand extends Command
                 ['pr0verter', 'Statistiken', 'Monatsstatistik', 'das pr0 programmiert', 'sfw', 'image', 'api']
             );
         } catch (Throwable $e) {
-            Log::error('Monthly report post failed (PNG retained)', ['exception' => $e, 'path' => $imagePath]);
+            report($e);
+            Log::error('Monthly report post failed (PNG retained)', ['message' => $e->getMessage(), 'path' => $imagePath]);
 
             return self::FAILURE;
         }

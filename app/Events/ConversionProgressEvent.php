@@ -16,7 +16,7 @@ class ConversionProgressEvent implements ShouldBroadcast, ShouldQueue
     use InteractsWithSockets;
     use SerializesModels;
 
-    public string $sessionId;
+    public ?string $sessionId;
 
     public string $conversionId;
 
@@ -38,7 +38,13 @@ class ConversionProgressEvent implements ShouldBroadcast, ShouldQueue
         $this->percentage = $percentage;
         $this->remaining = $remaining;
         $this->rate = $rate;
-        $this->sessionId = Conversion::find($conversionId)->session_id;
+        // Null when the conversion was deleted while the encoding was still running.
+        $this->sessionId = Conversion::whereKey($conversionId)->value('session_id');
+    }
+
+    public function broadcastWhen(): bool
+    {
+        return $this->sessionId !== null;
     }
 
     public function broadcastOn(): array

@@ -9,6 +9,7 @@ use App\Models\Conversion;
 use App\Services\ThumbnailService;
 use App\Services\VideoAnalysisService;
 use App\ValueObjects\VideoMetadata;
+use FFMpeg\Exception\RuntimeException as FFMpegRuntimeException;
 use FFMpeg\FFProbe;
 use FFMpeg\Format\Audio\DefaultAudio;
 use FFMpeg\Format\Audio\Mp3;
@@ -43,17 +44,15 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
     {
         $conversion = Conversion::find($this->conversionId);
 
-        if ($conversion === null) {
+        // Checked before the status update, which would otherwise overwrite a
+        // cancel that arrived while the job was still waiting in the queue.
+        if ($conversion === null || ! $this->shouldContinue()) {
             return;
         }
 
         $conversion->update([
             'status' => 'preparing',
         ]);
-
-        if (! $this->shouldContinue()) {
-            return;
-        }
 
         $conversion = $conversion->loadMissing('file');
 
@@ -64,8 +63,23 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         }
 
         $filePath = Storage::disk($conversion->file->disk)->path($conversion->file->filename);
-        $analysisService = app(VideoAnalysisService::class);
-        $metadata = $analysisService->analyze($filePath);
+
+        try {
+            $metadata = app(VideoAnalysisService::class)->analyze($filePath);
+        } catch (FFMpegRuntimeException $e) {
+            // Broken or truncated upload: FFprobe cannot read its header.
+            Log::warning('Video analysis failed, file is not readable', [
+                'conversionId' => $conversion->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            $conversion->update([
+                'status' => ConversionStatus::FAILED,
+                'error_message' => 'Die Datei ist beschädigt oder kein gültiges Video.',
+            ]);
+
+            return;
+        }
 
         $qualityTier = $metadata->getQualityTier();
 
@@ -118,6 +132,22 @@ class ConversionJob implements ShouldBeUnique, ShouldQueue
         }
 
         $this->performEncoding($conversion, $format, $newFileName);
+    }
+
+    /**
+     * Runs when the worker gives up on the job (uncaught exception, timeout,
+     * killed worker picked up again) so the conversion does not hang in
+     * "preparing" or "processing".
+     */
+    public function failed(?Throwable $exception): void
+    {
+        Conversion::whereKey($this->conversionId)
+            ->whereNotIn('status', [ConversionStatus::FINISHED, ConversionStatus::FAILED, ConversionStatus::CANCELED])
+            ->first()
+            ?->update([
+                'status' => ConversionStatus::FAILED,
+                'error_message' => 'Beim Konvertieren ist ein Fehler aufgetreten.',
+            ]);
     }
 
     /**

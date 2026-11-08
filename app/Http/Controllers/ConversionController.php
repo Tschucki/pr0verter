@@ -45,10 +45,10 @@ class ConversionController extends Controller
 
     public function togglePublicFlag(Conversion $conversion, Request $request): JsonResponse
     {
-        $sessionId = Session::getId();
-        $conversionSessionId = $conversion->file->session_id;
+        abort_unless($conversion->session_id === Session::getId(), 403);
 
-        abort_unless($conversionSessionId === $sessionId, 403);
+        // URL conversions have no file until the download has finished.
+        abort_if($conversion->file === null, 404);
 
         $conversion->file->update([
             'public' => ! $conversion->file->public,
@@ -63,10 +63,9 @@ class ConversionController extends Controller
 
     public function cancel(Conversion $conversion, Request $request): JsonResponse
     {
-        $sessionId = Session::getId();
-        $conversionSessionId = $conversion->file->session_id;
-
-        abort_unless($conversionSessionId === $sessionId, 403);
+        // The conversion carries the session itself: URL conversions have no
+        // file while they are still downloading, which is exactly when users cancel.
+        abort_unless($conversion->session_id === Session::getId(), 403);
 
         if ($conversion->status === ConversionStatus::FINISHED) {
             return response()->json([

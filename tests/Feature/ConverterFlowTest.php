@@ -37,12 +37,9 @@ it('completes the upload → start → redirect → list → job dispatch flow',
     Bus::fake([ConversionJob::class]);
     Event::fake([FileUploadSuccessful::class]);
 
-    // files.session_id is FK-constrained to sessions.id, but the StartSession
-    // middleware mints a fresh session per test request and only persists it
-    // *after* the response — so the File insert mid-request can never satisfy
-    // the constraint. Skipping FK checks for this single test is the standard
-    // workaround; RefreshDatabase rolls everything back afterwards.
-    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    // files.session_id is FK-constrained to sessions.id: the controller stores
+    // the fresh session row before inserting, so no FK workaround is needed.
+    expect(DB::table('sessions')->count())->toBe(0);
 
     $upload = UploadedFile::fake()->create('clip.mp4', 1024, 'video/mp4');
 

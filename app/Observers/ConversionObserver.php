@@ -15,12 +15,20 @@ class ConversionObserver
 {
     public function updated(Conversion $conversion): void
     {
+        // A running job can still update a conversion whose row is gone (new
+        // upload in the same session, cleanup, expired session cascade).
+        // Eloquent fires "updated" even when no row matched, and recreating the
+        // statistic would then violate its foreign key.
+        if (! Conversion::whereKey($conversion->getKey())->exists()) {
+            return;
+        }
+
         $conversion->trackStatistic();
 
         ConversionUpdated::dispatch($conversion->id);
 
         if ($conversion->status === ConversionStatus::FINISHED) {
-            ConversionFinished::dispatch($conversion->file->session_id);
+            ConversionFinished::dispatch($conversion->session_id);
         }
     }
 

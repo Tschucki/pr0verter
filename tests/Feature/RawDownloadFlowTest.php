@@ -8,7 +8,6 @@ use App\Enums\SubtitleMode;
 use App\Jobs\DownloadVideoJob;
 use App\Models\Conversion;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\DB;
 
 beforeEach(function (): void {
     $this->withoutVite();
@@ -17,9 +16,8 @@ beforeEach(function (): void {
 it('stores a raw download conversion without any media operation settings', function (): void {
     Bus::fake([DownloadVideoJob::class]);
 
-    // conversions.session_id is FK-constrained to sessions.id, but the session
-    // is only persisted after the response — same workaround as ConverterFlowTest.
-    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    // conversions.session_id is FK-constrained to sessions.id: the controller
+    // stores the fresh session row before inserting the conversion.
 
     $response = $this
         ->from(route('home'))

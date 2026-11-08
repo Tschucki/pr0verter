@@ -6,6 +6,7 @@ use App\Enums\ConversionStatus;
 use App\Enums\SubtitleMode;
 use App\Enums\SubtitleStatus;
 use App\Events\DownloadProgress;
+use App\Exceptions\DownloadAbortedException;
 use App\Models\Conversion;
 use App\Models\File;
 use App\Services\Pr0verterYoutubeDl;
@@ -39,6 +40,10 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
     public function __construct(public string $conversionId)
     {
         $this->timeout = (int) config('converter.download.timeout') + self::POST_DOWNLOAD_BUFFER_SECONDS;
+
+        // The "downloader" supervisor waits long enough for a running download
+        // when Horizon scales workers down; the default one kills it after 60s.
+        $this->onQueue('downloader');
     }
 
     public function uniqueId(): string
@@ -55,9 +60,10 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
     {
         $conversion = Conversion::find($this->conversionId);
 
-        if ($conversion === null) {
+        if ($conversion === null || $conversion->status === ConversionStatus::CANCELED) {
             return;
         }
+
         try {
             $conversion->update([
                 'status' => ConversionStatus::DOWNLOADING,
@@ -66,8 +72,14 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
             $youtubeDl = app('pr0verter-yt-dlp');
 
             $lastProgressAt = null;
+            $aborted = false;
 
-            $youtubeDl->onProgress(function (?string $progressTarget, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null) use ($conversion, &$lastProgressAt): void {
+            $youtubeDl->onProgress(function (?string $progressTarget, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null) use ($conversion, &$lastProgressAt, &$aborted): void {
+                // The process destructor flushes the pipes once more after an abort.
+                if ($aborted) {
+                    return;
+                }
+
                 $isFinished = $percentage !== null && (float) $percentage >= 100.0;
 
                 // yt-dlp prints several progress lines per second; one update per interval is enough.
@@ -76,6 +88,12 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 }
 
                 $lastProgressAt = microtime(true);
+
+                if ($this->isCanceledOrDeleted()) {
+                    $aborted = true;
+
+                    throw new DownloadAbortedException('Download aborted for conversion ' . $conversion->id);
+                }
 
                 DownloadProgress::dispatch($conversion->id, $progressTarget, $percentage, $size, $speed, $eta, $totalTime);
             });
@@ -134,6 +152,12 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                     'conversion_id' => $conversion->id,
                     'error' => $errorMessage,
                 ]);
+
+                return;
+            }
+
+            if ($this->isCanceledOrDeleted()) {
+                \Illuminate\Support\Facades\File::delete($video->getFile()->getPathname());
 
                 return;
             }
@@ -197,6 +221,12 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
 
             ConversionJob::dispatch($conversion->id)->onQueue('converter');
         } catch (Throwable $th) {
+            // Canceled by the user or deleted meanwhile (new upload in the same
+            // session, cleanup, expired session): nothing left to report.
+            if ($th instanceof DownloadAbortedException || $this->isCanceledOrDeleted()) {
+                return;
+            }
+
             $conversion->update([
                 'status' => ConversionStatus::FAILED,
                 'error_message' => Str::limit($th->getMessage(), 250),
@@ -207,6 +237,28 @@ class DownloadVideoJob implements ShouldBeUnique, ShouldQueue
                 'error' => $th->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Runs when the worker gives up on the job (timeout, killed worker picked
+     * up again, max attempts) so the conversion does not hang in "downloading".
+     */
+    public function failed(?Throwable $exception): void
+    {
+        Conversion::whereKey($this->conversionId)
+            ->whereIn('status', [ConversionStatus::PENDING, ConversionStatus::DOWNLOADING])
+            ->first()
+            ?->update([
+                'status' => ConversionStatus::FAILED,
+                'error_message' => 'Der Download hat zu lange gedauert oder wurde unterbrochen.',
+            ]);
+    }
+
+    private function isCanceledOrDeleted(): bool
+    {
+        $status = Conversion::whereKey($this->conversionId)->first(['status'])?->status;
+
+        return $status === null || $status === ConversionStatus::CANCELED;
     }
 
     private function moveSubtitleToConversionsDisk(Conversion $conversion, string $subPath): string

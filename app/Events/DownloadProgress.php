@@ -42,8 +42,8 @@ class DownloadProgress implements ShouldBroadcast, ShouldQueue
     public function __construct(string $conversionId, ?string $progressTarget = null, ?string $percentage = null, ?string $size = null, ?string $speed = null, ?string $eta = null, ?string $totalTime = null)
     {
         $this->conversionId = $conversionId;
-        $conversion = Conversion::find($this->conversionId);
-        $this->sessionId = $conversion->session_id;
+        // Null when the conversion was deleted while the download was still running.
+        $this->sessionId = Conversion::whereKey($conversionId)->value('session_id');
         $this->progressTarget = $progressTarget;
         $this->percentage = $percentage;
         $this->size = $size;
@@ -51,6 +51,11 @@ class DownloadProgress implements ShouldBroadcast, ShouldQueue
         $this->speedInMegabytes = self::toMegabytesPerSecond($speed);
         $this->eta = $eta;
         $this->totalTime = $totalTime;
+    }
+
+    public function broadcastWhen(): bool
+    {
+        return $this->sessionId !== null;
     }
 
     public function broadcastOn(): array

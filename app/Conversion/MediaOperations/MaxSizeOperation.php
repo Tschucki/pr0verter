@@ -62,7 +62,9 @@ class MaxSizeOperation implements MediaFormatOperation
             $videoBitrateKbps = min($videoBitrateKbps, $originalVideoBitrateKbps);
         }
 
-        $kiloBitRate = (int) round($videoBitrateKbps);
+        // A source with a near-zero bitrate (still image, broken metadata) would
+        // round down to 0, which FFMpeg rejects as "Wrong kiloBitrate value".
+        $kiloBitRate = max(1, (int) round($videoBitrateKbps));
 
         Log::info('Bitrate calculation', [
             'conversion_id' => $this->conversion->id,
