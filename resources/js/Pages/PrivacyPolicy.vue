@@ -13,20 +13,6 @@ defineProps({
   </Head>
 
   <div
-    class="markdown prose mx-auto max-w-5xl grow py-6"
+    class="prose prose-invert mx-auto max-w-5xl grow py-6"
     v-html="content"></div>
-  <div class="markdown prose mx-auto max-w-5xl grow py-6"></div>
 </template>
-
-<style scoped>
-.markdown.prose * {
-  color: white !important;
-}
-
-.markdown.prose
-  :where(ul > li):not(
-    :where([class~='not-prose'], [class~='not-prose'] *)
-  )::marker {
-  color: white !important;
-}
-</style>

@@ -102,12 +102,29 @@
     --accent: 12 6.5% 15.1%;
     --accent-foreground: 60 9.1% 97.8%;
 
-    --destructive: 0 72.2% 50.6%;
+    /* HIG-Grundlagen (siehe CLAUDE.md): Fehlerrot auch als Textfarbe lesbar,
+       #ef4444 auf #161618 = 4,80:1 (vorher #dc2626 = 3,74:1). */
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
 
+    /* --border bleibt dekorativ (Karten, Trenner). --input umrandet
+       Bedienelemente (Felder, Switch aus) und braucht 3:1: #78716c = 3,77:1
+       (vorher #292524 = 1,19:1, Felder waren kaum zu sehen). */
     --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
+    --input: 25 5.3% 44.7%;
     --ring: 10 85% 55.7%;
+  }
+
+  /* Erhöhter Kontrast (macOS/iOS „Kontrast erhöhen“, Windows-Kontrastdesign):
+     gefüllte Buttons mit dunkler Schrift (#161618 auf Orange 4,96:1, auf
+     Rot 4,80:1), Nebentext und Trenner heller. */
+  @media (prefers-contrast: more) {
+    .dark {
+      --primary-foreground: 240 4% 9%;
+      --destructive-foreground: 240 4% 9%;
+      --muted-foreground: 30 6% 82%;
+      --border: 24 5% 45%;
+    }
   }
 }
 
@@ -118,5 +135,25 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Sichtbarer Tastaturfokus überall, auch an Links ohne eigene Ring-Klasse.
+     Orange auf #161618 = 4,96:1. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Bewegung reduzieren: Übergänge und Animationen aus. Ladespinner
+     drehen weiter, sie zeigen Fortschritt an. */
+  @media (prefers-reduced-motion: reduce) {
+    *:not(.animate-spin),
+    *:not(.animate-spin)::before,
+    *:not(.animate-spin)::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

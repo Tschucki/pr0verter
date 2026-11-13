@@ -24,7 +24,7 @@ const forwarded = useForwardProps(delegatedProps);
   <NumberFieldDecrement
     :class="
       cn(
-        'absolute top-1/2 left-0 -translate-y-1/2 p-3 disabled:cursor-not-allowed disabled:opacity-20',
+        'absolute top-1/2 left-0 -translate-y-1/2 p-3 disabled:cursor-not-allowed disabled:opacity-20 pointer-coarse:p-3.5',
         props.class
       )
     "

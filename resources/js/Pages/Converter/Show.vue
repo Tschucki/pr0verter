@@ -243,7 +243,7 @@ const removeFile = () => {
                 'border-primary': isOverDropZone,
                 'justify-center': !form.values.file,
               }"
-              class="relative flex h-60 shrink-0 items-center rounded-md border">
+              class="has-[input:focus-visible]:ring-ring relative flex h-60 shrink-0 items-center rounded-md border has-[input:focus-visible]:ring-2">
               <label
                 :class="{
                   'absolute inset-0': !form.values.file,
@@ -254,7 +254,7 @@ const removeFile = () => {
               <div
                 v-show="!form.values.file"
                 class="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                <CloudUpload class="size-8" />
+                <CloudUpload class="size-8" aria-hidden="true" />
                 <h3 class="mt-4 text-lg font-semibold">
                   {{
                     isOverDropZone
@@ -293,7 +293,14 @@ const removeFile = () => {
                   </div>
                 </div>
                 <div>
-                  <Trash2 class="size-6 cursor-pointer" @click="removeFile" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Datei entfernen"
+                    @click="removeFile">
+                    <Trash2 class="size-5!" aria-hidden="true" />
+                  </Button>
                 </div>
               </div>
               <FormControl>
@@ -393,9 +400,15 @@ const removeFile = () => {
               <FormControl>
                 <div
                   class="flex w-full flex-row items-center gap-x-4 lg:w-auto">
-                  <RotateCcw
-                    class="text-muted-foreground size-4 cursor-pointer"
-                    @click="resetAudioQuality" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    class="text-muted-foreground hover:text-foreground"
+                    aria-label="Audioqualität auf 100 % zurücksetzen"
+                    @click="resetAudioQuality">
+                    <RotateCcw aria-hidden="true" />
+                  </Button>
                   <NumberField
                     id="audioQuality"
                     class="w-full lg:w-auto"
@@ -684,13 +697,16 @@ const removeFile = () => {
         </FormField>
       </div>
       <p class="text-muted-foreground text-sm">
+        Alle Daten werden zum Ende der Session nach 2 Stunden vom Server
+        gelöscht. Metadaten werden anonymisiert für die Statistik gespeichert.
+        Bei Problemen oder Fragen schreib mir auf pr0gramm:
         <a
+          class="text-foreground underline underline-offset-4"
           target="_blank"
+          rel="noopener"
           href="https://pr0gramm.com/inbox/messages/PimmelmannJones"
-          >Alle Daten werden zum Ende der Session nach 2 Stunden vom Server
-          gelöscht. Metadaten werden anonymisiert für die Statistik gespeichert.
-          Bei Problemen oder Fragen schreib mir (PimmelmannJones) auf pr0gramm.
-        </a>
+          >PimmelmannJones</a
+        >.
       </p>
     </fieldset>
     <Button id="startConversionButton" type="submit">Konvertieren</Button>
