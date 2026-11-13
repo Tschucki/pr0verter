@@ -7,10 +7,10 @@ const props = defineProps({
 </script>
 
 <template>
-  <h3
+  <h2
     :class="
       cn('text-2xl leading-none font-semibold tracking-tight', props.class)
     ">
     <slot />
-  </h3>
+  </h2>
 </template>

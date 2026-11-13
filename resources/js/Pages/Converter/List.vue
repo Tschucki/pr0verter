@@ -1,5 +1,5 @@
 <script setup>
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 import {
@@ -17,7 +17,6 @@ import {
   StepperItem,
   StepperSeparator,
   StepperTitle,
-  StepperTrigger,
 } from '@/components/ui/stepper';
 import {
   Captions,
@@ -156,6 +155,34 @@ const subtitleTooltip = (status) => {
   }
 };
 
+// Vorlesetext zum Schritt-Symbol: Haken, Kreuz und Spinner nicht nur visuell.
+const stepState = (step) => {
+  if (step.completed) {
+    return 'Erledigt';
+  }
+  if (step.current_step) {
+    return 'Läuft';
+  }
+  return step.completed === false && step.current_step === false
+    ? 'Nicht ausgeführt'
+    : 'Ausstehend';
+};
+
+// Schritt-Symbol im Look eines runden Buttons, aber ohne Button-Rolle und
+// immer 36 px (kein Bedienelement, daher keine 44-px-Regel).
+const stepIconClass = (step) =>
+  cn(
+    buttonVariants({
+      variant: step.completed || step.current_step ? 'default' : 'outline',
+      size: 'icon',
+    }),
+    step.completed &&
+      step.current_step &&
+      'ring-ring ring-offset-background ring-2 ring-offset-2',
+    step.current_step === false && 'opacity-50',
+    'pointer-coarse:size-9 z-10 shrink-0 rounded-full'
+  );
+
 const formatQualityTier = (tier) => {
   const tiers = {
     ultra_hd: '4K Ultra HD (2160p)',
@@ -258,6 +285,8 @@ onMounted(() => {
                     conversion.subtitle_status
                   "
                   class="inline-flex items-center"
+                  role="img"
+                  :aria-label="subtitleTooltip(conversion.subtitle_status)"
                   :title="subtitleTooltip(conversion.subtitle_status)">
                   <Captions
                     v-if="
@@ -298,41 +327,28 @@ onMounted(() => {
                       "
                       class="bg-muted group-data-[state=completed]:bg-primary absolute top-[38px] left-[18px] block h-[105%] w-0.5 shrink-0 rounded-full" />
 
-                    <StepperTrigger as-child>
-                      <Button
-                        :class="[
-                          step.completed &&
-                            step.current_step &&
-                            'ring-ring ring-offset-background ring-2 ring-offset-2',
-                        ]"
-                        :disabled="step.current_step === false"
-                        :variant="
-                          step.completed || step.current_step
-                            ? 'default'
-                            : 'outline-solid'
+                    <div aria-hidden="true" :class="stepIconClass(step)">
+                      <Check v-if="step.completed" class="size-5" />
+                      <X
+                        v-else-if="
+                          step.completed === false &&
+                          step.current_step === false
                         "
-                        class="pointer-events-none z-10 shrink-0 rounded-full"
-                        size="icon">
-                        <Check v-if="step.completed" class="size-5" />
-                        <X
-                          v-else-if="
-                            step.completed === false &&
-                            step.current_step === false
-                          "
-                          class="size-5" />
-                        <Loader
-                          v-else-if="
-                            step.current_step && step.completed === false
-                          "
-                          class="size-5 animate-spin" />
-                        <Dot v-else />
-                      </Button>
-                    </StepperTrigger>
+                        class="size-5" />
+                      <Loader
+                        v-else-if="
+                          step.current_step && step.completed === false
+                        "
+                        class="size-5 animate-spin" />
+                      <Dot v-else />
+                    </div>
 
                     <div class="flex flex-col gap-1">
                       <StepperTitle
+                        as="h3"
                         :class="[step.current_step && 'text-primary']"
                         class="text-sm font-semibold transition lg:text-base">
+                        <span class="sr-only">{{ stepState(step) }}: </span>
                         {{ step.title }}
                       </StepperTitle>
                       <StepperDescription
@@ -384,34 +400,25 @@ onMounted(() => {
             </CardContent>
             <CardFooter>
               <div class="grid w-full grid-cols-1 gap-4">
-                <a
-                  :class="{
-                    'cursor-not-allowed': !conversion.downloadable,
-                    'w-full': true,
-                  }"
-                  :href="
-                    conversion.downloadable
-                      ? route('conversions.download', conversion.id)
-                      : null
-                  "
-                  target="_blank">
-                  <Button
+                <Button v-if="conversion.downloadable" as-child class="w-full">
+                  <a
                     id="download-button"
-                    :disabled="!conversion.downloadable"
-                    class="w-full">
-                    <Download
-                      v-if="conversion.downloadable"
-                      class="mr-2 h-4 w-4" />
-                    <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />
-                    {{ conversion.downloadable ? 'Datei herunterladen' : '' }}
-                  </Button>
-                </a>
+                    :href="route('conversions.download', conversion.id)"
+                    target="_blank">
+                    <Download aria-hidden="true" />
+                    Datei herunterladen
+                  </a>
+                </Button>
+                <Button v-else id="download-button" disabled class="w-full">
+                  <Loader2 class="animate-spin" aria-hidden="true" />
+                  Datei wird vorbereitet …
+                </Button>
                 <Button
                   :disabled="!conversion.downloadable"
                   class="w-full"
                   variant="outline"
                   @click="togglePublic(conversion)">
-                  <LinkIcon class="mr-2 size-4"></LinkIcon>
+                  <LinkIcon aria-hidden="true" />
                   {{
                     conversion.public === false
                       ? 'Link öffentlich machen & kopieren'
@@ -426,7 +433,7 @@ onMounted(() => {
                   class="w-full"
                   variant="outline"
                   @click="cancelConversion(conversion)">
-                  <StopCircle class="mr-2 size-4"></StopCircle>
+                  <StopCircle aria-hidden="true" />
                   Konvertierung abbrechen
                 </Button>
                 <p class="text-muted-foreground text-sm">
@@ -434,8 +441,9 @@ onMounted(() => {
                   eingegeben werden.
                   <a
                     target="_blank"
+                    rel="noopener"
                     href="https://pr0gramm.com/upload"
-                    class="text-primary"
+                    class="text-primary underline underline-offset-4"
                     >Direkt zum Upload</a
                   >
                 </p>
@@ -451,11 +459,9 @@ onMounted(() => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Link :href="route('home')">
-            <Button class="mt-4" type="button">
-              Neue Konvertierung starten
-            </Button>
-          </Link>
+          <Button as-child class="mt-4">
+            <Link :href="route('home')">Neue Konvertierung starten</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

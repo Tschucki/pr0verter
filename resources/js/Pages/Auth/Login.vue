@@ -50,9 +50,12 @@ const onSubmit = () => {
           class="mt-1"
           required />
       </Label>
-      <span v-if="form.errors.email" class="text-red-600">{{
-        form.errors.email
-      }}</span>
+      <p
+        v-if="form.errors.email"
+        role="alert"
+        class="text-destructive text-sm font-medium">
+        {{ form.errors.email }}
+      </p>
       <Button type="submit" class="mt-4 w-full">Login</Button>
     </fieldset>
   </form>
